@@ -2,3 +2,4 @@ data/raw
 *.csv
 *.pyc
 *.png
+*.pickle
