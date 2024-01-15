@@ -1,0 +1,43 @@
+[STATUS] Running train.py with arguments: Namespace(file_path='/home/FYP/siddhant005/fyp/data/processed/ml-1m/', out_path='/home/FYP/siddhant005/fyp/src/out/tmp/', L=11, H=3, epoch_num=20, topk=20, batch_size=1024, learning_rate=0.001, l2=0.001, neg_samples=3, sets_of_neg_samples=50, dim=30, conv_layer_num=2, adj_dropout=0, num_bases=2, verbose=True)
+====================================================================================================
+[INFO] device: cuda 
+====================================================================================================
+[STATUS] Data preprocessing completed
+[INFO] uid2locid_time: 4247 
+[INFO] locid2detail: 3116 
+[INFO] node_num: 7368 
+[INFO] relation_num: 6 
+[INFO] user_num: 4247 
+[INFO] train_num: 29729 
+[INFO] test_num: 4247 
+[INFO] train_set: (29729, 14) 
+[INFO] test_set: (4247, 11) 
+[INFO] uid_list_: 4247 
+[INFO] u2v: 4247 
+[INFO] u2vc: 4247 
+[INFO] v2u: 3116 
+[INFO] v2vc: 3116 
+====================================================================================================
+[STATUS] Commencing training for RetaGNN
+Epoch [1/20]:	Precision@10: 0.0616	Recall@10:  0.0308	MAP@10: 0.0255	NDCG@10: 0.0659
+Epoch [2/20]:	Precision@10: 0.0702	Recall@10:  0.0351	MAP@10: 0.0307	NDCG@10: 0.0745
+Epoch [3/20]:	Precision@10: 0.0643	Recall@10:  0.0322	MAP@10: 0.0280	NDCG@10: 0.0688
+Epoch [4/20]:	Precision@10: 0.0673	Recall@10:  0.0336	MAP@10: 0.0278	NDCG@10: 0.0699
+Epoch [5/20]:	Precision@10: 0.0688	Recall@10:  0.0344	MAP@10: 0.0284	NDCG@10: 0.0707
+Epoch [6/20]:	Precision@10: 0.0688	Recall@10:  0.0344	MAP@10: 0.0274	NDCG@10: 0.0689
+Epoch [7/20]:	Precision@10: 0.0666	Recall@10:  0.0333	MAP@10: 0.0279	NDCG@10: 0.0676
+Epoch [8/20]:	Precision@10: 0.0662	Recall@10:  0.0331	MAP@10: 0.0278	NDCG@10: 0.0673
+Epoch [9/20]:	Precision@10: 0.0692	Recall@10:  0.0346	MAP@10: 0.0281	NDCG@10: 0.0698
+Epoch [10/20]:	Precision@10: 0.0663	Recall@10:  0.0331	MAP@10: 0.0297	NDCG@10: 0.0714
+Epoch [11/20]:	Precision@10: 0.0753	Recall@10:  0.0376	MAP@10: 0.0283	NDCG@10: 0.0751
+Epoch [12/20]:	Precision@10: 0.0747	Recall@10:  0.0373	MAP@10: 0.0290	NDCG@10: 0.0744
+Epoch [13/20]:	Precision@10: 0.0759	Recall@10:  0.0380	MAP@10: 0.0296	NDCG@10: 0.0763
+Epoch [14/20]:	Precision@10: 0.0699	Recall@10:  0.0350	MAP@10: 0.0280	NDCG@10: 0.0727
+Epoch [15/20]:	Precision@10: 0.0765	Recall@10:  0.0383	MAP@10: 0.0298	NDCG@10: 0.0776
+Epoch [16/20]:	Precision@10: 0.0788	Recall@10:  0.0394	MAP@10: 0.0318	NDCG@10: 0.0832
+Epoch [17/20]:	Precision@10: 0.0791	Recall@10:  0.0395	MAP@10: 0.0309	NDCG@10: 0.0822
+Epoch [18/20]:	Precision@10: 0.0801	Recall@10:  0.0400	MAP@10: 0.0297	NDCG@10: 0.0805
+Epoch [19/20]:	Precision@10: 0.0845	Recall@10:  0.0423	MAP@10: 0.0300	NDCG@10: 0.0819
+Epoch [20/20]:	Precision@10: 0.0858	Recall@10:  0.0429	MAP@10: 0.0321	NDCG@10: 0.0845
+====================================================================================================
+[STATUS] Training completed successfully
