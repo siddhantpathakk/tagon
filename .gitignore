@@ -3,4 +3,8 @@ data/raw
 *.pyc
 *.png
 *.pickle
+*.pkl
 *.tsv
+*.txt
+data/processed/ml-100k/ml_100k_main1_data.pickle
+data/processed/ml-100k/ml_100k_main2_data.pickle
