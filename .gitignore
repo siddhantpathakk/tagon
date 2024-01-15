@@ -3,3 +3,4 @@ data/raw
 *.pyc
 *.png
 *.pickle
+*.tsv
