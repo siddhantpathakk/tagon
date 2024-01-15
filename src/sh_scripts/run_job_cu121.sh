@@ -11,4 +11,4 @@
 module load anaconda
 module load cuda/12.1
 source activate retagnn_pyg
-/home/FYP/siddhant005/.conda/envs/retagnn_pyg/bin/python /home/FYP/siddhant005/fyp/src/main.py
+/home/FYP/siddhant005/.conda/envs/retagnn_pyg/bin/python /home/FYP/siddhant005/fyp/src/main.py 
