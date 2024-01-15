@@ -111,11 +111,11 @@ class DataCollector:
                 'locid2detail':locid2detail,
                 'uid2attr':uid2attr,
             }
-            file = open(self.file_path + 'ml_100k_main1_data.pickle', 'wb')
+            file = open(self.file_path + 'ml_main1_data.pickle', 'wb')
             pickle.dump(ig_main1_data, file)
             file.close()   
         else:
-            with open(self.file_path + 'ml_100k_main1_data.pickle', 'rb') as file:
+            with open(self.file_path + 'ml_main1_data.pickle', 'rb') as file:
                 ig_main1_data = pickle.load(file)
             uid2locid_time = ig_main1_data['uid2locid_time']
             locid2detail = ig_main1_data['locid2detail']
@@ -259,11 +259,11 @@ class DataCollector:
                 'relation_num':relation_num,
                 'uid2attr':uid2attr,
             }
-            file = open(self.file_path + 'ml_100k_main2_data.pickle', 'wb')
+            file = open(self.file_path + 'ml_main2_data.pickle', 'wb')
             pickle.dump(ig_main2_data, file)
             file.close()       
         else:
-            with open(self.file_path + 'ml_100k_main2_data.pickle', 'rb') as file:
+            with open(self.file_path + 'ml_main2_data.pickle', 'rb') as file:
                 ig_main2_data = pickle.load(file)
             uid2locid_time = ig_main2_data['uid2locid_time']
             locid2detail = ig_main2_data['locid2detail']
