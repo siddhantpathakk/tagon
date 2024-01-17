@@ -76,14 +76,14 @@ NODE_DIM = args.node_dim
 TIME_DIM = args.time_dim
 
 
-MODEL_SAVE_PATH = f'./saved_models/{args.prefix}-{args.agg_method}-{args.attn_mode}-{args.data}.pth'
+MODEL_SAVE_PATH = f'/home/FYP/siddhant005/fyp/experiments/tgsrec/src/saved_models/{args.prefix}-{args.agg_method}-{args.attn_mode}-{args.data}.pth'
 get_checkpoint_path = lambda epoch: f'./saved_checkpoints/{args.prefix}-{args.agg_method}-{args.attn_mode}-{args.data}-{epoch}.pth'
 
 ### set up logger
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
-fh = logging.FileHandler('log/{}.log'.format(str(time.time())))
+fh = logging.FileHandler('/home/FYP/siddhant005/fyp/experiments/tgsrec/src/log/{}.log'.format(str(time.time())))
 fh.setLevel(logging.DEBUG)
 ch = logging.StreamHandler()
 ch.setLevel(logging.WARN)
@@ -95,13 +95,13 @@ logger.addHandler(ch)
 logger.info(args)
 
 
-RANK_RESULTS_DIR = f"./rank_results/{args.data}"
+RANK_RESULTS_DIR = f"/home/FYP/siddhant005/fyp/experiments/tgsrec/src/rank_results/{args.data}"
 if not os.path.isdir(RANK_RESULTS_DIR):
     os.mkdir(RANK_RESULTS_DIR)
 RANK_RESULTS_FILE = RANK_RESULTS_DIR + f"/{args.bs}_{args.n_degree}_{args.n_epoch}_{args.n_head}_{args.drop_out}_{args.time}_{args.n_layer}_{NUM_NEIGHBORS}_{args.node_dim}_{args.time_dim}_{args.lr}"
 
 
-SAVE_MODEL_DIR = f"./saved_models/{args.data}"
+SAVE_MODEL_DIR = f"/home/FYP/siddhant005/fyp/experiments/tgsrec/src/saved_models/{args.data}"
 if not os.path.isdir(SAVE_MODEL_DIR):
     os.mkdir(SAVE_MODEL_DIR)
 SAVE_MODEL_PATH = SAVE_MODEL_DIR + f"/checkpoint.{args.bs}_{args.n_degree}_{args.n_epoch}_{args.n_head}_{args.drop_out}_{args.time}_{args.n_layer}_{NUM_NEIGHBORS}_{args.node_dim}_{args.time_dim}_{args.lr}.pth.tar"
