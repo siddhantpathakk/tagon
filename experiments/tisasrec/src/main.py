@@ -4,9 +4,9 @@ import torch
 import pickle
 import argparse
 
-from experiments.tisasrec.model import TiSASRec
+from model import TiSASRec
 from tqdm import tqdm
-from experiments.tisasrec.utils import *
+from utils import *
 
 def str2bool(s):
     if s not in {'false', 'true'}:
@@ -48,10 +48,10 @@ print('average sequence length: %.2f' % (cc / len(user_train)))
 f = open(os.path.join(args.dataset + '_' + args.train_dir, 'log.txt'), 'w')
 
 try:
-    relation_matrix = pickle.load(open('data/relation_matrix_%s_%d_%d.pickle'%(args.dataset, args.maxlen, args.time_span),'rb'))
+    relation_matrix = pickle.load(open('/home/FYP/siddhant005/fyp/experiments/tisasrec/data/relation_matrix_%s_%d_%d.pickle'%(args.dataset, args.maxlen, args.time_span),'rb'))
 except:
     relation_matrix = Relation(user_train, usernum, args.maxlen, args.time_span)
-    pickle.dump(relation_matrix, open('data/relation_matrix_%s_%d_%d.pickle'%(args.dataset, args.maxlen, args.time_span),'wb'))
+    pickle.dump(relation_matrix, open('/home/FYP/siddhant005/fyp/experiments/tisasrec/data/relation_matrix_%s_%d_%d.pickle'%(args.dataset, args.maxlen, args.time_span),'wb'))
 
 sampler = WarpSampler(user_train, usernum, itemnum, relation_matrix, batch_size=args.batch_size, maxlen=args.maxlen, n_workers=3)
 model = TiSASRec(usernum, itemnum, itemnum, args).to(args.device)

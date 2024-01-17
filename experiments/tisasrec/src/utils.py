@@ -151,7 +151,7 @@ def data_partition(fname):
     user_test = {}
     
     print('Preparing data...')
-    f = open('data/%s.txt' % fname, 'r')
+    f = open('/home/FYP/siddhant005/fyp/experiments/tisasrec/data/%s.txt' % fname, 'r')
     time_set = set()
 
     user_count = defaultdict(int)
@@ -166,7 +166,7 @@ def data_partition(fname):
         user_count[u]+=1
         item_count[i]+=1
     f.close()
-    f = open('data/%s.txt' % fname, 'r') # try?...ugly data pre-processing code
+    f = open('/home/FYP/siddhant005/fyp/experiments/tisasrec/data/%s.txt' % fname, 'r') # try?...ugly data pre-processing code
     for line in f:
         try:
             u, i, rating, timestamp = line.rstrip().split('\t')
