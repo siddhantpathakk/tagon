@@ -120,7 +120,7 @@ np.random.seed(2020)
 
 
 ### Model initialize
-device = torch.device('cuda:{}'.format(GPU))
+device = torch.device('cuda:{}'.format(GPU)) if torch.cuda.is_available() else torch.device('cpu')
 n_nodes = data.max_idx
 print(n_nodes, "n nodes")
 n_edges = data.num_total_edges

@@ -8,7 +8,7 @@ class Data():
 
     def __init__(self, DATASET, args):
         ### Load data and train val test split
-        g_df = pd.read_csv('./processed/ml_{}.csv'.format(DATASET))
+        g_df = pd.read_csv('/home/FYP/siddhant005/fyp/experiments/tgsrec/processed/ml_{}.csv'.format(DATASET))
         self.split_data(g_df, args)
 
 

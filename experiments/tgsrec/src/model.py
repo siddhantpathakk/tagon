@@ -524,7 +524,7 @@ class TGRec(torch.nn.Module):
     def tem_conv(self, src_idx_l, cut_time_l, curr_layers, num_neighbors=20):
         assert(curr_layers >= 0)
         
-        device = torch.device('cuda:{}'.format(0))
+        device = torch.device('cuda:{}'.format(0)) if torch.cuda.is_available() else torch.device('cpu')
     
         batch_size = len(src_idx_l)
         
