@@ -10,4 +10,4 @@
 
 module load anaconda
 source activate tisasrec
-python3 main.py --dataset=ml-1m --train_dir=default --device=cuda
+/home/FYP/siddhant005/.conda/envs/tisasrec/bin/python3 /home/FYP/siddhant005/fyp/experiments/tisasrec/src/main.py --dataset=ml-1m --train_dir=default --device=cuda

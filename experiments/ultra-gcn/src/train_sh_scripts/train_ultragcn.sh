@@ -10,4 +10,4 @@
 
 module load anaconda
 source activate ultragcn
-python /home/FYP/siddhant005/fyp/experiments/ultra-gcn/src/main.py --config_file /home/FYP/siddhant005/fyp/experiments/ultra-gcn/src/config/ultragcn_movielens1m_m1.ini --dataset movielens
+/home/FYP/siddhant005/.conda/envs/ultragcn/bin/python3 /home/FYP/siddhant005/fyp/experiments/ultra-gcn/src/main.py --config_file /home/FYP/siddhant005/fyp/experiments/ultra-gcn/src/config/ultragcn_movielens1m_m1.ini --dataset movielens

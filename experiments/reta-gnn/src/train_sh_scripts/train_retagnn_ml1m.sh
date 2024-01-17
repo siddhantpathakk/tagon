@@ -10,5 +10,5 @@
 
 module load anaconda
 module load cuda/12.1
-source activate retagnn
-python3 /home/FYP/siddhant005/fyp/experiments/reta-gnn/src/main.py --file_path /home/FYP/siddhant005/fyp/experiments/reta-gnn/data/processed/ml-1m/
+source activate retagnn_pyg
+home/FYP/siddhant005/.conda/envs/retagnn_pyg/bin/python3 /home/FYP/siddhant005/fyp/experiments/reta-gnn/src/main.py --file_path /home/FYP/siddhant005/fyp/experiments/reta-gnn/data/processed/ml-1m/
