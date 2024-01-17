@@ -39,8 +39,8 @@ def data_param_prepare(config_file):
     train_file_path = config['Training']['train_file_path']
     gpu = config['Training']['gpu']
     params['gpu'] = gpu
-    # device = torch.device('cuda'+ params['gpu'] if torch.cuda.is_available() else "cpu")
-    device = torch.device('cuda') 
+    device = torch.device('cuda' if torch.cuda.is_available() else "cpu")
+    # device = torch.device('cuda') 
     params['device'] = device
     lr = config.getfloat('Training', 'learning_rate')
     params['lr'] = lr
@@ -286,6 +286,7 @@ class UltraGCN(nn.Module):
         #     pos_weight = self.w1 * torch.ones(len(pos_items)).to(device)
         
         # users = (users * self.item_num).unsqueeze(0)
+        
         if self.w4 > 0:
             neg_weight = torch.mul(torch.repeat_interleave(self.constraint_mat['beta_uD'][users.cpu()], neg_items.size(1)), self.constraint_mat['beta_iD'][neg_items.cpu().flatten()]).to(device)
             neg_weight = self.w3 + self.w4 * neg_weight
@@ -553,13 +554,8 @@ if __name__ == "__main__":
 
     print('###################### UltraGCN ######################')
 
-    # args = {
-    #     'config_file': './config/ultragcn_yelp18_m1.ini',
-    #     'dataset': None
-    # }
-
     print('Loading Configuration...')
-    params, constraint_mat, ii_constraint_mat, ii_neighbor_mat, train_loader, test_loader, mask, test_ground_truth_list, interacted_items = data_param_prepare(args['config_file'])
+    params, constraint_mat, ii_constraint_mat, ii_neighbor_mat, train_loader, test_loader, mask, test_ground_truth_list, interacted_items = data_param_prepare(args.config_file)
 
     print('Load Configuration OK, show them below')
     print('Configuration:')
