@@ -2,7 +2,7 @@
 #SBATCH --partition=SCSEGPU_UG
 #SBATCH --gres=gpu:1
 #SBATCH --nodes=1
-#SBATCH --qos=normal
+#SBATCH --qos=q_ug48
 #SBATCH --mem=20G
 #SBATCH --output=/home/FYP/siddhant005/fyp/code/src/logs/%x_%j.out
 #SBATCH --error=/home/FYP/siddhant005/fyp/code/src/logs/err/%x_%j.err
