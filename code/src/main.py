@@ -58,9 +58,9 @@ def parse_opt():
     parser.add_argument('--TSAL_head_num', type=int, default=2)
     parser.add_argument('--TSAL_attn_drop', type=float, default=0.1)
     
-    # User Attention based parameters
-    parser.add_argument('--user_attn_head_num', type=int, default=2)
-    parser.add_argument('--user_attn_drop', type=float, default=0.1)
+    # Cross attention based parameters
+    parser.add_argument('--cross_attn_head_num', type=int, default=2)
+    parser.add_argument('--cross_attn_drop', type=float, default=0.1)
     
     # other parameters
     parser.add_argument('--verbose', type=str2bool, nargs='?', const=True, default=False)

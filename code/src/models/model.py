@@ -4,7 +4,6 @@ from torch.autograd import Variable
 import torch.nn.functional as F
 
 from models.feed_forward import PointWiseFeedForward
-from models.UserAttentionLayer import UserAttentionLayer
 
 class GNN_SR_Net(nn.Module):
     def __init__(self, config, item_num, node_num, relation_num, gcn, device):
@@ -45,21 +44,26 @@ class GNN_SR_Net(nn.Module):
         self.TSAL_dim = (conv_layer_num+short_term_conv_layer_num) * dim
         self.head_num = self.arg.TSAL_head_num
         self.attn_drop = self.arg.TSAL_attn_drop
-         
+        self.drop_layer = nn.Dropout(p=self.attn_drop)
+
         self.TSAL_W_Q = Variable(torch.zeros(self.TSAL_dim,self.TSAL_dim).type(torch.FloatTensor), requires_grad=True).to(device)
         self.TSAL_W_K = Variable(torch.zeros(self.TSAL_dim,self.TSAL_dim).type(torch.FloatTensor), requires_grad=True).to(device)
         self.TSAL_W_V = Variable(torch.zeros(self.TSAL_dim,self.TSAL_dim).type(torch.FloatTensor), requires_grad=True).to(device)
 
-        self.drop_layer = nn.Dropout(p=self.attn_drop)
+        # Cross Attention Layer
+        self.CAL_dim = (conv_layer_num+short_term_conv_layer_num) * dim
+        self.CAL_head_num = self.arg.cross_attn_head_num
+        self.CAL_drop = self.arg.cross_attn_drop
+        self.CAL_drop_layer = nn.Dropout(p=self.attn_drop)
+        
+        self.CAL_W_Q = Variable(torch.zeros(self.CAL_dim,self.CAL_dim).type(torch.FloatTensor), requires_grad=True).to(device)
+        self.CAL_W_K = Variable(torch.zeros(self.CAL_dim,self.CAL_dim).type(torch.FloatTensor), requires_grad=True).to(device)
+        self.CAL_W_V = Variable(torch.zeros(self.CAL_dim,self.CAL_dim).type(torch.FloatTensor), requires_grad=True).to(device)
+
         self.feedforward = nn.Sequential(
             PointWiseFeedForward(self.TSAL_dim, self.attn_drop), # (default) nn.Sequential(nn.Linear(self.TSAL_dim, self.TSAL_dim))
             torch.nn.LayerNorm(self.TSAL_dim, eps=1e-8),
         )   
-        
-        # User Attention Layer setting
-        self.user_attn_layer = UserAttentionLayer(self.arg, 
-                                                  dim = (conv_layer_num+short_term_conv_layer_num) * dim,
-                                                  device=device).to(self.device)
      
         # reset parameters
         self.reset_parameters()
@@ -68,9 +72,14 @@ class GNN_SR_Net(nn.Module):
         self.predict_emb_w.weight.data.normal_(0, 1.0 / self.predict_emb_w.embedding_dim)
         self.predict_emb_b.weight.data.zero_()
         self.node_embeddings.weight.data.normal_(0, 1.0 / self.node_embeddings.embedding_dim)
+        
         self.TSAL_W_Q = nn.init.xavier_uniform_(self.TSAL_W_Q)
         self.TSAL_W_K = nn.init.xavier_uniform_(self.TSAL_W_K)
         self.TSAL_W_V = nn.init.xavier_uniform_(self.TSAL_W_V)
+        
+        self.CAL_W_Q = nn.init.xavier_uniform_(self.CAL_W_Q)
+        self.CAL_W_K = nn.init.xavier_uniform_(self.CAL_W_K)
+        self.CAL_W_V = nn.init.xavier_uniform_(self.CAL_W_V)
         
     def Temporal_Attention_Layer(self,input_tensor):
         time_step = input_tensor.size()[1]
@@ -104,6 +113,37 @@ class GNN_SR_Net(nn.Module):
 
         return output_tensor
 
+    def CrossAttention_Layer(self, user_emb, item_emb):
+        time_step = item_emb.size()[1]
+        
+        user_emb = user_emb.unsqueeze(1)
+        
+        Q_tensor = torch.matmul(item_emb, self.CAL_W_Q)  #(N,T,input_dim)->(N,T,input_dim)
+        K_tensor = torch.matmul(user_emb, self.CAL_W_K)  #(N,T,input_dim)->(N,T,input_dim)
+        V_tensor = torch.matmul(user_emb, self.CAL_W_V)  #(N,T,input_dim)->(N,T,input_dim)
+        
+        Q_tensor_ = torch.cat(torch.split(Q_tensor, int(self.CAL_dim/self.CAL_head_num), 2), 0)   #(N,T,input_dim)->(N*head_num,T,input_dim/head_num)
+        K_tensor_ = torch.cat(torch.split(K_tensor, int(self.CAL_dim/self.CAL_head_num), 2), 0)   #(N,T,input_dim)->(N*head_num,T,input_dim/head_num)
+        V_tensor_ = torch.cat(torch.split(V_tensor, int(self.CAL_dim/self.CAL_head_num), 2), 0)   #(N,T,input_dim)->(N*head_num,T,input_dim/head_num)
+
+        output_tensor = torch.matmul(Q_tensor_,K_tensor_.permute(0,2,1)) #(N*head_num,T,input_dim/head_num)->(N*head_num,T,T)
+        output_tensor = output_tensor/(time_step ** 0.5)
+
+        diag_val = torch.ones_like(output_tensor[0,:,:]).to(self.device) #(T,T)
+        tril_tensor = torch.tril(diag_val).unsqueeze(0) #(T,T)->(1,T,T),where tril is lower_triangle matx.
+        masks = tril_tensor.repeat(output_tensor.size()[0],1,1) #(1,T,T)->(N*head_num,T,T)
+        padding = torch.ones_like(masks) * (-2 ** 32 + 1) 
+        output_tensor = torch.where(masks.eq(0),padding,output_tensor) #(N*head_num,T,T),where replace lower_trianlge 0 with 1.
+        output_tensor= F.softmax(output_tensor,1) 
+        self.CAL_attn = output_tensor
+
+        output_tensor = self.CAL_drop_layer(output_tensor) 
+        N = output_tensor.size()[0]
+        output_tensor = torch.matmul(output_tensor, V_tensor_) #(N*head_num,T,T),(N*head_num,T,input_dim/head_num)->(N*head_num,T,input_dim/head_num)
+        output_tensor = torch.cat(torch.split(output_tensor,int(N/self.CAL_head_num),0),-1) #(N*head_num,T,input_dim/head_num) -> (N,T,input_dim)
+
+        return output_tensor
+
     def forward(self,X_user_item,X_graph_base,for_pred=False):
         batch_users, batch_sequences, items_to_predict = X_user_item[0], X_user_item[1], X_user_item[2]
         edge_index, edge_type, node_no, short_term_part = X_graph_base[0], X_graph_base[1], X_graph_base[2], X_graph_base[3]
@@ -126,12 +166,12 @@ class GNN_SR_Net(nn.Module):
             concat_states.append((1-self.lambda_val)* x)
  
         concat_states = torch.cat(concat_states, 1)
-        user_emb_conv = concat_states[batch_users]
-        item_embs_conv = concat_states[batch_sequences] 
-        
+        user_emb = concat_states[batch_users]
+        item_embs_conv = concat_states[batch_sequences]
         item_embs = self.Temporal_Attention_Layer(item_embs_conv)
-        user_emb = self.user_attn_layer(user_emb_conv) ## NEW!
-
+        item_embs_2 = self.CrossAttention_Layer(user_emb, item_embs)
+        # print(item_embs.size(), item_embs_2.size())
+        
         '''
         user_emb : shape(bz,dim)
         item_embs : shape(bz,L,dim)
