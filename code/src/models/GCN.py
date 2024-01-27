@@ -120,8 +120,6 @@ class GCN(MessagePassing):
         if self.bias is not None:
             aggr_out = aggr_out + self.bias
             
-        ## LOGIC FOR TIME INTERVAL ACCUMULATION
-
         return aggr_out
 
     def __repr__(self):

@@ -27,38 +27,38 @@ def parse_opt():
 
     # data based parameters
     parser.add_argument('--L', type=int, default=11)
-    parser.add_argument('--H', type=int, default=2)
+    parser.add_argument('--H', type=int, default=3)
     parser.add_argument('--topk', type=int, default=20)
     
     # model training based parameters
     parser.add_argument('--epoch_num', type=int, default=100)
     parser.add_argument('--learning_rate', type=float, default=1e-3)
-    parser.add_argument('--l2', type=float, default=1e-5)
+    parser.add_argument('--l2', type=float, default=1e-4)
     
     # negative sampling parameters
-    parser.add_argument('--neg_samples', type=int, default=3)
+    parser.add_argument('--neg_samples', type=int, default=2)
     parser.add_argument('--sets_of_neg_samples', type=int, default=50)
     
     # GCN based parameters
     parser.add_argument('--dim', type=int, default=32)
-    parser.add_argument('--conv_layer_num', type=int, default=2)
-    parser.add_argument('--short_term_conv_layer_num', type=int, default=3)
-    parser.add_argument('--num_bases', type=int, default=2)
+    parser.add_argument('--conv_layer_num', type=int, default=3)
+    parser.add_argument('--short_term_conv_layer_num', type=int, default=4)
+    parser.add_argument('--num_bases', type=int, default=3)
     parser.add_argument('--adj_dropout', type=int, default=0)
     parser.add_argument('--lambda_val', type=float, default=0.5)
 
     # TSAL based parameters
     parser.add_argument('--TSAL_head_num', type=int, default=2)
-    parser.add_argument('--TSAL_attn_drop', type=float, default=0.1)
+    parser.add_argument('--TSAL_attn_drop', type=float, default=0.0)
     
     # Cross attention based parameters
     parser.add_argument('--cross_attn_head_num', type=int, default=2)
-    parser.add_argument('--cross_attn_drop', type=float, default=0.1)
+    parser.add_argument('--cross_attn_drop', type=float, default=0.0)
     
     # other parameters
     parser.add_argument('--verbose', type=str2bool, nargs='?', const=True, default=False)
     parser.add_argument('--debug', type=str2bool, nargs='?', const=True, default=False)
-    parser.add_argument('--seed', type=int, default=42)
+    parser.add_argument('--seed', type=int, default=123456)
     return parser.parse_args()
 
 if __name__ == '__main__':
@@ -67,7 +67,7 @@ if __name__ == '__main__':
     
     if config.dataset == 'ml100k':
         config.file_path = '/home/FYP/siddhant005/fyp/code/data/processed/ml-100k/'
-        config.batch_size = 256
+        config.batch_size = 128
     elif config.dataset == 'ml1m':
         config.file_path = '/home/FYP/siddhant005/fyp/code/data/processed/ml-1m/'
         config.batch_size = 512

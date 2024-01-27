@@ -36,9 +36,9 @@ class DataCollector:
         for ny_demo_i in self.demo[1:]:
             ny_demo_i = ny_demo_i.decode('utf-8').split(',')
             uid_, age_, gender_ = ny_demo_i[0],int(ny_demo_i[1]),int(ny_demo_i[2])
-            if age_ <= 20:
+            if age_ <= 25:
                 age_ = 1
-            elif  age_ > 20 and age_ <= 40:
+            elif  age_ > 25 and age_ <= 35:
                 age_ = 2
             else:
                 age_ = 3
@@ -242,7 +242,7 @@ class DataCollector:
             
             uid_list_,user_np,seq_train,seq_test,test_set = self._seq_data_building_(old_uid_list_,uid2locid_time)
             u2v,u2vc,v2u,v2vc = self._edge_building_(uid_list_,uid2locid_time,locid2detail)
-            relation_num =  6 #u_vc,u,v,v_vc
+            relation_num =  4 #u_vc,u,v,v_vc
             ig_main2_data = {
                 'uid2locid_time':uid2locid_time,
                 'locid2detail':locid2detail,

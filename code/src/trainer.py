@@ -19,7 +19,10 @@ class Trainer:
         self.device = device
         self.arg = config
         self.node_num = node_num
-        self.optimizer = torch.optim.Adam(self.gnn_sr_model.parameters(),lr=config.learning_rate,weight_decay=config.l2)
+        self.optimizer = torch.optim.Adam(self.gnn_sr_model.parameters(), 
+                                          lr=config.learning_rate, 
+                                          weight_decay=config.l2,
+                                          )
         self.short_term_window_num = 3
  
     def Negative_Sampling(self,user2item,batch_users,item_set):
@@ -261,13 +264,14 @@ class Trainer:
             else:
                 self.pred_list = np.append(self.pred_list, batch_pred_list, axis=0)
 
-        precision, recall, MAP, ndcg = [], [], [], []
+        precision, recall, MAP, ndcg, hr = [], [], [], [], []
         for k in [10, 20]:
             precision.append(precision_at_k(test_set, self.pred_list, k))
             recall.append(recall_at_k(test_set, self.pred_list, k))
             MAP.append(mapk(test_set, self.pred_list, k))
             ndcg.append(ndcg_k(test_set, self.pred_list, k))
-        return precision, recall, MAP, ndcg
+            hr.append(hit_ratio_at_k(test_set, self.pred_list, k))
+        return precision, recall, MAP, ndcg, hr
 
     def Eval_Draw_Graph_(self,users_np_test,sequences_np_test,test_set,uid2locid_time,threshold_rate=0.8,restrict_user_num=100):
         uid2locid = dict()
@@ -476,7 +480,7 @@ class Trainer:
         short_term_window_size = int(self.arg.L / self.short_term_window_num)
         short_term_window = [0] + [i + short_term_window_size for i in range(self.short_term_window_num-1)] + [-1]
 
-        print('Epoch\tLoss\t\tP@10\tR@10\tMAP@10\tNDCG@10\t\tP@20\tR@20\tMAP@20\tNDCG@20')
+        print('Epoch\tLoss\t\tP@10\tR@10\tMAP@10\tNDCG@10\tHR@10\t\tP@20\tR@20\tMAP@20\tNDCG@20\tHR@20')
 
         for epoch_ in range(self.arg.epoch_num):
             self.gnn_sr_model.train()
@@ -515,33 +519,36 @@ class Trainer:
                 X_graph_base = [edge_index,edge_type,node_no,short_term_part]
 
                 pred_score,user_emb,item_embs_conv = self.gnn_sr_model(X_user_item,X_graph_base,for_pred=False)
+                # print(pred_score.shape)
+                # print('pred_score',pred_score)
                 user_emd_batch_list.append(user_emb)
                 item_emd_batch_list.append(item_embs_conv)
 
                 (targets_pred, negatives_pred) = torch.split(pred_score, [batch_targets.size(1), batch_negatives.size(1)], dim=1)
 
                 # RAGCN loss (long term)
-                reg_loss = 0
+                gcn_loss = 0
                 for gconv in self.gnn_sr_model.conv_modulelist:
                     w = torch.matmul(gconv.att_r, gconv.basis.view(gconv.num_bases, -1)).view(gconv.num_relations, gconv.in_channels, gconv.out_channels)
-                    reg_loss += torch.sum((w[1:, :, :] - w[:-1, :, :])**2)
-                reg_loss = reg_loss/len(self.gnn_sr_model.conv_modulelist)
+                    gcn_loss += torch.sum((w[1:, :, :] - w[:-1, :, :])**2)
+                gcn_loss = gcn_loss/len(self.gnn_sr_model.conv_modulelist)
 
                 # RAGCN loss (short term)
-                short_reg_loss = 0
+                short_gcn_loss = 0
                 for gconv in self.gnn_sr_model.short_conv_modulelist:
                     w = torch.matmul(gconv.att_r, gconv.basis.view(gconv.num_bases, -1)).view(gconv.num_relations, gconv.in_channels, gconv.out_channels)
-                    short_reg_loss += torch.sum((w[1:, :, :] - w[:-1, :, :])**2)
-                short_reg_loss = short_reg_loss/len(self.gnn_sr_model.short_conv_modulelist)            
+                    short_gcn_loss += torch.sum((w[1:, :, :] - w[:-1, :, :])**2)
+                short_gcn_loss = short_gcn_loss/len(self.gnn_sr_model.short_conv_modulelist)            
 
                 # Combine GCN short term and long term loss
-                reg_loss += short_reg_loss
+                gcn_loss += short_gcn_loss
                 
                 # BPR loss
                 loss = -torch.log(torch.sigmoid(targets_pred - negatives_pred) + 1e-8)
                 loss = torch.mean(torch.sum(loss))
-
-                loss += 900 * reg_loss
+                
+                # Total loss = BPR loss + RAGCN loss
+                loss = loss + (900 * gcn_loss)
                 
                 # loss = loss * 0 # needed in case to block backpropagation to RAGCN
                 
@@ -560,8 +567,8 @@ class Trainer:
             
             if (epoch_ +1) % 1 == 0:
                 self.gnn_sr_model.eval()
-                precision, recall, MAP, ndcg = self.Evaluation(users_np_test,sequences_np_test,test_set)                
-                print(f'{epoch_+1}\t{total_loss/batch_num:.3f}\t\t{precision[0]:.3f}\t{recall[0]:.3f}\t{MAP[0]:.3f}\t{ndcg[0]:.3f}\t\t{precision[1]:.3f}\t{recall[1]:.3f}\t{MAP[1]:.3f}\t{ndcg[1]:.3f}')
+                precision, recall, MAP, ndcg, hr = self.Evaluation(users_np_test,sequences_np_test,test_set)                
+                print(f'{epoch_+1}\t{total_loss/batch_num:.3f}\t\t{precision[0]:.3f}\t{recall[0]:.3f}\t{MAP[0]:.3f}\t{ndcg[0]:.3f}\t{hr[0]:.3f}\t\t{precision[1]:.3f}\t{recall[1]:.3f}\t{MAP[1]:.3f}\t{ndcg[1]:.3f}\t{hr[1]:.3f}')
         
         if not self.arg.debug:
             self.save_model(self.arg.out_path + 'model.pt')
