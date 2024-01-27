@@ -280,7 +280,6 @@ class DataCollector:
         return uid2locid_time,locid2detail,node_num,relation_num,uid_list_,user_np,seq_train,seq_test,test_set,u2v,u2vc,v2u,v2vc  
 
     def main(self,save1=True,save2=True):
-        #if save1:
         uid2locid_time,locid2detail,uid2attr = self.main_data2dict(save1)
         uid2locid_time,locid2detail,node_num,relation_num,uid_list_,user_np,seq_train,seq_test,test_set,u2v,u2vc,v2u,v2vc = self.main_datadict2traindata(uid2locid_time,locid2detail,uid2attr,save2)
         return uid2locid_time,locid2detail,node_num,relation_num,uid_list_,user_np,seq_train,seq_test,test_set,u2v,u2vc,v2u,v2vc
