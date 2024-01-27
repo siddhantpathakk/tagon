@@ -122,7 +122,20 @@ def idcg_k(k):
     else:
         return res
 
+import torch
+import numpy as np
+import random
 
+def seed_everything(seed=42):
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+    
+    np.random.seed(seed)
+    
+    random.seed(seed)
 # if __name__ == '__main__':
 #     actual = [[1, 2], [3, 4, 5]]
 #     predicted = [[10, 20, 1, 30, 40], [10, 3, 20, 4, 5]]
