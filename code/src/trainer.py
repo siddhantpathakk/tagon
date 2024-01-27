@@ -520,7 +520,6 @@ class Trainer:
 
                 (targets_pred, negatives_pred) = torch.split(pred_score, [batch_targets.size(1), batch_negatives.size(1)], dim=1)
 
-
                 # RAGCN loss (long term)
                 reg_loss = 0
                 for gconv in self.gnn_sr_model.conv_modulelist:
@@ -556,8 +555,8 @@ class Trainer:
             
             
             self.epoch_ = epoch_
-            # self.Eval_Draw_Graph_(users_np_test,sequences_np_test,test_set,uid2locid_time)
-            # self.Eval_TSNE(user_emd_batch_list,item_emd_batch_list)
+            self.Eval_Draw_Graph_(users_np_test,sequences_np_test,test_set,uid2locid_time)
+            self.Eval_TSNE(user_emd_batch_list,item_emd_batch_list)
             
             if (epoch_ +1) % 1 == 0:
                 self.gnn_sr_model.eval()
