@@ -122,6 +122,6 @@ if __name__ == '__main__':
     train_part = [user_np,seq_train]
     test_part = [seq_test,test_set,uid_list_,uid2locid_time]
     
-    modeling = Trainer(config,node_num,relation_num,u2v,u2vc,v2u,v2vc,device)
+    trainer = Trainer(config,node_num,relation_num,u2v,u2vc,v2u,v2vc,device)
     
-    modeling.train(train_part,test_part)
+    trainer.train(train_part,test_part)
