@@ -4,6 +4,7 @@ from torch.autograd import Variable
 import torch.nn.functional as F
 
 from models.feed_forward import PointWiseFeedForward
+from models.UserAttentionLayer import UserAttentionLayer
 
 class GNN_SR_Net(nn.Module):
     def __init__(self, config, item_num, node_num, relation_num, gcn, device):
@@ -56,24 +57,9 @@ class GNN_SR_Net(nn.Module):
         )   
         
         # User Attention Layer setting
-        self.user_attn_layer_num = 1
-        self.user_attn_layer = nn.ModuleList()
-        self.user_attn_head_num = self.arg.user_attn_head_num
-        self.user_attn_drop = self.arg.user_attn_drop
-        self.user_attn_dim = self.TSAL_dim
-        
-        for i in range(self.user_attn_layer_num):
-            new_attn_layernorm = nn.LayerNorm(self.user_attn_dim, eps=1e-8)
-            self.user_attn_layer.append(new_attn_layernorm)
-            
-            new_attn_layer = nn.MultiheadAttention(self.user_attn_dim, self.user_attn_head_num, dropout=self.user_attn_drop)
-            self.user_attn_layer.append(new_attn_layer)
-            
-            new_fwd_layer = PointWiseFeedForward(self.user_attn_dim, self.user_attn_drop)
-            self.user_attn_layer.append(new_fwd_layer)
-            
-            new_fwd_layernorm = nn.LayerNorm(self.user_attn_dim, eps=1e-8)
-            self.user_attn_layer.append(new_fwd_layernorm)
+        self.user_attn_layer = UserAttentionLayer(self.arg, 
+                                                  dim = (conv_layer_num+short_term_conv_layer_num) * dim,
+                                                  device=device).to(self.device)
      
         # reset parameters
         self.reset_parameters()
@@ -119,8 +105,8 @@ class GNN_SR_Net(nn.Module):
         return output_tensor
 
     def forward(self,X_user_item,X_graph_base,for_pred=False):
-        batch_users,batch_sequences,items_to_predict = X_user_item[0],X_user_item[1],X_user_item[2]
-        edge_index,edge_type,node_no,short_term_part = X_graph_base[0],X_graph_base[1],X_graph_base[2],X_graph_base[3]
+        batch_users, batch_sequences, items_to_predict = X_user_item[0], X_user_item[1], X_user_item[2]
+        edge_index, edge_type, node_no, short_term_part = X_graph_base[0], X_graph_base[1], X_graph_base[2], X_graph_base[3]
         x = self.node_embeddings(node_no)
 
         rate = torch.tensor([[1] for i in range(edge_type.size()[0])]).to(self.device)
@@ -144,7 +130,7 @@ class GNN_SR_Net(nn.Module):
         item_embs_conv = concat_states[batch_sequences] 
         
         item_embs = self.Temporal_Attention_Layer(item_embs_conv)
-        user_emb = self.user_attn_layer[0](user_emb_conv) ## NEW!
+        user_emb = self.user_attn_layer(user_emb_conv) ## NEW!
 
         '''
         user_emb : shape(bz,dim)
