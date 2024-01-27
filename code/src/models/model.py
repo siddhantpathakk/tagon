@@ -4,10 +4,13 @@ from torch.autograd import Variable
 import torch.nn.functional as F
 
 from models.feed_forward import PointWiseFeedForward
+from utils.metric import seed_everything
 
 class GNN_SR_Net(nn.Module):
     def __init__(self, config, item_num, node_num, relation_num, gcn, device):
         super(GNN_SR_Net, self).__init__()
+        
+        # seed_everything(42)
         
         # parameter setting
         self.arg = config
@@ -118,9 +121,9 @@ class GNN_SR_Net(nn.Module):
         
         user_emb = user_emb.unsqueeze(1)
         
-        Q_tensor = torch.matmul(item_emb, self.CAL_W_Q)  #(N,T,input_dim)->(N,T,input_dim)
-        K_tensor = torch.matmul(user_emb, self.CAL_W_K)  #(N,T,input_dim)->(N,T,input_dim)
-        V_tensor = torch.matmul(user_emb, self.CAL_W_V)  #(N,T,input_dim)->(N,T,input_dim)
+        Q_tensor = torch.matmul(user_emb, self.CAL_W_Q)  #(N,T,input_dim)->(N,T,input_dim)
+        K_tensor = torch.matmul(item_emb, self.CAL_W_K)  #(N,T,input_dim)->(N,T,input_dim)
+        V_tensor = torch.matmul(item_emb, self.CAL_W_V)  #(N,T,input_dim)->(N,T,input_dim)
         
         Q_tensor_ = torch.cat(torch.split(Q_tensor, int(self.CAL_dim/self.CAL_head_num), 2), 0)   #(N,T,input_dim)->(N*head_num,T,input_dim/head_num)
         K_tensor_ = torch.cat(torch.split(K_tensor, int(self.CAL_dim/self.CAL_head_num), 2), 0)   #(N,T,input_dim)->(N*head_num,T,input_dim/head_num)
@@ -169,8 +172,8 @@ class GNN_SR_Net(nn.Module):
         user_emb = concat_states[batch_users]
         item_embs_conv = concat_states[batch_sequences]
         item_embs = self.Temporal_Attention_Layer(item_embs_conv)
-        item_embs_2 = self.CrossAttention_Layer(user_emb, item_embs)
-        # print(item_embs.size(), item_embs_2.size())
+        item_embs = self.CrossAttention_Layer(user_emb, item_embs)
+        # print(final_emb.squeeze().unsqueeze(2).size(), user_emb.size(), user_emb.unsqueeze(2).size())
         
         '''
         user_emb : shape(bz,dim)

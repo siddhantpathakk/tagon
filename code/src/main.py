@@ -5,6 +5,8 @@ from dataloader.dataloader import DataCollector
 from trainer import Trainer
 import json
 import numpy as np
+import random
+from utils.metric import seed_everything
 
 def str2bool(v):
     if isinstance(v, bool):
@@ -15,15 +17,6 @@ def str2bool(v):
         return False
     else:
         raise argparse.ArgumentTypeError('Boolean value expected.')
-
-def seed_everything(seed=42):
-    torch.manual_seed(seed)
-    torch.cuda.manual_seed(seed)
-    
-    torch.backends.cudnn.deterministic = True
-    torch.backends.cudnn.benchmark = False
-    
-    np.random.seed(seed)
 
 def parse_opt():
     parser = argparse.ArgumentParser(description='Trainer for FYP GNN')

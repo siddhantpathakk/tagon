@@ -1,5 +1,5 @@
 {
-  "dataset": "ml1m",
+  "dataset": "ml100k",
   "out_path": "/home/FYP/siddhant005/fyp/code/src/logs/tmp/",
   "L": 11,
   "H": 2,
@@ -16,12 +16,12 @@
   "adj_dropout": 0,
   "lambda_val": 0.5,
   "TSAL_head_num": 2,
-  "TSAL_attn_drop": 0.0,
-  "user_attn_head_num": 2,
-  "user_attn_drop": 0.0,
+  "TSAL_attn_drop": 0.1,
+  "cross_attn_head_num": 2,
+  "cross_attn_drop": 0.1,
   "verbose": false,
   "debug": true,
   "seed": 42,
-  "file_path": "/home/FYP/siddhant005/fyp/code/data/processed/ml-1m/",
-  "batch_size": 512
+  "file_path": "/home/FYP/siddhant005/fyp/code/data/processed/ml-100k/",
+  "batch_size": 256
 }

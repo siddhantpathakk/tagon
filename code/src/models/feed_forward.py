@@ -1,10 +1,13 @@
 import torch.nn as nn
+from utils.metric import seed_everything
 
 class PointWiseFeedForward(nn.Module):
     def __init__(self, hidden_units, dropout_rate): # wried, why fusion X 2?
 
         super(PointWiseFeedForward, self).__init__()
 
+        # seed_everything(42)
+        
         self.conv1 = nn.Conv1d(hidden_units, hidden_units, kernel_size=1)
         self.dropout1 = nn.Dropout(p=dropout_rate)
         self.relu = nn.ReLU()

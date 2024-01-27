@@ -7,12 +7,13 @@ from utils.tensor_inits import uniform
 
 from torch_geometric.nn.conv import MessagePassing
 from torch_geometric.utils import softmax
- 
+from utils.metric import seed_everything
+
 class GCN(MessagePassing):
 
     def __init__(self, in_channels, out_channels, num_relations, num_bases,device, root_weight=True, bias=True, **kwargs):
         super(GCN, self).__init__(aggr='add', **kwargs)
-        
+        # seed_everything(42)
         self.device = device
         self.in_channels = in_channels
         self.out_channels = out_channels
@@ -41,6 +42,7 @@ class GCN(MessagePassing):
         self.dropout = 0
 
     def reset_parameters(self):
+        # seed_everything(42)
         size = self.num_bases * self.in_channels
         uniform(size, self.basis)
         uniform(size, self.att_r)
