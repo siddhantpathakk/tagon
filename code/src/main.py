@@ -56,11 +56,11 @@ def parse_opt():
 
     # TSAL based parameters
     parser.add_argument('--TSAL_head_num', type=int, default=2)
-    parser.add_argument('--TSAL_attn_drop', type=float, default=0.0)
+    parser.add_argument('--TSAL_attn_drop', type=float, default=0.1)
     
     # User Attention based parameters
     parser.add_argument('--user_attn_head_num', type=int, default=2)
-    parser.add_argument('--user_attn_drop', type=float, default=0.0)
+    parser.add_argument('--user_attn_drop', type=float, default=0.1)
     
     # other parameters
     parser.add_argument('--verbose', type=str2bool, nargs='?', const=True, default=False)
