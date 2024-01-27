@@ -11,4 +11,4 @@
 module load anaconda
 module load cuda/12.1
 source activate retagnn_pyg
-/home/FYP/siddhant005/.conda/envs/retagnn_pyg/bin/python3 /home/FYP/siddhant005/fyp/code/src/main.py --file_path /home/FYP/siddhant005/fyp/code/data/processed/ml-100k/ --batch_size 256
+/home/FYP/siddhant005/.conda/envs/retagnn_pyg/bin/python3 /home/FYP/siddhant005/fyp/code/src/main.py --dataset ml100k --verbose 1 --debug 0
