@@ -129,6 +129,9 @@ class GNN_SR_Net(nn.Module):
         output_tensor = torch.matmul(output_tensor, V_tensor_) #(N*head_num,T,T),(N*head_num,T,input_dim/head_num)->(N*head_num,T,input_dim/head_num)
         output_tensor = torch.cat(torch.split(output_tensor,int(N/self.head_num),0),-1) #(N*head_num,T,input_dim/head_num) -> (N,T,input_dim)
 
+        # output_tensor = self.feedforward(output_tensor)
+        # output_tensor += input_tensor
+        
         return output_tensor
 
     def CrossAttention_Layer(self, user_emb, item_emb):
@@ -162,7 +165,7 @@ class GNN_SR_Net(nn.Module):
 
         # LayerNormed-Feed Forward + Residual Connection
         output_tensor = self.feedforward_cross(output_tensor)
-        output_tensor *= user_emb
+        output_tensor += user_emb
         
         return output_tensor
 

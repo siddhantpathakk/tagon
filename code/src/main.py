@@ -24,15 +24,15 @@ def parse_opt():
     # directory based parameters
     parser.add_argument('--dataset', type=str, default='ml100k')
     parser.add_argument('--out_path', type=str, default='/home/FYP/siddhant005/fyp/code/src/logs/tmp/')
-
+    parser.add_argument('--processed', type=str2bool, nargs='?', const=True, default=False )
     # data based parameters
     parser.add_argument('--L', type=int, default=11)
     parser.add_argument('--H', type=int, default=3)
     parser.add_argument('--topk', type=int, default=20)
     
     # model training based parameters
-    parser.add_argument('--epoch_num', type=int, default=100)
-    parser.add_argument('--learning_rate', type=float, default=1e-3)
+    parser.add_argument('--epoch_num', type=int, default=50)
+    parser.add_argument('--learning_rate', type=float, default=5e-3)
     parser.add_argument('--l2', type=float, default=1e-4)
     
     # negative sampling parameters
@@ -41,8 +41,8 @@ def parse_opt():
     
     # GCN based parameters
     parser.add_argument('--dim', type=int, default=32)
-    parser.add_argument('--conv_layer_num', type=int, default=3)
-    parser.add_argument('--short_term_conv_layer_num', type=int, default=4)
+    parser.add_argument('--conv_layer_num', type=int, default=2)
+    parser.add_argument('--short_term_conv_layer_num', type=int, default=3)
     parser.add_argument('--num_bases', type=int, default=3)
     parser.add_argument('--adj_dropout', type=int, default=0)
     parser.add_argument('--lambda_val', type=float, default=0.5)
@@ -66,8 +66,11 @@ if __name__ == '__main__':
     config = parse_opt()
     
     if config.dataset == 'ml100k':
-        config.file_path = '/home/FYP/siddhant005/fyp/code/data/processed/ml-100k/'
         config.batch_size = 128
+        if config.processed:
+            config.file_path = '/home/FYP/siddhant005/fyp/code/data/processed_timesteps/ml-100k/'
+        else:
+            config.file_path = '/home/FYP/siddhant005/fyp/code/data/processed/ml-100k/'
     elif config.dataset == 'ml1m':
         config.file_path = '/home/FYP/siddhant005/fyp/code/data/processed/ml-1m/'
         config.batch_size = 512
