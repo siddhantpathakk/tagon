@@ -30,7 +30,7 @@ class MovielensPreprocessor:
       
     def _gender_to_int(self, gender):
         try:
-            return 1 if gender == 'M' else 2
+            return 1 if gender == 'M' else 0
         except:
             raise AttributeError('Only two genders are supported: M and F') 
             
