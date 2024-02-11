@@ -1,11 +1,12 @@
 from models.model import GNN_SR_Net
-from  models.RAGCNConv import RAGCNConv
+from models.GCN import GCN
 import torch
 import numpy as np
-import torch.nn as nn
+import csv
 import random
 from utils.metric import *
 import pickle
+import time
 
 class Trainer:
     def __init__(self,config,node_num,relation_num,u2v,u2vc,v2u,v2vc,device):
@@ -15,37 +16,27 @@ class Trainer:
         self.item_indexes = torch.tensor(v_list_).to(device)
         item_num = len(v_list_)
         self.item_set = set(self.v2u.keys())
-        self.gnn_sr_model = GNN_SR_Net(config,item_num,node_num,relation_num,rgcn=RAGCNConv,device=device)
+        self.gnn_sr_model = GNN_SR_Net(config,item_num,node_num,relation_num,gcn=GCN,device=device)
         self.device = device
         self.arg = config
         self.node_num = node_num
-        self.optimizer = torch.optim.Adam(self.gnn_sr_model.parameters(),lr=config.learning_rate,weight_decay=config.l2)
+        self.optimizer = torch.optim.Adam(self.gnn_sr_model.parameters(), 
+                                          lr=config.learning_rate, 
+                                          weight_decay=config.l2,
+                                          )
         self.short_term_window_num = 3
  
-    def Negative_Sampling(self,user2item,batch_users,item_set,save=True):
-        if save:
-            negatives_np = list()
-            for i in range(batch_users.shape[0]):
-                user_item_set = set(user2item[batch_users[i]])
-                difference_set = item_set - user_item_set
-                # print(len(difference_set), type(difference_set))
-                negtive_list_ = random.sample(sorted(difference_set),self.arg.H)
-                negatives_np.append(negtive_list_)
-            negatives_np = np.array(negatives_np)
-
-            neg_node_test2 = {
-                'negatives_np':negatives_np,
-            }
-            #file = open('neg_node_DRS.pickle', 'wb')
-            #pickle.dump(neg_node_test2, file)
-            #file.close()
-        else:
-            with open(self.arg.out_path + 'neg_node_DRS.pickle', 'rb') as file:
-                neg_node_test2 = pickle.load(file)
-                negatives_np = neg_node_test2['negatives_np']
+    def Negative_Sampling(self,user2item,batch_users,item_set):
+        negatives_np = list()
+        for i in range(batch_users.shape[0]):
+            user_item_set = set(user2item[batch_users[i]])
+            difference_set = item_set - user_item_set
+            negtive_list_ = random.sample(sorted(difference_set),self.arg.H)
+            negatives_np.append(negtive_list_)
+        negatives_np = np.array(negatives_np)
         return negatives_np
 
-    def Extract_SUBGraph(self,user_no,seq_no,sub_seq_no=None,node2ids=None,hop=2,test=False):
+    def Extract_SUBGraph(self, user_no, seq_no, sub_seq_no=None, node2ids=None, hop=2, test=False):
         '''
          vc (O)     vc(X)       vc(O)    
         u{v1,.. => {u1,... => {v5,v6,... 
@@ -53,7 +44,6 @@ class Trainer:
          0-hop      1-hop      2-hop
 
          edge type: uv 0 ; vu 1 ; vvc 2 ;  vcv 3
-
         '''
         if sub_seq_no is not None:
             origin_seq_no = seq_no
@@ -164,6 +154,7 @@ class Trainer:
         edge_index = torch.t(torch.tensor(edge_index).to(self.device))
         edge_type = torch.tensor(edge_type).to(self.device)
         node_no = torch.tensor(sorted(list(node2ids.values()))).to(self.device)
+        
         # new_user_no,new_seq_no
         new_user_no,new_seq_no = list(),list()
         for i in range(user_no.shape[0]):
@@ -171,10 +162,8 @@ class Trainer:
         for i in range(seq_no.shape[0]):
             new_seq_no.append([node2ids[seq_no[i,j]] for j in range(seq_no[i,:].shape[0])])
         new_user_no,new_seq_no = np.array(new_user_no),np.array(new_seq_no)
-        if test:
-            return new_user_no,new_seq_no,edge_index,edge_type,node_no,node2ids
-        else:
-            return new_user_no,new_seq_no,edge_index,edge_type,node_no,node2ids
+
+        return new_user_no,new_seq_no,edge_index,edge_type,node_no,node2ids
             
     def _Eval_Draw_Graph_(self,batch_users,test_set,rating_pred,edge_index,edge_type,attn_weight_list,node2ids,topk=10):
         batch_users = batch_users.cpu().data.numpy().copy()
@@ -217,10 +206,6 @@ class Trainer:
                     # print(111)
             attns.append(attn_value)               
 
-
-
-
-
         item_list,rating_list,attn_list = list(),list(),list()
         attn_list = [list() for i in range(len(attn_weight_list))]
         for i in range(len(top10_list)):
@@ -229,17 +214,9 @@ class Trainer:
                 rating_list.append(ratings[i])
                 for j in range(len(attn_weight_list)):
                     attn_list[j].append(attns[i][j])
-        
-        # print('item_list:',item_list)
-        # print('rating_list:',rating_list)
-        # print('attn_list:',attn_list)
-        user_list = [user for i in range(len(item_list))]
-        
-        # Draw_Bipartite_Graph(user_list,item_list,rating_list,0,save=True)
-        # for i in range(len(attn_weight_list)):
-        #     Draw_Bipartite_Graph(user_list,item_list,attn_list[i],i+1,save=True)
 
-    def Evaluation(self,users_np_test,sequences_np_test,test_set):
+    def Evaluation(self, users_np_test, sequences_np_test, test_set):
+        
         #short term part
         short_term_window_size = int(self.arg.L / self.short_term_window_num)
         short_term_window = [0] + [i+short_term_window_size for i in range(self.short_term_window_num-1)] + [-1]
@@ -275,14 +252,6 @@ class Trainer:
             attn_weight_list = self.gnn_sr_model.attn_weight_list
             self._Eval_Draw_Graph_(batch_users,test_set,rating_pred,edge_index,edge_type,attn_weight_list,node2ids,topk=10)
 
-            
-            TSA_attn = self.gnn_sr_model.TSA_attn[10:15]
-            TSA_attn = TSA_attn.cpu().data.numpy().copy()
-            for i in range(TSA_attn.shape[0]):
-                array_ = TSA_attn[i,:,:]
-                name = (self.epoch_,i)
-                # HeatMap(array_,name)
-
             rating_pred = rating_pred.cpu().data.numpy().copy()
 
             ind = np.argpartition(rating_pred, -self.arg.topk)
@@ -296,13 +265,14 @@ class Trainer:
             else:
                 self.pred_list = np.append(self.pred_list, batch_pred_list, axis=0)
 
-        precision, recall, MAP, ndcg = [], [], [], []
-        for k in [5, 10, 15, 20]:
+        precision, recall, MAP, ndcg, hr = [], [], [], [], []
+        for k in [10, 20]:
             precision.append(precision_at_k(test_set, self.pred_list, k))
             recall.append(recall_at_k(test_set, self.pred_list, k))
             MAP.append(mapk(test_set, self.pred_list, k))
             ndcg.append(ndcg_k(test_set, self.pred_list, k))
-        return precision, recall, MAP, ndcg
+            hr.append(hit_ratio_at_k(test_set, self.pred_list, k))
+        return precision, recall, MAP, ndcg, hr
 
     def Eval_Draw_Graph_(self,users_np_test,sequences_np_test,test_set,uid2locid_time,threshold_rate=0.8,restrict_user_num=100):
         uid2locid = dict()
@@ -368,8 +338,6 @@ class Trainer:
                         #     seq_vc.append(edge_index[1,i])
                         #     attn_value_2.append(attn_weight_)
 
-                    # Draw_Bipartite_Graph(user,seq_item,attn_value_1,select_user_num,save=True,name=(k,j))
-
     def _Eval_Draw_Graph_Filter_(self,edge_index,edge_type,attn_weight_list):
         v2u_list_,user_set_ = dict(),list()
         for i in range(edge_index.shape[1]):
@@ -412,34 +380,31 @@ class Trainer:
     def Eval_New_User_Insert(self,train_part,test_part,choosing_rate=0.7,save=True):
         '''
         add new user in training
-        not add new user in training 
         '''
-        import pickle
-        if save:
-            users_np,sequences_np_train = train_part[0],train_part[1]
-            sequences_np_test,test_set,uid_list_ = test_part[0],test_part[1],test_part[2]
-            users_np_test = np.array(uid_list_)
-            user_set = set(list(users_np))
+        users_np,sequences_np_train = train_part[0],train_part[1]
+        sequences_np_test,test_set,uid_list_ = test_part[0],test_part[1],test_part[2]
+        users_np_test = np.array(uid_list_)
+        user_set = set(list(users_np))
 
-            new_user_set = set(random.sample(list(user_set),int(len(user_set)*choosing_rate)))
-            old_user_set = user_set - new_user_set
+        new_user_set = set(random.sample(list(user_set),int(len(user_set)*choosing_rate)))
+        old_user_set = user_set - new_user_set
 
-            new_user_np,new_sequences_np_train = list(),list()
-            new_sequences_np_test,new_test_set,new_uid_list_ = list(),list(),list()
-            for i in range(users_np.shape[0]):
-                if users_np[i] in old_user_set:
-                    new_user_np.append(users_np[i])
-                    new_sequences_np_train.append(sequences_np_train[i,:])
-            
-            for i in range(users_np_test.shape[0]):
-                if users_np_test[i] in new_user_set:
-                    new_uid_list_.append(users_np_test[i])
-                    new_sequences_np_test.append(sequences_np_test[i,:])
-                    new_test_set.append(test_set[i])
+        new_user_np,new_sequences_np_train = list(),list()
+        new_sequences_np_test,new_test_set,new_uid_list_ = list(),list(),list()
+        for i in range(users_np.shape[0]):
+            if users_np[i] in old_user_set:
+                new_user_np.append(users_np[i])
+                new_sequences_np_train.append(sequences_np_train[i,:])
+        
+        for i in range(users_np_test.shape[0]):
+            if users_np_test[i] in new_user_set:
+                new_uid_list_.append(users_np_test[i])
+                new_sequences_np_test.append(sequences_np_test[i,:])
+                new_test_set.append(test_set[i])
 
-            new_user_np = np.array(new_user_np)
-            new_sequences_np_train = np.array(new_sequences_np_train)
-            new_sequences_np_test = np.array(new_sequences_np_test)
+        new_user_np = np.array(new_user_np)
+        new_sequences_np_train = np.array(new_sequences_np_train)
+        new_sequences_np_test = np.array(new_sequences_np_test)
 
         if save:
             ig_eval_new_user = {
@@ -452,9 +417,7 @@ class Trainer:
             file = open(self.arg.out_path + 'ig_eval_new_user.pickle', 'wb')
             pickle.dump(ig_eval_new_user, file)
             file.close()   
-        else:
-            with open('ig_eval_new_user.pickle', 'rb') as file:
-                ig_eval_new_user = pickle.load(file)
+
         new_user_np = ig_eval_new_user['new_user_np']
         new_sequences_np_train = ig_eval_new_user['new_sequences_np_train']
         new_sequences_np_test = ig_eval_new_user['new_sequences_np_test']
@@ -468,16 +431,19 @@ class Trainer:
         for i in range(len(user_emd_batch_list)):
             bz_user_emd = user_emd_batch_list[i].cpu().data.numpy().copy()
             bz_item_emd = item_emd_batch_list[i].cpu().data.numpy().copy()
+            
             for j in range(bz_user_emd.shape[0]):
                 user_emd,seq_item_emd = bz_user_emd[j,:],bz_item_emd[j,:,:]
                 user_emd_list.append(list(user_emd))
                 # print(list(user_emd))
+                
                 for k in range(seq_item_emd.shape[0]):
                     item_emd = seq_item_emd[k,:]
                     item_emd_list.append(list(item_emd))
                     # print(list(item_emd))
-        shadow_list,user_index,item_index = list(),0,0
-        import csv
+                    
+        shadow_list,user_index,item_index = list(), 0, 0
+        
         with open('tSNE_data1.tsv', 'wt') as out_file:
             tsv_writer = csv.writer(out_file, delimiter='\t')
             for i in range(len(user_emd_list)):
@@ -487,55 +453,58 @@ class Trainer:
             for i in range(len(item_emd_list)):
                 shadow_list.append(item_index)
                 item_index +=1
-                tsv_writer.writerow(item_emd_list[i])                
+                tsv_writer.writerow(item_emd_list[i])    
+                            
         with open(self.arg.out_path + 'tSNE_data2.tsv', 'wt') as out_file:
             tsv_writer = csv.writer(out_file, delimiter='\t')
             tsv_writer.writerow(['node type'])
             for i in range(len(shadow_list)):
                 tsv_writer.writerow([shadow_list[i]])
 
-    def train(self,train_part,test_part,eval_new_user=True):
-        #users_np,sequences_np_train,sequences_np_test,test_set,uid_list_ = self.Eval_New_User_Insert(train_part,test_part,choosing_rate=0.7,save=True)
+    def save_model(self, path_name):
+        torch.save(self.gnn_sr_model.state_dict(), path_name)
+
+    def train(self,train_part,test_part):
+        # users_np,sequences_np_train,sequences_np_test,test_set,uid_list_ = self.Eval_New_User_Insert(train_part,test_part,choosing_rate=0.7,save=True)
         users_np,sequences_np_train = train_part[0],train_part[1]
         sequences_np_test,test_set,uid_list_ = test_part[0],test_part[1],test_part[2]
         uid2locid_time = test_part[-1]
         users_np_test = np.array(uid_list_)
-
-        total_loss = 0.0
         
         train_num = users_np.shape[0]
-
-        batch_num = int(train_num/self.arg.batch_size)+1 
         record_indexes = np.arange(train_num)
- 
-        #loss part
-        self.CE_loss = nn.CrossEntropyLoss()
+
+        total_loss, epoch_loss = 0.0, 0.0        
+        batch_num = int(train_num/self.arg.batch_size) + 1 
 
         #short term part
         short_term_window_size = int(self.arg.L / self.short_term_window_num)
-        short_term_window = [0] + [i+short_term_window_size for i in range(self.short_term_window_num-1)] + [-1]
+        short_term_window = [0] + [i + short_term_window_size for i in range(self.short_term_window_num-1)] + [-1]
 
-        epoch_loss = 0.0
+        print('Epoch\tTime\tLoss\t\tP@10\tR@10\tMAP@10\tNDCG@10\tHR@10\t\tP@20\tR@20\tMAP@20\tNDCG@20\tHR@20')
+
         for epoch_ in range(self.arg.epoch_num):
-            self.gnn_sr_model.train()
-            # print(f'{epoch_}')
             
-            #visualization on TSNE
-            user_emd_batch_list,item_emd_batch_list = list(),list()
+            start = time.time()
+            
+            self.gnn_sr_model.train()
+
+            user_emd_batch_list,item_emd_batch_list = list(), list()
+            
             for batch_ in range(batch_num):
-                # print(f'{str(epoch_)}-{str(batch_)}')
-                start_index , end_index = batch_*self.arg.batch_size , (batch_+1)*self.arg.batch_size
+                start_index, end_index = batch_ * self.arg.batch_size, (batch_+1) * self.arg.batch_size
                 batch_record_index = record_indexes[start_index : end_index]
 
                 batch_users = users_np[batch_record_index]
-                batch_neg = self.Negative_Sampling(self.u2v,batch_users,self.item_set,save=True)
+                batch_neg = self.Negative_Sampling(self.u2v,batch_users,self.item_set)
                  
                 batch_sequences_train = sequences_np_train[batch_record_index]
                 batch_sequences,batch_targets = batch_sequences_train[:,:self.arg.L] , batch_sequences_train[:,self.arg.L:]
 
-                #Extracting SUBGraph(long term)
+                # Extracting SUBGraph (long term)
                 batch_users,batch_sequences,edge_index,edge_type,node_no,node2ids = self.Extract_SUBGraph(batch_users,batch_sequences,sub_seq_no=None)
-                #Extracting SUBGraph(short term)
+                
+                # Extracting SUBGraph (short term)
                 short_term_part = []
                 for i in range(len(short_term_window)):
                     if i != len(short_term_window)-1:
@@ -554,36 +523,39 @@ class Trainer:
                 X_graph_base = [edge_index,edge_type,node_no,short_term_part]
 
                 pred_score,user_emb,item_embs_conv = self.gnn_sr_model(X_user_item,X_graph_base,for_pred=False)
+                # print(pred_score.shape)
+                # print('pred_score',pred_score)
                 user_emd_batch_list.append(user_emb)
                 item_emd_batch_list.append(item_embs_conv)
 
-                (targets_pred, negatives_pred) = torch.split(
-                    pred_score, [batch_targets.size(1), batch_negatives.size(1)], dim=1)
+                (targets_pred, negatives_pred) = torch.split(pred_score, [batch_targets.size(1), batch_negatives.size(1)], dim=1)
 
+                # RAGCN loss (long term)
+                gcn_loss = 0
+                for gconv in self.gnn_sr_model.conv_modulelist:
+                    w = torch.matmul(gconv.att_r, gconv.basis.view(gconv.num_bases, -1)).view(gconv.num_relations, gconv.in_channels, gconv.out_channels)
+                    gcn_loss += torch.sum((w[1:, :, :] - w[:-1, :, :])**2)
+                gcn_loss = gcn_loss/len(self.gnn_sr_model.conv_modulelist)
+
+                # RAGCN loss (short term)
+                short_gcn_loss = 0
+                for gconv in self.gnn_sr_model.short_conv_modulelist:
+                    w = torch.matmul(gconv.att_r, gconv.basis.view(gconv.num_bases, -1)).view(gconv.num_relations, gconv.in_channels, gconv.out_channels)
+                    short_gcn_loss += torch.sum((w[1:, :, :] - w[:-1, :, :])**2)
+                short_gcn_loss = short_gcn_loss/len(self.gnn_sr_model.short_conv_modulelist)            
+
+                # Combine GCN short term and long term loss
+                gcn_loss += short_gcn_loss
+                
                 # BPR loss
                 loss = -torch.log(torch.sigmoid(targets_pred - negatives_pred) + 1e-8)
                 loss = torch.mean(torch.sum(loss))
-
-                # RAGCN losss(long term)
-                reg_loss = 0
-                for gconv in self.gnn_sr_model.conv_modulelist:
-                    w = torch.matmul(gconv.att_r, gconv.basis.view(gconv.num_bases, -1)).view(gconv.num_relations, gconv.in_channels, gconv.out_channels)
-                    reg_loss += torch.sum((w[1:, :, :] - w[:-1, :, :])**2)
-                reg_loss = reg_loss/len(self.gnn_sr_model.conv_modulelist)
-
-                # RAGCN losss(short term)
-                short_reg_loss = 0
-                for gconv in self.gnn_sr_model.short_conv_modulelist:
-                    w = torch.matmul(gconv.att_r, gconv.basis.view(gconv.num_bases, -1)).view(gconv.num_relations, gconv.in_channels, gconv.out_channels)
-                    short_reg_loss += torch.sum((w[1:, :, :] - w[:-1, :, :])**2)
-                short_reg_loss = short_reg_loss/len(self.gnn_sr_model.short_conv_modulelist)            
-
-
-                reg_loss += short_reg_loss
-                loss += 0.6 *reg_loss #### WHY 900??????
-                # loss = loss * 0
                 
-                # Optimization
+                # Total loss = BPR loss + RAGCN loss
+                loss = loss + (900 * gcn_loss)
+                
+                # loss = loss * 0 # needed in case to block backpropagation
+                
                 self.optimizer.zero_grad()
                 loss.backward()
                 self.optimizer.step()
@@ -591,19 +563,17 @@ class Trainer:
                 epoch_loss += loss.item()
                 epoch_loss /= batch_num
                 total_loss = epoch_loss
-                
-            self.Eval_Draw_Graph_(users_np_test,sequences_np_test,test_set,uid2locid_time)
             
-            #visualization on TSNE
-            self.Eval_TSNE(user_emd_batch_list,item_emd_batch_list)
-            # Evaluation
+            
             self.epoch_ = epoch_
+            self.Eval_Draw_Graph_(users_np_test,sequences_np_test,test_set,uid2locid_time)
+            self.Eval_TSNE(user_emd_batch_list,item_emd_batch_list)
+            
+            time_ = time.time() - start
             if (epoch_ +1) % 1 == 0:
                 self.gnn_sr_model.eval()
-                precision, recall, MAP, ndcg = self.Evaluation(users_np_test,sequences_np_test,test_set)
-                K_map = {5:0, 10:1, 15:2, 20:3}
-
-                for K_val, idx in K_map.items():
-                    print(f'Epoch [{epoch_ + 1}/{self.arg.epoch_num}]:\tLoss: {total_loss/batch_num:.4f}\t\tP@{K_val}: {precision[idx]:.3f}\tR@{K_val}:  {recall[idx]:.3f}\tMAP@{K_val}: {MAP[idx]:.3f}\tNDCG@{K_val}: {ndcg[idx]:.3f}')
-                print()
-                # print(f'Epoch [{epoch_ + 1}/{self.arg.epoch_num}]:\tLoss: {total_loss/batch_num:.4f}\t\tP@{K}: {precision[K_map[K]]:.3f}\tR@{K}:  {recall[K_map[K]]:.3f}\tMAP@{K}: {MAP[K_map[K]]:.3f}\tNDCG@{K}: {ndcg[K_map[K]]:.3f}')
+                precision, recall, MAP, ndcg, hr = self.Evaluation(users_np_test,sequences_np_test,test_set)                
+                print(f'{epoch_+1}\t{time_:.3f} s\t{total_loss/batch_num:.3f}\t\t{precision[0]:.3f}\t{recall[0]:.3f}\t{MAP[0]:.3f}\t{ndcg[0]:.3f}\t{hr[0]:.3f}\t\t{precision[1]:.3f}\t{recall[1]:.3f}\t{MAP[1]:.3f}\t{ndcg[1]:.3f}\t{hr[1]:.3f}')
+        
+        if not self.arg.debug:
+            self.save_model(self.arg.out_path + 'model.pt')
