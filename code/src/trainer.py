@@ -6,6 +6,7 @@ import csv
 import random
 from utils.metric import *
 import pickle
+import time
 
 class Trainer:
     def __init__(self,config,node_num,relation_num,u2v,u2vc,v2u,v2vc,device):
@@ -480,9 +481,12 @@ class Trainer:
         short_term_window_size = int(self.arg.L / self.short_term_window_num)
         short_term_window = [0] + [i + short_term_window_size for i in range(self.short_term_window_num-1)] + [-1]
 
-        print('Epoch\tLoss\t\tP@10\tR@10\tMAP@10\tNDCG@10\tHR@10\t\tP@20\tR@20\tMAP@20\tNDCG@20\tHR@20')
+        print('Epoch\tTime\tLoss\t\tP@10\tR@10\tMAP@10\tNDCG@10\tHR@10\t\tP@20\tR@20\tMAP@20\tNDCG@20\tHR@20')
 
         for epoch_ in range(self.arg.epoch_num):
+            
+            start = time.time()
+            
             self.gnn_sr_model.train()
 
             user_emd_batch_list,item_emd_batch_list = list(), list()
@@ -550,7 +554,7 @@ class Trainer:
                 # Total loss = BPR loss + RAGCN loss
                 loss = loss + (900 * gcn_loss)
                 
-                # loss = loss * 0 # needed in case to block backpropagation to RAGCN
+                # loss = loss * 0 # needed in case to block backpropagation
                 
                 self.optimizer.zero_grad()
                 loss.backward()
@@ -565,10 +569,11 @@ class Trainer:
             self.Eval_Draw_Graph_(users_np_test,sequences_np_test,test_set,uid2locid_time)
             self.Eval_TSNE(user_emd_batch_list,item_emd_batch_list)
             
+            time_ = time.time() - start
             if (epoch_ +1) % 1 == 0:
                 self.gnn_sr_model.eval()
                 precision, recall, MAP, ndcg, hr = self.Evaluation(users_np_test,sequences_np_test,test_set)                
-                print(f'{epoch_+1}\t{total_loss/batch_num:.3f}\t\t{precision[0]:.3f}\t{recall[0]:.3f}\t{MAP[0]:.3f}\t{ndcg[0]:.3f}\t{hr[0]:.3f}\t\t{precision[1]:.3f}\t{recall[1]:.3f}\t{MAP[1]:.3f}\t{ndcg[1]:.3f}\t{hr[1]:.3f}')
+                print(f'{epoch_+1}\t{time_:.3f} s\t{total_loss/batch_num:.3f}\t\t{precision[0]:.3f}\t{recall[0]:.3f}\t{MAP[0]:.3f}\t{ndcg[0]:.3f}\t{hr[0]:.3f}\t\t{precision[1]:.3f}\t{recall[1]:.3f}\t{MAP[1]:.3f}\t{ndcg[1]:.3f}\t{hr[1]:.3f}')
         
         if not self.arg.debug:
             self.save_model(self.arg.out_path + 'model.pt')
