@@ -58,7 +58,7 @@ def parse_opt():
     # other parameters
     parser.add_argument('--verbose', type=str2bool, nargs='?', const=True, default=False)
     parser.add_argument('--debug', type=str2bool, nargs='?', const=True, default=False)
-    parser.add_argument('--seed', type=int, default=123456)
+    parser.add_argument('--seed', type=int, default=42)
     return parser.parse_args()
 
 if __name__ == '__main__':
@@ -72,8 +72,8 @@ if __name__ == '__main__':
         else:
             config.file_path = '/home/FYP/siddhant005/fyp/code/data/processed/ml-100k/'
     elif config.dataset == 'ml1m':
-        config.file_path = '/home/FYP/siddhant005/fyp/code/data/processed/ml-1m/'
-        config.batch_size = 512
+        config.file_path = '/home/FYP/siddhant005/fyp/code/data/processed_with_gender10/'
+        config.batch_size = 1024
     else:
         raise NotImplementedError(f'[ERROR] Dataset {config.dataset} not implemented')
 
