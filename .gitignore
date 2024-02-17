@@ -1,5 +1,5 @@
-data/raw
-*.csv
+# data/raw
+# *.csv
 *.pyc
 *.png
 *.pickle
