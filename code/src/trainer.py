@@ -552,7 +552,7 @@ class Trainer:
                 loss = torch.mean(torch.sum(loss))
                 
                 # Total loss = BPR loss + RAGCN loss
-                loss = loss + (900 * gcn_loss)
+                # loss = loss + (900 * gcn_loss)
                 
                 # loss = loss * 0 # needed in case to block backpropagation
                 
@@ -569,11 +569,14 @@ class Trainer:
             self.Eval_Draw_Graph_(users_np_test,sequences_np_test,test_set,uid2locid_time)
             self.Eval_TSNE(user_emd_batch_list,item_emd_batch_list)
             
-            time_ = time.time() - start
+            time_ = time.time()
+            hours, rem = divmod(time_-start, 3600)
+            minutes, seconds = divmod(rem, 60)
+            time_str = "{:0>2}m{:0>2}s".format(int(minutes),int(seconds))
             if (epoch_ +1) % 1 == 0:
                 self.gnn_sr_model.eval()
                 precision, recall, MAP, ndcg, hr = self.Evaluation(users_np_test,sequences_np_test,test_set)                
-                print(f'{epoch_+1}\t{time_:.3f} s\t{total_loss/batch_num:.3f}\t\t{precision[0]:.3f}\t{recall[0]:.3f}\t{MAP[0]:.3f}\t{ndcg[0]:.3f}\t{hr[0]:.3f}\t\t{precision[1]:.3f}\t{recall[1]:.3f}\t{MAP[1]:.3f}\t{ndcg[1]:.3f}\t{hr[1]:.3f}')
+                print(f'{epoch_+1}\t{time_str}\t{total_loss/batch_num:.3f}\t\t{precision[0]:.3f}\t{recall[0]:.3f}\t{MAP[0]:.3f}\t{ndcg[0]:.3f}\t{hr[0]:.3f}\t\t{precision[1]:.3f}\t{recall[1]:.3f}\t{MAP[1]:.3f}\t{ndcg[1]:.3f}\t{hr[1]:.3f}')
         
         if not self.arg.debug:
             self.save_model(self.arg.out_path + 'model.pt')

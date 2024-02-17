@@ -90,17 +90,17 @@ class GNN_SR_Net(nn.Module):
         time_step = input_tensor.size()[1]
         
         # positional embedding using sin and cos function
-        # pos_emb = torch.arange(0, time_step).unsqueeze(0).repeat(input_tensor.size()[0],1).to(self.device) #(T)->(1,T)->(N,T)
-        # pos_emb = pos_emb.unsqueeze(-1) #(N,T,1)
-        # dim_emb = torch.arange(0, self.TSAL_dim, 2).unsqueeze(0).unsqueeze(0).repeat(input_tensor.size()[0],time_step,1).to(self.device) #(input_dim/2)->(1,input_dim/2)->(N,T,input_dim/2)
-        # div_term = torch.exp(torch.arange(0, self.TSAL_dim, 2).float() * (-torch.log(torch.tensor(10000.0)) / self.TSAL_dim)).unsqueeze(0).unsqueeze(0).repeat(input_tensor.size()[0],time_step,1).to(self.device) #(input_dim/2)->(1,input_dim/2)->(N,T,input_dim/2)
-        # pos_emb = pos_emb.float()
-        # dim_emb = dim_emb.float()
-        # div_term = div_term.float()
-        # pe = torch.zeros(input_tensor.size()[0],time_step,self.TSAL_dim).to(self.device) #(N,T,input_dim)
-        # pe[:,:,0::2] = torch.sin(pos_emb * div_term) #(N,T,input_dim/2)
-        # pe[:,:,1::2] = torch.cos(pos_emb * div_term) #(N,T,input_dim/2)
-        # input_tensor = input_tensor + pe #(N,T,input_dim)
+        pos_emb = torch.arange(0, time_step).unsqueeze(0).repeat(input_tensor.size()[0],1).to(self.device) #(T)->(1,T)->(N,T)
+        pos_emb = pos_emb.unsqueeze(-1) #(N,T,1)
+        dim_emb = torch.arange(0, self.TSAL_dim, 2).unsqueeze(0).unsqueeze(0).repeat(input_tensor.size()[0],time_step,1).to(self.device) #(input_dim/2)->(1,input_dim/2)->(N,T,input_dim/2)
+        div_term = torch.exp(torch.arange(0, self.TSAL_dim, 2).float() * (-torch.log(torch.tensor(10000.0)) / self.TSAL_dim)).unsqueeze(0).unsqueeze(0).repeat(input_tensor.size()[0],time_step,1).to(self.device) #(input_dim/2)->(1,input_dim/2)->(N,T,input_dim/2)
+        pos_emb = pos_emb.float()
+        dim_emb = dim_emb.float()
+        div_term = div_term.float()
+        pe = torch.zeros(input_tensor.size()[0],time_step,self.TSAL_dim).to(self.device) #(N,T,input_dim)
+        pe[:,:,0::2] = torch.sin(pos_emb * div_term) #(N,T,input_dim/2)
+        pe[:,:,1::2] = torch.cos(pos_emb * div_term) #(N,T,input_dim/2)
+        input_tensor = input_tensor + pe #(N,T,input_dim)
                 
         Q_tensor = torch.matmul(input_tensor, self.TSAL_W_Q)  #(N,T,input_dim)->(N,T,input_dim)
         K_tensor = torch.matmul(input_tensor, self.TSAL_W_K)  #(N,T,input_dim)->(N,T,input_dim)
