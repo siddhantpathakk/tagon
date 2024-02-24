@@ -190,9 +190,9 @@ class DataCollector:
 
         for i in range(len(new_uid_list_)):
             locid_time_ = uid2locid_time[new_uid_list_[i]]
-            train_part = locid_time_[:self.N]
-            testX_part = locid_time_[self.N:self.N+self.L]
-            testY_part = locid_time_[self.N+self.L:]
+            train_part = locid_time_[:self.N] # first N items up for training
+            testX_part = locid_time_[self.N:self.N+self.L] # next L items for val
+            testY_part = locid_time_[self.N+self.L:] # next H items for testing
 
             for j in range(len(train_part)-self.L-self.H+1):
                 train_part_j_ = train_part[j:j+self.L+self.H]
@@ -210,7 +210,7 @@ class DataCollector:
         u2v,u2vc,v2u,v2vc = dict(),dict(),dict(),dict()
         for i in range(len(uid_list_)):
             locid_time_ = uid2locid_time[uid_list_[i]]
-            v_list_,u_vc_list_ = list(),list()
+            v_list_, u_vc_list_ = list(),list()
             for j in range(len(locid_time_)):
                 locid_ = locid_time_[j][0]
                 v_list_.append(locid_)
@@ -262,21 +262,6 @@ class DataCollector:
             file = open(self.file_path + 'ml_main2_data.pickle', 'wb')
             pickle.dump(ig_main2_data, file)
             file.close()       
-        else:
-            with open(self.file_path + 'ml_main2_data.pickle', 'rb') as file:
-                ig_main2_data = pickle.load(file)
-            uid2locid_time = ig_main2_data['uid2locid_time']
-            locid2detail = ig_main2_data['locid2detail']
-            node_num = ig_main2_data['node_num']
-            uid_list_ = ig_main2_data['uid_list_']
-            user_np = ig_main2_data['user_np']
-            seq_train = ig_main2_data['seq_train']
-            seq_test = ig_main2_data['seq_test']
-            test_set = ig_main2_data['test_set']
-            u2v = ig_main2_data['u2v']
-            u2vc = ig_main2_data['u2vc']
-            v2u = ig_main2_data['v2u']
-            v2vc = ig_main2_data['v2vc']
         return uid2locid_time,locid2detail,node_num,relation_num,uid_list_,user_np,seq_train,seq_test,test_set,u2v,u2vc,v2u,v2vc  
 
     def main(self,save1=True,save2=True):

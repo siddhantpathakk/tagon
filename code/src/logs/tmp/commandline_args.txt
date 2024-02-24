@@ -1,12 +1,12 @@
 {
-  "dataset": "ml1m",
+  "dataset": "ml100k",
   "out_path": "/home/FYP/siddhant005/fyp/code/src/logs/tmp/",
-  "processed": false,
-  "log_path": "/home/FYP/siddhant005/fyp/code/src/logs/train/ml1m/",
+  "processed": true,
+  "log_path": "/home/FYP/siddhant005/fyp/code/src/logs/train/ml100k/",
   "L": 11,
   "H": 3,
   "topk": 20,
-  "epoch_num": 10,
+  "epoch_num": 500,
   "learning_rate": 0.001,
   "l2": 0.0001,
   "neg_samples": 2,
@@ -23,9 +23,9 @@
   "cross_attn_drop": 0.0,
   "seed": 42,
   "verbose": true,
-  "debug": true,
+  "debug": false,
   "plot": true,
   "block_backprop": false,
-  "file_path": "/home/FYP/siddhant005/fyp/code/data/processed/ml-1m/",
-  "batch_size": 1024
+  "batch_size": 128,
+  "file_path": "/home/FYP/siddhant005/fyp/code/data/processed_timesteps/ml-100k/"
 }

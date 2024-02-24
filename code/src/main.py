@@ -24,7 +24,7 @@ def parse_opt():
     # directory based parameters
     parser.add_argument('--dataset', type=str, default='ml100k', help='ml100k, ml1m')
     parser.add_argument('--out_path', type=str, default='/home/FYP/siddhant005/fyp/code/src/logs/tmp/', help='output path')
-    parser.add_argument('--processed', type=str2bool, nargs='?', const=True, default=False, help='whether to use processed data or not')
+    parser.add_argument('--processed', type=str2bool, nargs='?', const=True, default=True, help='whether to use processed data or not')
     parser.add_argument('--log_path', type=str, default='/home/FYP/siddhant005/fyp/code/src/logs/', help='log path')
     
     # data based parameters
@@ -33,9 +33,9 @@ def parse_opt():
     parser.add_argument('--topk', type=int, default=20, help='top k items to recommend')
     
     # model training based parameters
-    parser.add_argument('--epoch_num', type=int, default=50, help='number of epochs')
-    parser.add_argument('--learning_rate', type=float, default=1e-3, help='learning rate')
-    parser.add_argument('--l2', type=float, default=1e-4, help='l2 regularization')
+    parser.add_argument('--epoch_num', type=int, default=500, help='number of epochs') # {}
+    parser.add_argument('--learning_rate', type=float, default=1e-3, help='learning rate') # {1e-3, 1e-4}
+    parser.add_argument('--l2', type=float, default=1e-4, help='l2 regularization') # {1e-1 ... 1e-5}
     
     # negative sampling parameters
     parser.add_argument('--neg_samples', type=int, default=2, help='number of negative samples')
