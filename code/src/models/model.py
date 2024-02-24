@@ -219,4 +219,4 @@ class GNN_SR_Net(nn.Module):
             rel_score = item_embs.bmm(pe_w.permute(0, 2, 1))
             rel_score = torch.sum(rel_score, dim=1)
             res += rel_score
-            return res,user_emb,item_embs_conv
+            return res,user_emb,item_embs ### Changed from item_embs_conv to item_embs
