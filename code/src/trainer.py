@@ -471,9 +471,14 @@ class Trainer:
         precision_list,recall_list,MAP_list,ndcg_list,hr_list = list(),list(),list(),list(),list()
         precision_list_20,recall_list_20,MAP_list_20,ndcg_list_20,hr_list_20 = list(),list(),list(),list(),list()
         
-        users_np,sequences_np_train,sequences_np_test,test_set,uid_list_ = self.Eval_New_User_Insert(train_part,test_part,choosing_rate=0.7,save=True)
-        # users_np,sequences_np_train = train_part[0],train_part[1]
-        # sequences_np_test,test_set,uid_list_ = test_part[0],test_part[1],test_part[2]
+        if self.arg.dataset == "ml100k":
+            users_np,sequences_np_train = train_part[0],train_part[1]
+            sequences_np_test,test_set,uid_list_ = test_part[0],test_part[1],test_part[2]
+        elif self.arg.dataset == "ml1m":
+            users_np,sequences_np_train = train_part[0],train_part[1]
+            sequences_np_test,test_set,uid_list_ = test_part[0],test_part[1],test_part[2]
+            # users_np,sequences_np_train,sequences_np_test,test_set,uid_list_ = self.Eval_New_User_Insert(train_part,test_part,choosing_rate=0.7,save=True)
+        
         uid2locid_time = test_part[-1]
         users_np_test = np.array(uid_list_)
         
