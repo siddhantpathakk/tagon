@@ -2,6 +2,7 @@
   "dataset": "ml1m",
   "out_path": "/home/FYP/siddhant005/fyp/code/src/logs/tmp/",
   "processed": false,
+  "log_path": "/home/FYP/siddhant005/fyp/code/src/logs/train/ml1m/",
   "L": 11,
   "H": 3,
   "topk": 20,
@@ -20,9 +21,11 @@
   "TSAL_attn_drop": 0.0,
   "cross_attn_head_num": 2,
   "cross_attn_drop": 0.0,
+  "seed": 42,
   "verbose": true,
   "debug": true,
-  "seed": 42,
-  "file_path": "/home/FYP/siddhant005/fyp/code/data/processed_with_gender10/",
+  "plot": true,
+  "block_backprop": false,
+  "file_path": "/home/FYP/siddhant005/fyp/code/data/processed/ml-1m/",
   "batch_size": 1024
 }
