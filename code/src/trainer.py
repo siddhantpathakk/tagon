@@ -7,6 +7,7 @@ import random
 from utils.metric import *
 import pickle
 import time
+import matplotlib.pyplot as plt
 
 class Trainer:
     def __init__(self,config,node_num,relation_num,u2v,u2vc,v2u,v2vc,device):
@@ -465,9 +466,14 @@ class Trainer:
         torch.save(self.gnn_sr_model.state_dict(), path_name)
 
     def train(self,train_part,test_part):
-        # users_np,sequences_np_train,sequences_np_test,test_set,uid_list_ = self.Eval_New_User_Insert(train_part,test_part,choosing_rate=0.7,save=True)
-        users_np,sequences_np_train = train_part[0],train_part[1]
-        sequences_np_test,test_set,uid_list_ = test_part[0],test_part[1],test_part[2]
+        
+        loss_list = list()
+        precision_list,recall_list,MAP_list,ndcg_list,hr_list = list(),list(),list(),list(),list()
+        precision_list_20,recall_list_20,MAP_list_20,ndcg_list_20,hr_list_20 = list(),list(),list(),list(),list()
+        
+        users_np,sequences_np_train,sequences_np_test,test_set,uid_list_ = self.Eval_New_User_Insert(train_part,test_part,choosing_rate=0.7,save=True)
+        # users_np,sequences_np_train = train_part[0],train_part[1]
+        # sequences_np_test,test_set,uid_list_ = test_part[0],test_part[1],test_part[2]
         uid2locid_time = test_part[-1]
         users_np_test = np.array(uid_list_)
         
@@ -552,16 +558,20 @@ class Trainer:
                 loss = torch.mean(torch.sum(loss))
                 
                 # Total loss = BPR loss + RAGCN loss
-                # loss = loss + (900 * gcn_loss)
+                loss = loss + (900 * gcn_loss)
                 
-                # loss = loss * 0 # needed in case to block backpropagation
+                if self.arg.block_backprop:
+                    loss = loss * 0 # needed in case to block backpropagation
                 
                 self.optimizer.zero_grad()
                 loss.backward()
                 self.optimizer.step()
 
                 epoch_loss += loss.item()
+                
+                # TODO: check whether should division be done here or not
                 epoch_loss /= batch_num
+                
                 total_loss = epoch_loss
             
             
@@ -570,13 +580,89 @@ class Trainer:
             self.Eval_TSNE(user_emd_batch_list,item_emd_batch_list)
             
             time_ = time.time()
-            hours, rem = divmod(time_-start, 3600)
+            _, rem = divmod(time_-start, 3600)
             minutes, seconds = divmod(rem, 60)
             time_str = "{:0>2}m{:0>2}s".format(int(minutes),int(seconds))
+            
+            loss_list.append(total_loss)
+            
             if (epoch_ +1) % 1 == 0:
                 self.gnn_sr_model.eval()
-                precision, recall, MAP, ndcg, hr = self.Evaluation(users_np_test,sequences_np_test,test_set)                
+                precision, recall, MAP, ndcg, hr = self.Evaluation(users_np_test,sequences_np_test,test_set)      
+                
+                precision_list.append(precision[0])
+                recall_list.append(recall[0])
+                MAP_list.append(MAP[0])
+                ndcg_list.append(ndcg[0])
+                hr_list.append(hr[0])
+                
+                precision_list_20.append(precision[1])
+                recall_list_20.append(recall[1])
+                MAP_list_20.append(MAP[1])
+                ndcg_list_20.append(ndcg[1])
+                hr_list_20.append(hr[1])
+                        
+                # TODO: check whether should division be done here or not with batch_num for loss value
                 print(f'{epoch_+1}\t{time_str}\t{total_loss/batch_num:.3f}\t\t{precision[0]:.3f}\t{recall[0]:.3f}\t{MAP[0]:.3f}\t{ndcg[0]:.3f}\t{hr[0]:.3f}\t\t{precision[1]:.3f}\t{recall[1]:.3f}\t{MAP[1]:.3f}\t{ndcg[1]:.3f}\t{hr[1]:.3f}')
         
         if not self.arg.debug:
-            self.save_model(self.arg.out_path + 'model.pt')
+            self.save_model(self.arg.out_path + 'saved_model.pt')
+            
+        if self.arg.plot or self.arg.debug:
+            # plot all and save them in the out_path
+            plt.figure()
+            plt.plot(loss_list)
+            plt.title('Loss')
+            plt.savefig(self.arg.log_path + 'loss.png')
+            
+            plt.figure()
+            plt.plot(precision_list)
+            plt.title('Precision@10')
+            plt.savefig(self.arg.log_path + 'precision@10.png')
+            
+            plt.figure()
+            plt.plot(recall_list)
+            plt.title('Recall@10')
+            plt.savefig(self.arg.log_path + 'recall@10.png')
+            
+            plt.figure()
+            plt.plot(MAP_list)
+            plt.title('MAP@10')
+            plt.savefig(self.arg.log_path + 'map@10.png')
+            
+            plt.figure()
+            plt.plot(ndcg_list)
+            plt.title('NDCG@10')
+            plt.savefig(self.arg.log_path + 'ndcg@10.png')
+            
+            plt.figure()
+            plt.plot(hr_list)
+            plt.title('HR@10')
+            plt.savefig(self.arg.log_path + 'hitrate@10.png')
+            
+            
+            plt.figure()
+            plt.plot(precision_list_20)
+            plt.title('Precision@20')
+            plt.savefig(self.arg.log_path + 'precision@20.png')
+            
+            plt.figure()
+            plt.plot(recall_list_20)
+            plt.title('Recall@10')
+            plt.savefig(self.arg.log_path + 'recall@20.png')
+            
+            plt.figure()
+            plt.plot(MAP_list_20)
+            plt.title('MAP@20')
+            plt.savefig(self.arg.log_path + 'map@20.png')
+            
+            plt.figure()
+            plt.plot(ndcg_list_20)
+            plt.title('NDCG@20')
+            plt.savefig(self.arg.log_path + 'ndcg@20.png')
+            
+            plt.figure()
+            plt.plot(hr_list_20)
+            plt.title('HR@20')
+            plt.savefig(self.arg.log_path + 'hitrate@20.png')
+            
