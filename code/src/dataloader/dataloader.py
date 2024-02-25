@@ -3,23 +3,48 @@ import numpy as np
 import random
 
 class DataCollector:
+    """
+    The DataCollector class is designed for preprocessing and structuring data for a sequential recommendation system, specifically tailored to handle datasets with user interactions, demographic information, venue names, and categories. 
+    """
     def __init__(self,config):
+        """
+        Initializes the DataCollector instance by setting up various configurations from the config argument. 
+        
+        These configurations include the file path to the dataset, parameters like L, H, topk for sequence lengths and recommendation settings, 
+        and N as a predefined constant.
+
+        Args:
+            config (argparse.ArgumentParser): The configuration object containing the file path and other parameters.
+        """
         self.arg = config
         self.file_path = self.arg.file_path
-        self.L,self.H,self.topk = self.arg.L,self.arg.H,self.arg.topk
+        
+        self.L = self.arg.L
+        self.H = self.arg.H
+        self.topk = self.arg.topk
+        
         self.N = 20
 
     def _load_raw_data_(self):
+        """
+        Loads the raw data files related to user interactions, venue names, user demographic information, and venue categories. Each data type is read from a separate file and stored in instance variables for further processing.
+        """
         self.data = open(self.file_path + 'u.data', 'rb').readlines()
         self.vname = open(self.file_path + 'u.vname', 'rb').readlines()
         self.demo = open(self.file_path + 'u.demo', 'rb').readlines()
         self.vcat = open(self.file_path + 'u.vcat', 'rb').readlines()
         
     def _demo2dict_(self):
-        gender_tocken,age_tocken = 2,3
-        onehot_len = gender_tocken * age_tocken
+        """
+        Converts demographic information into a dictionary where user IDs map to demographic attributes (like age and gender) encoded as one-hot vectors. This method also handles the categorization of age into predefined ranges and deals with missing values by assigning random attributes.
+
+        Returns:
+            dict: A dictionary where user IDs map to demographic attributes encoded as one-hot vectors.
+        """
+        gender_tocken, age_tocken = 2, 3 
+        onehot_len = gender_tocken * age_tocken 
         tocken2onehot,index = dict(),0
-        for i in range(gender_tocken):
+        for i in range(gender_tocken): 
             for k in range(age_tocken):
                 tocken_ = str(i+1)+'-'+str(k+1)
                 onehot_ = list()
@@ -52,6 +77,13 @@ class DataCollector:
         return uid2attr
     
     def _data2dict_(self):
+        """
+        Transforms user interaction data into dictionaries. One maps user IDs to lists of venue IDs and timestamps, indicating the sequence of interactions. The other maps venue IDs to details like ratings.
+
+
+        Returns:
+            dict: A dictionary where user IDs map to lists of venue IDs and timestamps.
+        """
         uid2locid_time,locid2detail = dict(),dict()
         for ny_checkin_i in self.data[1:]:
             ny_checkin_i = ny_checkin_i.decode('utf-8').split(',')
@@ -65,6 +97,13 @@ class DataCollector:
         return uid2locid_time,locid2detail
     
     def _vname2dict_(self):
+        """
+        Creates a dictionary mapping venue IDs to their names, facilitating the association of venues with readable identifiers.
+
+
+        Returns:
+            dict: A dictionary where venue IDs map to venue names.
+        """
         locid2locname = dict()
         for ny_vname_i in self.vname[1:]:
             ny_vname_i = ny_vname_i.decode('utf-8').split(',')
@@ -74,6 +113,13 @@ class DataCollector:
         return locid2locname
     
     def _vcat2dict_(self):   
+        """
+        Generates a dictionary mapping venue IDs to category IDs, allowing for the categorization of venues based on predefined types.
+        
+
+        Returns:
+            dict: A dictionary where venue IDs map to category IDs.
+        """
         locid2catid = dict()
         for ny_vcat_i in self.vcat[1:]:
             ny_vcat_i = ny_vcat_i.decode('utf-8').split(',')
@@ -83,6 +129,19 @@ class DataCollector:
         return locid2catid
    
     def _locid2detail_Merge_(self,locid2detail,locid2locname,locid2catid,uid2locid_time):
+        """
+        Merges venue details, names, and categories into a single detailed structure. This method enhances the locid2detail dictionary with venue names and category IDs, enriching the venue-related information.
+
+
+        Args:
+            locid2detail (dict): A dictionary where venue IDs map to details like ratings.
+            locid2locname (dict): A dictionary where venue IDs map to venue names.
+            locid2catid (dict): A dictionary where venue IDs map to category IDs.
+            uid2locid_time (dict): A dictionary where user IDs map to lists of venue IDs and timestamps.
+
+        Returns:
+            dict: A dictionary where venue IDs map to detailed information including names and category IDs.
+        """
         locid_name_ = list(set(locid2detail.keys()))
         for i in range(len(locid_name_)):
             if locid_name_[i] in locid2locname:
@@ -99,30 +158,39 @@ class DataCollector:
         return locid2detail
     
     def main_data2dict(self,save=True):
-        if save:
-            self._load_raw_data_()
-            uid2locid_time,locid2detail = self._data2dict_()
-            locid2locname = self._vname2dict_()
-            locid2catid = self._vcat2dict_()
-            uid2attr = self._demo2dict_()
-            locid2detail = self._locid2detail_Merge_(locid2detail,locid2locname,locid2catid,uid2locid_time)
-            ig_main1_data = {
-                'uid2locid_time':uid2locid_time,
-                'locid2detail':locid2detail,
-                'uid2attr':uid2attr,
-            }
-            file = open(self.file_path + 'ml_main1_data.pickle', 'wb')
-            pickle.dump(ig_main1_data, file)
-            file.close()   
-        else:
-            with open(self.file_path + 'ml_main1_data.pickle', 'rb') as file:
-                ig_main1_data = pickle.load(file)
-            uid2locid_time = ig_main1_data['uid2locid_time']
-            locid2detail = ig_main1_data['locid2detail']
-            uid2attr = ig_main1_data['uid2attr']
+        """
+        A high-level function that orchestrates the loading and processing of raw data into structured dictionaries for user interactions, venue details, and user attributes. Optionally, it saves the processed data into a pickle file for later use.
+
+
+        Args:
+            save (bool, optional): _description_. Defaults to True.
+
+
+        Returns:
+            dict: A dictionary where user IDs map to lists of venue IDs and timestamps.
+            dict: A dictionary where venue IDs map to detailed information including names and category IDs.
+            dict: A dictionary where user IDs map to demographic attributes encoded as one-hot vectors.
+        """
+        self._load_raw_data_()
+        uid2locid_time,locid2detail = self._data2dict_()
+        locid2locname = self._vname2dict_()
+        locid2catid = self._vcat2dict_()
+        uid2attr = self._demo2dict_()
+        locid2detail = self._locid2detail_Merge_(locid2detail,locid2locname,locid2catid,uid2locid_time)
         return uid2locid_time,locid2detail,uid2attr
 
     def _limit_in_seqlen_(self,uid2locid_time):
+        """
+        Prunes user interaction sequences to ensure they meet the required sequence length defined by N, L, and topk. This step is crucial for maintaining consistency in input data for the recommendation model.
+
+
+        Args:
+            uid2locid_time (dict): A dictionary where user IDs map to lists of venue IDs and timestamps.
+
+
+        Returns:
+            dict: A dictionary where user IDs map to lists of venue IDs and timestamps, pruned to meet the required sequence length.
+        """
         old_uid_list_ = list(uid2locid_time.keys())
         for i in range(len(old_uid_list_)):
             locid_time_ = uid2locid_time[old_uid_list_[i]]
@@ -133,6 +201,20 @@ class DataCollector:
         return uid2locid_time
      
     def _element2ids_(self,uid2locid_time,locid2detail):
+        """
+        Converts user and venue identifiers into a unified indexing system. This method prepares the data for numerical processing by replacing string IDs with numerical ones, facilitating easier handling in machine learning models.
+
+
+        Args:
+            uid2locid_time (dict): A dictionary where user IDs map to lists of venue IDs and timestamps.
+            locid2detail (dict): A dictionary where venue IDs map to detailed information including names and category IDs.
+
+
+        Returns:
+            list: A list of user IDs.
+            list: A list of venue IDs.
+            int: The total number of nodes in the graph.
+        """
         old_uid_list_ = list(uid2locid_time.keys()) 
         locid_list_,vc_list_ = list(),list()
 
@@ -164,6 +246,23 @@ class DataCollector:
         return old_uid_list_,locid_list_,node_num
 
     def _replace_element_with_ids_(self,old_uid_list_,locid_list_,uid2locid_time,locid2detail,uid2attr):
+        """
+        Updates the user interaction data and venue details to use the new numerical IDs established by _element2ids_. This method ensures consistency in the representation of entities across the dataset.
+
+
+        Args:
+            old_uid_list_ (list): A list of user IDs.
+            locid_list_ (list): A list of venue IDs.
+            uid2locid_time (dict): A dictionary where user IDs map to lists of venue IDs and timestamps.
+            locid2detail (dict): A dictionary where venue IDs map to detailed information including names and category IDs.
+            uid2attr (dict): A dictionary where user IDs map to demographic attributes encoded as one-hot vectors.
+
+
+        Returns:
+            dict: A dictionary where user IDs map to lists of venue IDs and timestamps, using numerical IDs.
+            dict: A dictionary where venue IDs map to detailed information including names and category IDs, using numerical IDs.
+            dict: A dictionary where user IDs map to demographic attributes encoded as one-hot vectors.
+        """
         new_uid2locid_time = dict()
         for i in range(len(old_uid_list_)):
             uid_ids_ = self.uid2ids[old_uid_list_[i]]
@@ -185,6 +284,18 @@ class DataCollector:
         return new_uid2locid_time,new_locid2detail,new_uid2attr
 
     def _seq_data_building_(self,old_uid_list_,uid2locid_time):
+        """
+        Constructs training and testing sequences from the interaction data. This method splits the data into sequences suitable for the sequential recommendation model, organizing them into inputs for training, validation, and testing phases.
+
+
+        Args:
+            old_uid_list_ (list): A list of user IDs.
+            uid2locid_time (dict): A dictionary where user IDs map to lists of venue IDs and timestamps.
+            
+            
+        Returns:
+            list: A list of user IDs using numerical IDs.
+        """
         new_uid_list_ = [self.uid2ids[old_uid_list_[i]] for i in range(len(old_uid_list_))]
         user_np,seq_train,seq_test,test_set = list(),list(),list(),list()
 
@@ -207,6 +318,22 @@ class DataCollector:
         return new_uid_list_,user_np,seq_train,seq_test,test_set
 
     def _edge_building_(self,uid_list_,uid2locid_time,locid2detail):
+        """
+        Builds edge relationships for graph-based models. It creates mappings between users and venues, and venues and categories, establishing the connections necessary for graph neural network processing.
+
+
+        Args:
+            uid_list_ (list): A list of user IDs using numerical IDs.
+            uid2locid_time (dict): A dictionary where user IDs map to lists of venue IDs and timestamps.
+            locid2detail (dict): A dictionary where venue IDs map to detailed information including names and category IDs.
+
+
+        Returns:
+            dict: A dictionary where user IDs map to lists of venue IDs.
+            dict: A dictionary where user IDs map to lists of venue categories.
+            dict: A dictionary where venue IDs map to lists of user IDs.
+            dict: A dictionary where venue IDs map to venue categories.
+        """
         u2v,u2vc,v2u,v2vc = dict(),dict(),dict(),dict()
         for i in range(len(uid_list_)):
             locid_time_ = uid2locid_time[uid_list_[i]]
@@ -233,39 +360,70 @@ class DataCollector:
         return u2v,u2vc,v2u,v2vc
 
     def main_datadict2traindata(self,uid2locid_time,locid2detail,uid2attr,save=True):
-        if save:
-            uid2locid_time = self._limit_in_seqlen_(uid2locid_time)
+        """
+        Converts the processed data dictionaries into structured training data formats, including sequences and edge relationships suitable for training graph-based sequential recommendation models. Optionally, it saves this structured data for later use.
 
-            old_uid_list_,locid_list_,node_num = self._element2ids_(uid2locid_time,locid2detail)
 
-            uid2locid_time,locid2detail,uid2attr = self._replace_element_with_ids_(old_uid_list_,locid_list_,uid2locid_time,locid2detail,uid2attr)
-            
-            uid_list_,user_np,seq_train,seq_test,test_set = self._seq_data_building_(old_uid_list_,uid2locid_time)
-            u2v,u2vc,v2u,v2vc = self._edge_building_(uid_list_,uid2locid_time,locid2detail)
-            relation_num =  4 #u_vc,u,v,v_vc
-            ig_main2_data = {
-                'uid2locid_time':uid2locid_time,
-                'locid2detail':locid2detail,
-                'node_num':node_num,
-                'uid_list_':uid_list_,
-                'user_np':user_np,
-                'seq_train':seq_train,
-                'seq_test':seq_test,
-                'test_set':test_set,
-                'u2v':u2v,
-                'u2vc':u2vc,
-                'v2u':v2u,
-                'v2vc':v2vc,
-                'relation_num':relation_num,
-                'uid2attr':uid2attr,
-            }
-            file = open(self.file_path + 'ml_main2_data.pickle', 'wb')
-            pickle.dump(ig_main2_data, file)
-            file.close()       
+        Args:
+            uid2locid_time (dict): A dictionary where user IDs map to lists of venue IDs and timestamps.
+            locid2detail (dict): A dictionary where venue IDs map to detailed information including names and category IDs.
+            uid2attr (dict): A dictionary where user IDs map to demographic attributes encoded as one-hot vectors.
+            save (bool, optional): _description_. Defaults to True.
+
+
+        Returns:
+            dict: A dictionary where user IDs map to lists of venue IDs and timestamps, using numerical IDs.
+            dict: A dictionary where venue IDs map to detailed information including names and category IDs, using numerical IDs.
+            int: The total number of nodes in the graph.
+            int: The total number of relationships in the graph.
+            list: A list of user IDs using numerical IDs.
+            numpy.ndarray: A numpy array of user IDs.
+            numpy.ndarray: A numpy array of training sequences.
+            numpy.ndarray: A numpy array of testing sequences.
+            numpy.ndarray: A numpy array of testing sets.
+            dict: A dictionary where user IDs map to lists of venue IDs.
+            dict: A dictionary where user IDs map to lists of venue categories.
+            dict: A dictionary where venue IDs map to lists of user IDs.
+            dict: A dictionary where venue IDs map to venue categories.
+        """
+        uid2locid_time = self._limit_in_seqlen_(uid2locid_time)
+
+        old_uid_list_,locid_list_,node_num = self._element2ids_(uid2locid_time,locid2detail)
+
+        uid2locid_time,locid2detail,uid2attr = self._replace_element_with_ids_(old_uid_list_,locid_list_,uid2locid_time,locid2detail,uid2attr)
+        
+        uid_list_,user_np,seq_train,seq_test,test_set = self._seq_data_building_(old_uid_list_,uid2locid_time)
+        u2v,u2vc,v2u,v2vc = self._edge_building_(uid_list_,uid2locid_time,locid2detail)
+        relation_num =  4 #u_vc,u,v,v_vc
         return uid2locid_time,locid2detail,node_num,relation_num,uid_list_,user_np,seq_train,seq_test,test_set,u2v,u2vc,v2u,v2vc  
 
     def main(self,save1=True,save2=True):
+        """
+        The main entry point for the data preprocessing pipeline. It sequentially calls the methods to load raw data, process it into structured formats, and then transform it into training data ready for use in the recommendation model. It supports saving intermediate results to speed up future preprocessing steps.
+
+
+        Args:
+            save1 (bool, optional): Save the processed data into a pickle file for later use. Defaults to True.
+            save2 (bool, optional): Save the training data into a pickle file for later use. Defaults to True.
+
+        Returns:
+            dict: A dictionary where user IDs map to lists of venue IDs and timestamps, using numerical IDs.
+            dict: A dictionary where venue IDs map to detailed information including names and category IDs, using numerical IDs.
+            int: The total number of nodes in the graph.
+            int: The total number of relationships in the graph.
+            list: A list of user IDs using numerical IDs.
+            numpy.ndarray: A numpy array of user IDs.
+            numpy.ndarray: A numpy array of training sequences.
+            numpy.ndarray: A numpy array of testing sequences.
+            numpy.ndarray: A numpy array of testing sets.
+            dict: A dictionary where user IDs map to lists of venue IDs.
+            dict: A dictionary where user IDs map to lists of venue categories.
+            dict: A dictionary where venue IDs map to lists of user IDs.
+            dict: A dictionary where venue IDs map to venue categories.
+        """
         uid2locid_time,locid2detail,uid2attr = self.main_data2dict(save1)
         uid2locid_time,locid2detail,node_num,relation_num,uid_list_,user_np,seq_train,seq_test,test_set,u2v,u2vc,v2u,v2vc = self.main_datadict2traindata(uid2locid_time,locid2detail,uid2attr,save2)
-        return uid2locid_time,locid2detail,node_num,relation_num,uid_list_,user_np,seq_train,seq_test,test_set,u2v,u2vc,v2u,v2vc
-
+        return uid2locid_time, locid2detail, node_num, relation_num, uid_list_, \
+            user_np, seq_train, \
+            seq_test, test_set, \
+            u2v, u2vc, v2u, v2vc 
