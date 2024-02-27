@@ -1,14 +1,24 @@
-import argparse
-import torch
-import os
-from dataloader.dataloader import DataCollector
-from trainer import Trainer
 import json
-import numpy as np
-import random
-from utils.metric import seed_everything
+import argparse
+import os
+import torch
+from .dataloader.dataloader import DataCollector
+from .trainer import Trainer
+from .utils.metric import seed_everything
 
 def str2bool(v):
+    """
+    Convert string to boolean
+
+    Args:
+        v (str): string to be converted to boolean
+
+    Raises:
+        argparse.ArgumentTypeError: Boolean value expected.
+
+    Returns:
+        bool: boolean value
+    """
     if isinstance(v, bool):
         return v
     if v.lower() in ('yes', 'true', 't', 'y', '1'):
@@ -19,13 +29,19 @@ def str2bool(v):
         raise argparse.ArgumentTypeError('Boolean value expected.')
 
 def parse_opt():
+    """
+    Parse command line arguments
+
+    Returns:
+        argparse.Namespace: command line arguments
+    """
     parser = argparse.ArgumentParser(description='Trainer for FYP GNN')
     
     # directory based parameters
     parser.add_argument('--dataset', type=str, default='ml100k', help='ml100k, ml1m')
     parser.add_argument('--out_path', type=str, default='/home/FYP/siddhant005/fyp/code/src/logs/tmp/', help='output path')
-    parser.add_argument('--processed', type=str2bool, nargs='?', const=True, default=True, help='whether to use processed data or not')
     parser.add_argument('--log_path', type=str, default='/home/FYP/siddhant005/fyp/code/src/logs/', help='log path')
+    parser.add_argument('--processed', type=str2bool, nargs='?', const=True, default=True, help='whether to use processed data or not')
     
     # data based parameters
     parser.add_argument('--L', type=int, default=11, help='length of sequence')
@@ -33,7 +49,7 @@ def parse_opt():
     parser.add_argument('--topk', type=int, default=20, help='top k items to recommend')
     
     # model training based parameters
-    parser.add_argument('--epoch_num', type=int, default=500, help='number of epochs') # {}
+    parser.add_argument('--epoch_num', type=int, default=500, help='number of epochs') # approx 300-500
     parser.add_argument('--learning_rate', type=float, default=1e-3, help='learning rate') # {1e-3, 1e-4}
     parser.add_argument('--l2', type=float, default=1e-4, help='l2 regularization') # {1e-1 ... 1e-5}
     
@@ -68,19 +84,21 @@ def parse_opt():
 if __name__ == '__main__':
 
     config = parse_opt()
+    cwd = os.getcwd()
     
     if config.dataset == 'ml100k':
         config.batch_size = 128
         if config.processed:
-            config.file_path = '/home/FYP/siddhant005/fyp/code/data/processed_timesteps/ml-100k/'
+            config.file_path = cwd + '/data/processed_timesteps/ml-100k/'
         else:
-            config.file_path = '/home/FYP/siddhant005/fyp/code/data/processed/ml-100k/'
+            config.file_path = cwd + '/data/processed/ml-100k/'
+    
     elif config.dataset == 'ml1m':
-        if config.processed:
-            config.file_path = '/home/FYP/siddhant005/fyp/code/data/processed_timesteps/ml-1m/'
-        else:
-            config.file_path = '/home/FYP/siddhant005/fyp/code/data/processed/ml-1m/'
         config.batch_size = 1024
+        if config.processed:
+            config.file_path = cwd + '/data/processed_timesteps/ml-1m/'
+        else:
+            config.file_path = cwd + '/data/processed/ml-1m/'
     else:
         raise NotImplementedError(f'[ERROR] Dataset {config.dataset} not implemented')
 
@@ -91,7 +109,7 @@ if __name__ == '__main__':
     print(f'[INFO] device: {device} ')
     
     if config.debug:
-        
+        print(f'[INFO] Running in debug mode')
         if config.dataset == 'ml100k':
             config.epoch_num = 30
         elif config.dataset == 'ml1m':
@@ -100,17 +118,17 @@ if __name__ == '__main__':
         import pprint
         pprint.pprint(config.__dict__)
         
-    with open(config.out_path+'commandline_args.txt', 'w') as f:
+    with open(config.out_path+'commandline_args.txt', 'w', encoding="utf-8") as f:
         json.dump(config.__dict__, f, indent=2)
     
     datacollector = DataCollector(config)
     uid2locid_time,locid2detail,node_num,relation_num,uid_list_,user_np,seq_train,seq_test,test_set,u2v,u2vc,v2u,v2vc = datacollector.main(save1=True,save2=True)
     
-    if config.verbose and config.debug == False:
+    if config.verbose and config.debug is False:
         print(f'[STATUS] Running train.py with arguments: {config}')
         print('=='*100)
         print('=='*100)
-        print(f'[STATUS] Data preprocessing completed')
+        print('[STATUS] Data preprocessing completed')
         print(f'[INFO] uid2locid_time: {len(uid2locid_time)} ')
         print(f'[INFO] locid2detail: {len(locid2detail)} ')
         print(f'[INFO] node_num: {node_num} ')
