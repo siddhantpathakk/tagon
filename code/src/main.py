@@ -2,7 +2,7 @@ import json
 import argparse
 import os
 import torch
-from .dataloader.dataloader import DataCollector
+from .dataloader.collector import DataCollector
 from .trainer import Trainer
 from .utils.metric import seed_everything
 
@@ -122,34 +122,23 @@ if __name__ == '__main__':
         json.dump(config.__dict__, f, indent=2)
     
     datacollector = DataCollector(config)
-    uid2locid_time,locid2detail,node_num,relation_num,uid_list_,user_np,seq_train,seq_test,test_set,u2v,u2vc,v2u,v2vc = datacollector.main(save1=True,save2=True)
+    train_part, test_part, edges, node_num, relation_num = datacollector.main()
     
     if config.verbose and config.debug is False:
         print(f'[STATUS] Running train.py with arguments: {config}')
         print('=='*100)
         print('=='*100)
         print('[STATUS] Data preprocessing completed')
-        print(f'[INFO] uid2locid_time: {len(uid2locid_time)} ')
-        print(f'[INFO] locid2detail: {len(locid2detail)} ')
         print(f'[INFO] node_num: {node_num} ')
         print(f'[INFO] relation_num: {relation_num} ')
-        print(f'[INFO] user_num: {len(uid_list_)} ')
-        print(f'[INFO] train_num: {user_np.shape[0]} ')
-        print(f'[INFO] test_num: {seq_test.shape[0]} ')
-        print(f'[INFO] train_set: {seq_train.shape} ')
-        print(f'[INFO] test_set: {seq_test.shape} ')
-        print(f'[INFO] uid_list_: {len(uid_list_)} ')
-        print(f'[INFO] u2v: {len(u2v)} ')
-        print(f'[INFO] u2vc: {len(u2vc)} ')
-        print(f'[INFO] v2u: {len(v2u)} ')
-        print(f'[INFO] v2vc: {len(v2vc)} ')
         
     print('=='*100)
     print(f'[STATUS] Commencing training for {config.epoch_num} epochs\n')
     
-    train_part = [user_np,seq_train]
-    test_part = [seq_test,test_set,uid_list_,uid2locid_time]
-    
-    trainer = Trainer(config,node_num,relation_num,u2v,u2vc,v2u,v2vc,device)
-    
+    trainer = Trainer(config=config,
+                      node_num=node_num,
+                      relation_num=relation_num, 
+                      u2v=edges[0], u2vc=edges[1], v2u=edges[2], v2vc=edges[3],
+                      device=device)
+
     trainer.train(train_part,test_part)

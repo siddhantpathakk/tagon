@@ -59,7 +59,7 @@ class Trainer:
         self.node_num = node_num
         self.short_term_window_num = 3
         self.pred_list = None
-
+        self.K_eval_list = [10, 20]
         self.optimizer = torch.optim.Adam(self.gnn_sr_model.parameters(),
                                           lr=config.learning_rate,
                                           weight_decay=config.l2)
@@ -220,49 +220,46 @@ class Trainer:
         return new_user_no, new_seq_no, edge_index, edge_type, node_no, node2ids
 
     def Evaluation(self, users_np_test, sequences_np_test, test_set):
+        # seq_np_test: validation split
+        # test_set: test split
+        
         # TODO: recheck this function
 
-        # short term part
         short_term_window_size = int(self.arg.L / self.short_term_window_num)
-        short_term_window = [
-            0] + [i+short_term_window_size for i in range(self.short_term_window_num-1)] + [-1]
-        batch_num = int(users_np_test.shape[0]/self.arg.batch_size)+1
+        short_term_window = [0] + [i+short_term_window_size for i in range(self.short_term_window_num-1)] + [-1]
+        batch_num = int(users_np_test.shape[0]/self.arg.batch_size)+1 # number of batches for validation
         data_index = np.arange(users_np_test.shape[0])
+        
         for batch_ in range(batch_num):
-            start_index, end_index = batch_ * \
-                self.arg.batch_size, (batch_+1)*self.arg.batch_size
+            start_index, end_index = batch_ * self.arg.batch_size, (batch_+1) * self.arg.batch_size
             batch_record_index = data_index[start_index: end_index]
 
             batch_users = users_np_test[batch_record_index]
             batch_sequences = sequences_np_test[batch_record_index]
 
             # Extracting SUBGraph (long term)
-            batch_users, batch_sequences, edge_index, edge_type, node_no, node2ids = self.Extract_SUBGraph(
-                batch_users, batch_sequences, sub_seq_no=None)
+            batch_users, batch_sequences, edge_index, edge_type, node_no, node2ids = self.Extract_SUBGraph(user_no=batch_users,
+                                                                                                           seq_no=batch_sequences, 
+                                                                                                           sub_seq_no=None)
 
             # Extracting SUBGraph (short term)
             short_term_part = []
             for i in range(len(short_term_window)):
                 if i != len(short_term_window)-1:
-                    sub_seq_no = batch_sequences[:,
-                                                 short_term_window[i]:short_term_window[i+1]]
-                    _, _, edge_index, edge_type, _, _ = self.Extract_SUBGraph(
-                        batch_users, batch_sequences, sub_seq_no=sub_seq_no, node2ids=node2ids)
+                    sub_seq_no = batch_sequences[:, short_term_window[i]:short_term_window[i+1]]
+                    _, _, edge_index, edge_type, _, _ = self.Extract_SUBGraph(user_no=batch_users, 
+                                                                              seq_no=batch_sequences, 
+                                                                              sub_seq_no=sub_seq_no, 
+                                                                              node2ids=node2ids)
                     short_term_part.append((edge_index, edge_type))
 
             batch_users = torch.tensor(batch_users).to(self.device)
-            batch_sequences = torch.from_numpy(batch_sequences).type(
-                torch.LongTensor).to(self.device)
+            batch_sequences = torch.from_numpy(batch_sequences).type(torch.LongTensor).to(self.device)
 
             X_user_item = [batch_users, batch_sequences, self.item_indexes]
             X_graph_base = [edge_index, edge_type, node_no, short_term_part]
 
-            rating_pred = self.gnn_sr_model(
-                X_user_item, X_graph_base, for_pred=True)
-
-            attn_weight_list = self.gnn_sr_model.attn_weight_list
-            self._Eval_Draw_Graph_(batch_users, test_set, rating_pred,
-                                   edge_index, edge_type, attn_weight_list, node2ids, topk=10)
+            rating_pred = self.gnn_sr_model(X_user_item, X_graph_base, for_pred=True)
 
             rating_pred = rating_pred.cpu().data.numpy().copy()
 
@@ -281,7 +278,7 @@ class Trainer:
                     self.pred_list, batch_pred_list, axis=0)
 
         precision, recall, MAP, ndcg, hr = [], [], [], [], []
-        for k in [10, 20]:
+        for k in self.K_eval_list:
             precision.append(precision_at_k(test_set, self.pred_list, k))
             recall.append(recall_at_k(test_set, self.pred_list, k))
             MAP.append(mapk(test_set, self.pred_list, k))
