@@ -17,7 +17,7 @@ if __name__ == '__main__':
     train_part, test_part, info, edges = datacollector.prepare(verbose=config.verbose, logger=logger)
     
     logger.info(f'Commencing training for {config.epoch_num} epochs')
-    trainer = Trainer(config=config,info=info,edges=edges)
+    trainer = Trainer(config=config,info=info,edges=edges, logger=logger)
     trainer.train(train_part=train_part,test_part=test_part)
 
     logger.info(f'Completed training for {config.epoch_num} epochs')

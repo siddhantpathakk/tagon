@@ -10,9 +10,8 @@ from utils.trainer_utils import NegativeSampler,SubGraphExtractor
 from model.CAGSRec import CAGSRec
 from utils.seed import seed_everything
 
-def build_model(config, item_num, node_num, relation_num):
+def build_model(config, item_num, node_num, relation_num, logger):
     seed_everything(config.seed)
-    print(node_num, relation_num, 'node_num, relation_num')
     model = CAGSRec(config, item_num, node_num, relation_num)
     
     if config.optimizer == 'adam':
@@ -35,9 +34,9 @@ def build_model(config, item_num, node_num, relation_num):
     lr_scheduler = torch.optim.lr_scheduler.LinearLR(optimizer)
     
     if config.verbose:
-        print(model)
-        print(f'Optimizer:\t{optimizer.__class__.__name__} with initial lr = {config.learning_rate}, l2 = {config.l2}')
-        print(f'LR Scheduler:\t{lr_scheduler.__class__.__name__}')
+        logger.info(model)
+        logger.info(f'Optimizer:\t{optimizer.__class__.__name__} with initial lr = {config.learning_rate}, l2 = {config.l2}')
+        logger.info(f'LR Scheduler:\t{lr_scheduler.__class__.__name__}')
     
     return model, optimizer, lr_scheduler
 
@@ -47,7 +46,7 @@ def load_model_from_ckpt(config, model_ckpt):
     return model
 
 class Trainer:
-    def __init__(self, config, info, edges, resume=False, model_ckpt=None, eval_mode=False):
+    def __init__(self, config, info, edges, logger, resume=False, model_ckpt=None, eval_mode=False):
         
         node_num, relation_num = info['node_num'], info['relation_num']
         u2v, u2vc, v2u, v2vc = edges
@@ -67,7 +66,7 @@ class Trainer:
         v_list_ = sorted(list(unique_values))       
         item_num = len(v_list_)
         
-        self.model, self.optimizer, self.lr_scheduler = build_model(config, item_num=item_num, node_num=node_num, relation_num=relation_num, )
+        self.model, self.optimizer, self.lr_scheduler = build_model(config, item_num=item_num, node_num=node_num, relation_num=relation_num, logger=logger)
         self.model = self.model.to(self.device)
         if resume:
             assert model_ckpt is not None, 'model_ckpt must be provided if resume is True'
