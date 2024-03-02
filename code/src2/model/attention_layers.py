@@ -14,8 +14,7 @@ class TemporalSequentialAttentionLayer(nn.Module):
 
     def forward(self, input_tensor):
         time_step = input_tensor.size(1)
-        pos_emb = self.positional_encoding(
-            time_step, self.embed_dim, input_tensor.device)
+        pos_emb = self.positional_encoding(time_step, self.embed_dim, input_tensor.device)
         input_tensor = input_tensor + pos_emb
 
         attn_output, _ = self.multihead_attn(input_tensor, input_tensor, input_tensor)
@@ -50,7 +49,7 @@ class CrossAttentionLayer(nn.Module):
 
     def forward(self, user_emb, item_emb):
         user_emb = user_emb.unsqueeze(1)  # Add sequence length dimension
-        attn_output, _ = self.multihead_attn(user_emb, item_emb, item_emb)
+        attn_output, _ = self.multihead_attn(query=user_emb, key=item_emb, value=item_emb)
         attn_output = self.dropout(attn_output)
         output_tensor = self.feedforward(attn_output)
         output_tensor = self.dropout(output_tensor)

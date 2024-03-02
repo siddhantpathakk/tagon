@@ -12,7 +12,7 @@ class NegativeSampler:
         for i in range(batch_users.shape[0]):
             user_item_set = set(user2item[batch_users[i]])
             difference_set = item_set - user_item_set
-            negtive_list_ = random.sample(sorted(difference_set), self.arg.H)
+            negtive_list_ = random.sample(sorted(difference_set), self.H)
             negatives_np.append(negtive_list_)
         negatives_np = np.array(negatives_np)
         return negatives_np

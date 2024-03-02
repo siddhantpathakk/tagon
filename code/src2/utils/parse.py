@@ -21,10 +21,9 @@ def parse_opt():
     
     # directory based parameters
     parser.add_argument('--dataset', type=str, default='ml100k', help='ml100k, ml1m')
-    parser.add_argument('--out_path', type=str,mdefault='/home/FYP/siddhant005/fyp/code/src/logs/tmp/', help='output path')
-    parser.add_argument('--processed', type=str2bool, nargs='?', const=True, default=True, help='whether to use processed data or not')
-    parser.add_argument('--log_path', type=str, default='/home/FYP/siddhant005/fyp/code/src/logs/', help='log path')
-
+    parser.add_argument('--out_path', type=str, default='code/src/logs/tmp/', help='output path')
+    parser.add_argument('--file_path', type=str, default='/code/data/processed_timesteps/ml-100k/', help='log path')
+    
     # data based parameters
     parser.add_argument('--L', type=int, default=11, help='length of sequence')
     parser.add_argument('--H', type=int, default=3, help='length of history')
@@ -37,43 +36,36 @@ def parse_opt():
     parser.add_argument('--l2', type=float, default=1e-4, help='l2 regularization')  # {1e-1 ... 1e-5}
 
     # negative sampling parameters
-    parser.add_argument('--neg_samples', type=int, default=2, help='number of negative samples')
-    parser.add_argument('--sets_of_neg_samples', type=int, default=50, help='number of sets of negative samples')
+    parser.add_argument('--negative_num', type=int, default=2, help='number of negative samples')
+    parser.add_argument('--hop', type=int, default=2, help='hop')
 
-    # GCN based parameters
+    # CAGSRec based parameters
     parser.add_argument('--dim', type=int, default=32, help='dimension of hidden layers')
-    parser.add_argument('--conv_layer_num', type=int, default=2, help='number of long term GCN layers')
-    parser.add_argument('--short_term_conv_layer_num', type=int, default=3, help='number of short term GCN layers')
+    parser.add_argument('--conv_layer_num', type=int, default=3, help='number of long term GCN layers')
+    parser.add_argument('--short_conv_layer_num', type=int, default=3, help='number of short term GCN layers')
     parser.add_argument('--num_bases', type=int, default=3, help='number of bases')
-    parser.add_argument('--adj_dropout', type=int, default=0, help='adjacency dropout')
-    parser.add_argument('--lambda_val', type=float, default=0.5, help='lambda value for combination of embeddings')
-
-    # TSAL based parameters
+    parser.add_argument('--FFN', type=str, default="Simple", help='Feed Forward Network')  # {Simple, PointWise}
+    parser.add_argument('--attn_drop', type=float, default=0.1, help='attention dropout')
     parser.add_argument('--TSAL_head_num', type=int, default=2, help='number of heads for Temporal Sequential Attn Layer')
-    parser.add_argument('--TSAL_attn_drop', type=float, default=0.0, help='attention dropout for Temporal Sequential Attn Layer')
-
-    # Cross attention based parameters
-    parser.add_argument('--cross_attn_head_num', type=int, default=2, help='number of heads for Cross Attn Layer')
-    parser.add_argument('--cross_attn_drop', type=float, default=0.0, help='attention dropout for Cross Attn Layer')
+    parser.add_argument('--CAL_head_num', type=int, default=2, help='number of heads for Cross Attn Layer')
 
     # other parameters
     parser.add_argument('--seed', type=int, default=42, help='seed for reproducibility')
     parser.add_argument('--verbose', type=str2bool, nargs='?', const=True, default=False, help='whether to print verbose logs or not')
     parser.add_argument('--debug', type=str2bool, nargs='?', const=True, default=False, help='whether to run in debug mode or not')
-    parser.add_argument('--plot', type=str2bool, nargs='?', const=True, default=True, help='whether to plot metrics or not')
     parser.add_argument('--block_backprop', type=str2bool, nargs='?', const=True,default=False, help='whether to block backpropagation or not')
+    parser.add_argument('--log_file', type=str, default='code/src2/logs.log', help='log path')
     
-    args = parser.parse_args()
+    args = fix_args(parser.parse_args())
     
     pp.pprint(vars(args))
 
-    return fix_args(args)
+    return args
 
 def fix_args(config):
-    config.log_path = config.log_path + "train/" + config.dataset + '/'
-
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    config.device = device
+    # config.device = device
+    config.device = 'cpu'
     
     if config.debug:
         if config.dataset == 'ml100k':
@@ -85,21 +77,7 @@ def fix_args(config):
 
     if config.dataset == 'ml100k':
         config.batch_size = 128
-        if config.processed:
-            config.file_path = '/home/FYP/siddhant005/fyp/code/data/processed_timesteps/ml-100k/'
-        else:
-            config.file_path = '/home/FYP/siddhant005/fyp/code/data/processed/ml-100k/'
     elif config.dataset == 'ml1m':
-        if config.processed:
-            config.file_path = '/home/FYP/siddhant005/fyp/code/data/processed_timesteps/ml-1m/'
-        else:
-            config.file_path = '/home/FYP/siddhant005/fyp/code/data/processed/ml-1m/'
         config.batch_size = 1024
-    else:
-        raise NotImplementedError(f'[ERROR] Dataset {config.dataset} not implemented')
-
-    with open(config.out_path+'commandline_args.txt', 'w') as f:
-        json.dump(config.__dict__, f, indent=2)
-        
         
     return config

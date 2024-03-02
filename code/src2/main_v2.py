@@ -1,8 +1,8 @@
-from .utils.loggers import set_logging_tool
-from .dataloader import DataCollector
-from .trainer_v2 import Trainer
-from .utils.seed import seed_everything
-from .utils.parse import parse_opt
+from utils.loggers import set_logging_tool
+from dataloader import DataCollector
+from trainer_v2 import Trainer
+from utils.seed import seed_everything
+from utils.parse import parse_opt
 
 if __name__ == '__main__':
     config = parse_opt()
