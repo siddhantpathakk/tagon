@@ -44,7 +44,7 @@ def parse_opt():
     parser.add_argument('--conv_layer_num', type=int, default=3, help='number of long term GCN layers')
     parser.add_argument('--short_conv_layer_num', type=int, default=3, help='number of short term GCN layers')
     parser.add_argument('--num_bases', type=int, default=3, help='number of bases')
-    parser.add_argument('--FFN', type=str, default="Simple", help='Feed Forward Network')  # {Simple, PointWise}
+    parser.add_argument('--FFN', type=str, default="PointWise", help='Feed Forward Network')  # {Simple, PointWise}
     parser.add_argument('--attn_drop', type=float, default=0.1, help='attention dropout')
     parser.add_argument('--TSAL_head_num', type=int, default=2, help='number of heads for Temporal Sequential Attn Layer')
     parser.add_argument('--CAL_head_num', type=int, default=2, help='number of heads for Cross Attn Layer')
