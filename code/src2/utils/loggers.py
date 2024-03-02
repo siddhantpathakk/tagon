@@ -3,8 +3,13 @@ import os
 
 def set_logging_tool(log_file):
 
+    # if the log file already exists, then delete it
+    if os.path.exists(log_file):
+        os.remove(log_file)
+        
     if not os.path.isfile(log_file):
         open(log_file, "w+").close()
+
 
     console_logging_format = "%(levelname)s %(module)s %(message)s"
     file_logging_format = "%(levelname)s: %(module)s: %(asctime)s: %(message)s"
