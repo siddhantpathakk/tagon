@@ -4,6 +4,7 @@ import torch.nn as nn
 from model.FFN import PointWiseFeedForward, SimpleFeedForward
 from model.improvedGNN import LongTermGNN, ShortTermGNN
 from model.attention_layers import TemporalSequentialAttentionLayer, CrossAttentionLayer
+from model.attention_layers_v2 import TemporalSequentialAttentionLayer_v2, CrossAttentionLayer_v2
 
 
 class CAGSRec(nn.Module):
@@ -19,8 +20,7 @@ class CAGSRec(nn.Module):
         self.node_num = node_num
         self.relation_num = relation_num
         
-        attn_dimension = (self.args.conv_layer_num +
-                              self.args.short_conv_layer_num) * self.args.dim
+        attn_dimension = (self.args.conv_layer_num + self.args.short_conv_layer_num) * self.args.dim
         
         if self.args.FFN == 'Simple':
             self.FFN = nn.Sequential(
@@ -35,15 +35,27 @@ class CAGSRec(nn.Module):
             ).to(self.device)
         
         
-        self.temporal_seq_attn_layer = TemporalSequentialAttentionLayer(embed_dim=attn_dimension,
-                                                                        num_heads=self.args.TSAL_head_num,
-                                                                        dropout=self.args.attn_drop,
-                                                                        feedforward=self.FFN).to(self.device)
+        # self.temporal_seq_attn_layer = TemporalSequentialAttentionLayer(embed_dim=attn_dimension,
+        #                                                                 num_heads=self.args.TSAL_head_num,
+        #                                                                 dropout=self.args.attn_drop,
+        #                                                                 feedforward=self.FFN).to(self.device)
         
-        self.cross_attn_layer = CrossAttentionLayer(embed_dim=attn_dimension,
-                                                    num_heads=self.args.CAL_head_num,
-                                                    dropout=self.args.attn_drop,
-                                                    feedforward=self.FFN).to(self.device)
+        # self.cross_attn_layer = CrossAttentionLayer(embed_dim=attn_dimension,
+        #                                             num_heads=self.args.CAL_head_num,
+        #                                             dropout=self.args.attn_drop,
+        #                                             feedforward=self.FFN).to(self.device)
+        
+        self.temporal_seq_attn_layer = TemporalSequentialAttentionLayer_v2(attn_dim=attn_dimension,
+                                                                            num_heads=self.args.TSAL_head_num,
+                                                                            feedforward=self.FFN,
+                                                                            dropout=self.args.attn_drop,
+                                                                            device=self.device).to(self.device)
+        
+        self.cross_attn_layer = CrossAttentionLayer_v2(attn_dim=attn_dimension,
+                                                        num_heads=self.args.CAL_head_num,
+                                                        feedforward=self.FFN,
+                                                        dropout=self.args.attn_drop,
+                                                        device=self.device).to(self.device)
         
         self.long_term_gnn = LongTermGNN(dim = self.args.dim,
                                          conv_layer_num=self.args.conv_layer_num,
@@ -58,7 +70,6 @@ class CAGSRec(nn.Module):
         self.predict_emb_w = nn.Embedding(item_num, (self.args.conv_layer_num + self.args.short_conv_layer_num) * self.args.dim, padding_idx=0).to(self.device)
         self.predict_emb_b = nn.Embedding(item_num, 1, padding_idx=0).to(self.device)
         self.node_embeddings = nn.Embedding(node_num, self.args.dim, padding_idx=0).to(self.device)
-        # print(node_num, self.args.dim, 'nn.emb')
         
         self.reset_parameters()
         
@@ -106,10 +117,11 @@ class CAGSRec(nn.Module):
             rel_score = torch.sum(rel_score, dim=1) 
             res += rel_score  
             return res  
-
+        
         res = torch.baddbmm(pe_b, pe_w, user_embeddings.unsqueeze(2)).squeeze()
         rel_score = item_embeddings.bmm(pe_w.permute(0, 2, 1))
         rel_score = torch.sum(rel_score, dim=1)
         res += rel_score
+        
         
         return res, user_embeddings, item_embeddings
