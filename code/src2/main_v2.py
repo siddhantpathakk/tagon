@@ -16,6 +16,18 @@ if __name__ == '__main__':
     datacollector = DataCollector(config)
     train_part, test_part, info, edges = datacollector.prepare(verbose=config.verbose, logger=logger)
     
+    with open('users_np.txt', 'w') as f:
+        f.write(str(train_part[0]))
+    with open('sequences_np_train.txt', 'w') as f:
+        f.write(str(train_part[1]))
+        
+    with open('sequences_np_test.txt', 'w') as f:
+        f.write(str(test_part[0]))
+    with open('items_np.txt', 'w') as f:
+        f.write(str(test_part[1]))
+    with open('uid_list.txt', 'w') as f:
+        f.write(str(test_part[2]))
+    
     logger.info(f'Commencing training for {config.epoch_num} epochs')
     trainer = Trainer(config=config,info=info,edges=edges, logger=logger)
     trainer.train(train_part=train_part,test_part=test_part)

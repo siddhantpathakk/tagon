@@ -28,5 +28,7 @@ err
 jupyter
 tmp
 ml-1m
-*.log
 src
+*.out
+*.err
+*.txt

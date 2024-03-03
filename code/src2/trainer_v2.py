@@ -6,13 +6,15 @@ torch.cuda.empty_cache()
 from tqdm import tqdm
 
 from utils.eval_utils import precision_at_k, recall_at_k, mapk, ndcg_k, hit_ratio_at_k
-from utils.trainer_utils import NegativeSampler,SubGraphExtractor
-from model.CAGSRec import CAGSRec
+from utils.trainer_utils import NegativeSampler
+from model.CAGSRec_v2 import CAGSRec
 from utils.seed import seed_everything
+from model.improvedGNN_v2 import ImprovedGNNunit
 
 def build_model(config, item_num, node_num, relation_num, logger):
     seed_everything(config.seed)
-    model = CAGSRec(config, item_num, node_num, relation_num)
+    gnn = ImprovedGNNunit
+    model = CAGSRec(config, item_num, node_num, relation_num, gcn=gnn).to(config.device)
     
     if config.optimizer == 'adam':
         optimizer = torch.optim.Adam(model.parameters(), 
@@ -80,7 +82,6 @@ class Trainer:
         self.short_term_window_num = 3
         
         self.negative_sampler = NegativeSampler(self.arg, self.arg.H)
-        self.subgraph_extractor = SubGraphExtractor(self.arg, self.v2vc, self.v2u, self.u2v, hop=2)
     
         self.topk_list = [10, 20]
         
@@ -221,7 +222,7 @@ class Trainer:
         p, r, map_, ndcg, hr = [], [], [], [], []
         p2, r2, map2, ndcg2, hr2 = [], [], [], [], []
         
-        users_np, sequences_np_train = train_part[0], train_part[1]
+        users_np, sequences_np_train = train_part
         sequences_np_test, test_set, uid_list_ = test_part[0], test_part[1], test_part[2]
         users_np_test = np.array(uid_list_)
 
@@ -239,7 +240,6 @@ class Trainer:
         for epoch_ in tqdm(range(self.arg.epoch_num), desc='Epoch Progress', leave=False):
             user_emd_batch_list,item_emd_batch_list = list(), list()
             start = time.time()
-            # for batch_ in tqdm(range(batch_num), desc=f'Batch Progress in Epoch {epoch_+1}'):
             for batch_ in range(batch_num):
                 start_index, end_index = batch_ * self.arg.batch_size, (batch_+1) * self.arg.batch_size
                 batch_record_index = record_indexes[start_index: end_index]
@@ -270,8 +270,7 @@ class Trainer:
                 items_to_predict = torch.cat((batch_targets, batch_negatives), 1)
 
                 X_user_item = [batch_users, batch_sequences, items_to_predict]
-                X_graph_base = [edge_index, edge_type,
-                                node_no, short_term_part]
+                X_graph_base = [edge_index, edge_type, node_no, short_term_part]
                 pred_score, user_emb, item_embs_conv = self.model(X_user_item, X_graph_base)
 
                 user_emd_batch_list.append(user_emb)
@@ -281,8 +280,8 @@ class Trainer:
                                                              [batch_targets.size(1), batch_negatives.size(1)], 
                                                              dim=1)
 
-                # # RAGCN loss (long term)
-                # gcn_loss = 0
+                # RAGCN loss (long term)
+                gcn_loss = 0
                 # for gconv in self.model.conv_modulelist:
                 #     w = torch.matmul(gconv.att_r, gconv.basis.view(gconv.num_bases, -1)).view(gconv.num_relations, gconv.in_channels, gconv.out_channels)
                 #     gcn_loss = gcn_loss + torch.sum((w[1:, :, :] - w[:-1, :, :])**2)
@@ -297,8 +296,7 @@ class Trainer:
 
                 # # Combine GCN short term and long term loss
                 # gcn_loss = gcn_loss + short_gcn_loss
-                gcn_loss = 0
-
+                
                 # BPR loss
                 loss = - torch.log(torch.sigmoid(targets_pred - negatives_pred) + 1e-8)
                 loss = torch.mean(loss)
@@ -320,7 +318,10 @@ class Trainer:
             _, rem = divmod(time_-start, 3600)
             minutes, seconds = divmod(rem, 60)
             time_str = "{:0>2}m{:0>2}s".format(int(minutes), int(seconds))
-
+            
+            print(f'\nEpoch {epoch_+1}/{self.arg.epoch_num} - Loss: {epoch_loss:.4f} - Time: {time_str}')
+            
+            self.model.eval()
             precision, recall, MAP, ndcg, hr = self.evaluate(users_np_test, sequences_np_test, test_set, return_metrics=True)
             
             loss_list, p, r, map_, ndcg, hr, p2, r2, map2, ndcg2, hr2 = \
@@ -340,52 +341,57 @@ class Trainer:
     def evaluate(self, users_np_test, sequences_np_test, test_set=None, return_metrics=False):  # TODO: recheck this function
         
         assert not return_metrics or test_set is not None, 'test_set must be provided if return_metrics is True'
-        self.model.eval()
+        
+        #short term part
         short_term_window_size = int(self.arg.L / self.short_term_window_num)
         short_term_window = [0] + [i+short_term_window_size for i in range(self.short_term_window_num-1)] + [-1]
-        batch_num = int(users_np_test.shape[0]/self.arg.batch_size) + 1
+        
+        batch_num = int(users_np_test.shape[0]/self.arg.batch_size)+1
         data_index = np.arange(users_np_test.shape[0])
+        
         self.pred_list = None
-        with torch.no_grad():
-            for batch_ in range(batch_num):
-                start_index, end_index = batch_ * self.arg.batch_size, (batch_+1)*self.arg.batch_size
-                batch_record_index = data_index[start_index: end_index]
+        
+        for batch_ in range(batch_num):
+            start_index , end_index = batch_ * self.arg.batch_size , (batch_+1) * self.arg.batch_size
+            batch_record_index = data_index[start_index : end_index]
 
-                batch_users = users_np_test[batch_record_index]
-                batch_sequences = sequences_np_test[batch_record_index]
+            batch_users = users_np_test[batch_record_index]
+            batch_sequences = sequences_np_test[batch_record_index]
+ 
+            #Extracting SUBGraph (long term)
+            batch_users, batch_sequences, edge_index, edge_type, node_no, node2ids = self.Extract_SUBGraph(batch_users,batch_sequences,sub_seq_no=None)
 
-                batch_users, batch_sequences, edge_index, edge_type, node_no, node2ids = self.subgraph_extractor.extract(batch_users, batch_sequences, sub_seq_no=None)
+            #Extracting SUBGraph (short term)
+            short_term_part = []
+            for i in range(len(short_term_window)):
+                if i != len(short_term_window)-1:
+                    sub_seq_no = batch_sequences[:,short_term_window[i]:short_term_window[i+1]]
+                    _,_,edge_index,edge_type,_,_ = self.Extract_SUBGraph(batch_users,batch_sequences,sub_seq_no=sub_seq_no,node2ids=node2ids)
+                    short_term_part.append((edge_index,edge_type))
 
-                short_term_part = []
-                for i in range(len(short_term_window)):
-                    if i != len(short_term_window)-1:
-                        sub_seq_no = batch_sequences[:,short_term_window[i]:short_term_window[i+1]]
-                        edge_index, edge_type= self.subgraph_extractor.extract(batch_users, batch_sequences, sub_seq_no=sub_seq_no, node2ids=node2ids, short_term=True)
-                        short_term_part.append((edge_index, edge_type))
+            batch_users = torch.tensor(batch_users).to(self.device)
+            batch_sequences = torch.from_numpy(batch_sequences).type(torch.LongTensor).to(self.device)
 
-                batch_users = torch.tensor(batch_users).to(self.device)
-                batch_sequences = torch.from_numpy(batch_sequences).type(torch.LongTensor).to(self.device)
+            X_user_item = [batch_users,batch_sequences,self.item_indexes]
+            X_graph_base = [edge_index,edge_type,node_no,short_term_part]
 
-                X_user_item = [batch_users, batch_sequences, self.item_indexes]
-                X_graph_base = [edge_index, edge_type, node_no, short_term_part]
+            rating_pred, _, _ = self.model(X_user_item, X_graph_base, for_pred=True)
 
-                rating_pred = self.model(X_user_item, X_graph_base, for_pred=True)
+            rating_pred = rating_pred.cpu().data.numpy().copy()
 
-                rating_pred = rating_pred.cpu().data.numpy().copy()
+            ind = np.argpartition(rating_pred, -self.arg.topk)
+            ind = ind[:, -self.arg.topk:]
+            arr_ind = rating_pred[np.arange(len(rating_pred))[:, None], ind]
+            arr_ind_argsort = np.argsort(arr_ind)[np.arange(len(rating_pred)), ::-1]
+            batch_pred_list = ind[np.arange(len(rating_pred))[:, None], arr_ind_argsort]
 
-                ind = np.argpartition(rating_pred, -self.arg.topk)
-                ind = ind[:, -self.arg.topk:]
-                arr_ind = rating_pred[np.arange(len(rating_pred))[:, None], ind]
-                arr_ind_argsort = np.argsort(arr_ind)[np.arange(len(rating_pred)), ::-1]
-                batch_pred_list = ind[np.arange(len(rating_pred))[:, None], arr_ind_argsort]
+            if batch_ == 0:
+                self.pred_list = batch_pred_list
+            else:
+                self.pred_list = np.append(self.pred_list, batch_pred_list, axis=0)
 
-                if batch_ == 0:
-                    self.pred_list = batch_pred_list
-                else:
-                    self.pred_list = np.append(self.pred_list, batch_pred_list, axis=0)
-
+        precision, recall, MAP, ndcg, hr = [], [], [], [], []
         if return_metrics:
-            precision, recall, MAP, ndcg, hr = [], [], [], [], []
             for k in [10, 20]:
                 precision.append(precision_at_k(test_set, self.pred_list, k))
                 recall.append(recall_at_k(test_set, self.pred_list, k))
@@ -393,8 +399,8 @@ class Trainer:
                 ndcg.append(ndcg_k(test_set, self.pred_list, k))
                 hr.append(hit_ratio_at_k(test_set, self.pred_list, k))
             return precision, recall, MAP, ndcg, hr
-        
-        return self.pred_list
+        else:
+            return self.pred_list
         
     def save_model(self, model_ckpt):
         torch.save(self.model.state_dict(), model_ckpt)

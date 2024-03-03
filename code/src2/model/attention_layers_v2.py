@@ -9,13 +9,13 @@ class BaseAttentionLayer(nn.Module):
         
         self.attn_dim = attn_dim
         self.head_num = num_heads
+        self.device = device
         
-        self.W_Q = Variable(torch.zeros(self.attn_dim,self.attn_dim).type(torch.FloatTensor), requires_grad=True).to(device)
-        self.W_K = Variable(torch.zeros(self.attn_dim,self.attn_dim).type(torch.FloatTensor), requires_grad=True).to(device)
-        self.W_V = Variable(torch.zeros(self.attn_dim,self.attn_dim).type(torch.FloatTensor), requires_grad=True).to(device)
+        self.W_Q = Variable(torch.zeros(self.attn_dim, self.attn_dim).type(torch.FloatTensor), requires_grad=True).to(device)
+        self.W_K = Variable(torch.zeros(self.attn_dim, self.attn_dim).type(torch.FloatTensor), requires_grad=True).to(device)
+        self.W_V = Variable(torch.zeros(self.attn_dim, self.attn_dim).type(torch.FloatTensor), requires_grad=True).to(device)
 
         self.drop_layer = nn.Dropout(p=dropout)
-        self.device = device
         self.feedforward = feedforward.to(device)
         
         self.attn = None
@@ -27,16 +27,17 @@ class BaseAttentionLayer(nn.Module):
         self.W_K = nn.init.xavier_uniform_(self.W_K)
         self.W_V = nn.init.xavier_uniform_(self.W_V) 
 
-    def forward(self, input_tensor):
+    def forward(self):
         raise NotImplementedError("forward method is not implemented")
-
-    def positional_encoding(self, input_tensor):
+    
+    def positional_encoding(self):
         raise NotImplementedError("positional_encoding method is not implemented")
 
 
 class TemporalSequentialAttentionLayer_v2(BaseAttentionLayer):
     def __init__(self, attn_dim, num_heads, feedforward, dropout=0.1, device='cuda'):
         super(TemporalSequentialAttentionLayer_v2, self).__init__(attn_dim, num_heads, feedforward, dropout, device)
+        self.reset_parameters()
     
     def forward(self, input_tensor):
         time_step = input_tensor.size()[1]
@@ -97,7 +98,8 @@ class TemporalSequentialAttentionLayer_v2(BaseAttentionLayer):
 class CrossAttentionLayer_v2(BaseAttentionLayer):
     def __init__(self, attn_dim, num_heads, feedforward, dropout=0.1, device='cuda'):
         super(CrossAttentionLayer_v2, self).__init__(attn_dim, num_heads, feedforward, dropout, device)
-    
+        self.reset_parameters()
+
     def forward(self, user_emb, item_emb):
         time_step = item_emb.size()[1]
         
@@ -128,9 +130,6 @@ class CrossAttentionLayer_v2(BaseAttentionLayer):
         output_tensor = torch.cat(torch.split(output_tensor,int(N/self.head_num),0),-1) 
 
         output_tensor = self.feedforward(output_tensor)
-        output_tensor += item_emb
+        output_tensor += user_emb # Why not item_emb?
         
         return output_tensor
-
-    def positional_encoding(self, length, dim, device):
-        pass

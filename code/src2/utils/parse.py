@@ -18,14 +18,13 @@ def parse_opt():
     parser = argparse.ArgumentParser(description='Trainer for FYP GNN')
     pp = pprint.PrettyPrinter(indent=4)  # PrettyPrinter is used to print the arguments in a clean way
 
-    
     # directory based parameters
     parser.add_argument('--dataset', type=str, default='ml100k', help='ml100k, ml1m')
-    parser.add_argument('--out_path', type=str, default='code/src/logs/tmp/', help='output path')
-    parser.add_argument('--file_path', type=str, default='/code/data/processed_timesteps/ml-100k/', help='log path')
+    parser.add_argument('--out_path', type=str, default='', help='output path')
+    parser.add_argument('--file_path', type=str, default='', help='director for dataset')
     
     # data based parameters
-    parser.add_argument('--L', type=int, default=11, help='length of sequence')
+    parser.add_argument('--L', type=int, default=10, help='length of sequence')
     parser.add_argument('--H', type=int, default=3, help='length of history')
     parser.add_argument('--topk', type=int, default=20, help='top k items to recommend')
 
@@ -54,7 +53,7 @@ def parse_opt():
     parser.add_argument('--verbose', type=str2bool, nargs='?', const=True, default=False, help='whether to print verbose logs or not')
     parser.add_argument('--debug', type=str2bool, nargs='?', const=True, default=False, help='whether to run in debug mode or not')
     parser.add_argument('--block_backprop', type=str2bool, nargs='?', const=True,default=False, help='whether to block backpropagation or not')
-    parser.add_argument('--log_file', type=str, default='code/src2/logs.log', help='log path')
+    parser.add_argument('--log_file', type=str, default='logs.log', help='log path')
     
     args = fix_args(parser.parse_args())
     

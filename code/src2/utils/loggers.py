@@ -10,9 +10,8 @@ def set_logging_tool(log_file):
     if not os.path.isfile(log_file):
         open(log_file, "w+").close()
 
-
-    console_logging_format = "%(levelname)s %(module)s %(message)s"
-    file_logging_format = "%(levelname)s: %(module)s: %(asctime)s: %(message)s"
+    console_logging_format = f"%(levelname)s:\t%(module)s:\t%(message)s"
+    file_logging_format = f"%(levelname)s:\t%(module)s:\t%(asctime)s:\t%(message)s"
 
     # configure logger
     logger = logging.getLogger(__name__)
