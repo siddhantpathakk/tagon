@@ -1,20 +1,20 @@
-INFO:	main:	2024-03-04 06:07:18,681:	Outputs will be saved in: runs/run1
-INFO:	main:	2024-03-04 06:07:18,681:	Using seed: 42
-INFO:	main:	2024-03-04 06:07:18,682:	Using device: cpu
-INFO:	main:	2024-03-04 06:07:18,682:	Commencing data collection for ml-100k
-INFO:	dataloader:	2024-03-04 06:07:18,927:	Data preprocessing completed
-INFO:	dataloader:	2024-03-04 06:07:18,927:	uid2locid_time: 568 
-INFO:	dataloader:	2024-03-04 06:07:18,928:	locid2detail: 1439 
-INFO:	dataloader:	2024-03-04 06:07:18,928:	node_num: 2012 
-INFO:	dataloader:	2024-03-04 06:07:18,928:	relation_num: 4 
-INFO:	dataloader:	2024-03-04 06:07:18,928:	user_num: 568 
-INFO:	dataloader:	2024-03-04 06:07:18,928:	train_num: 4544 
-INFO:	dataloader:	2024-03-04 06:07:18,928:	test_num: 568 
-INFO:	dataloader:	2024-03-04 06:07:18,928:	train_set: (4544, 13) 
-INFO:	dataloader:	2024-03-04 06:07:18,928:	test_set: (568, 10) 
-INFO:	dataloader:	2024-03-04 06:07:18,928:	uid_list_: 568 
-INFO:	dataloader:	2024-03-04 06:07:18,928:	u2v: 568 
-INFO:	dataloader:	2024-03-04 06:07:18,928:	u2vc: 568 
-INFO:	dataloader:	2024-03-04 06:07:18,928:	v2u: 1439 
-INFO:	dataloader:	2024-03-04 06:07:18,928:	v2vc: 1439 
-INFO:	main:	2024-03-04 06:07:18,928:	Commencing training for 500 epochs. Please follow Training Logger from here on.
+INFO:	main:	2024-03-04 06:19:29,770:	Outputs will be saved in: runs/run1
+INFO:	main:	2024-03-04 06:19:29,770:	Using seed: 42
+INFO:	main:	2024-03-04 06:19:29,770:	Using device: cpu
+INFO:	main:	2024-03-04 06:19:29,770:	Commencing data collection for ml-100k
+INFO:	dataloader:	2024-03-04 06:19:30,019:	Data preprocessing completed
+INFO:	dataloader:	2024-03-04 06:19:30,019:	uid2locid_time: 568 
+INFO:	dataloader:	2024-03-04 06:19:30,019:	locid2detail: 1439 
+INFO:	dataloader:	2024-03-04 06:19:30,019:	node_num: 2012 
+INFO:	dataloader:	2024-03-04 06:19:30,019:	relation_num: 4 
+INFO:	dataloader:	2024-03-04 06:19:30,019:	user_num: 568 
+INFO:	dataloader:	2024-03-04 06:19:30,019:	train_num: 4544 
+INFO:	dataloader:	2024-03-04 06:19:30,019:	test_num: 568 
+INFO:	dataloader:	2024-03-04 06:19:30,019:	train_set: (4544, 13) 
+INFO:	dataloader:	2024-03-04 06:19:30,019:	test_set: (568, 10) 
+INFO:	dataloader:	2024-03-04 06:19:30,019:	uid_list_: 568 
+INFO:	dataloader:	2024-03-04 06:19:30,019:	u2v: 568 
+INFO:	dataloader:	2024-03-04 06:19:30,019:	u2vc: 568 
+INFO:	dataloader:	2024-03-04 06:19:30,019:	v2u: 1439 
+INFO:	dataloader:	2024-03-04 06:19:30,019:	v2vc: 1439 
+INFO:	main:	2024-03-04 06:19:30,020:	Commencing training for 10 epochs. Please follow Training Logger from here on.

@@ -27,6 +27,9 @@ class Trainer:
         item_num = len(v_list_)
         self.item_set = set(self.v2u.keys())
         
+        self.gnn_sr_model, self.optimizer, self.lr_scheduler = build_model(
+            config, item_num, node_num, relation_num, logger)
+        
         if resume:
             assert model_ckpt is not None, 'model_ckpt must be provided if resume is True'
             self.gnn_sr_model = load_model_from_ckpt(self.arg, model_ckpt)
@@ -35,9 +38,6 @@ class Trainer:
             assert model_ckpt is not None, 'model_ckpt must be provided if eval_mode is True'
             self.gnn_sr_model = load_model_from_ckpt(self.arg, model_ckpt)
         
-        else:
-            self.gnn_sr_model, self.optimizer, self.lr_scheduler = build_model(
-                config, item_num, node_num, relation_num, logger)
             
         self.device = device
         self.arg = config
@@ -374,7 +374,7 @@ class Trainer:
                     precision, recall, MAP, ndcg, hr = self.Evaluation(users_np_test, sequences_np_test, test_set)
                 
                 # self.logger.info(f'Epoch {epoch_+1}/{self.arg.epoch_num}:\tLoss: {epoch_loss:.4f}\tP@10: {precision[0]:.4f}\tR@10: {recall[0]:.4f}\tMAP@10: {MAP[0]:.4f}\tNDCG@10: {ndcg[0]:.4f}\tHR@10: {hr[0]:.4f}\tP@20: {precision[1]:.4f}\tR@20: {recall[1]:.4f}\tMAP@20: {MAP[1]:.4f}\tNDCG@20: {ndcg[1]:.4f}\tHR@20: {hr[1]:.4f}')
-                pbar.set_postfix(ordered_dict={'Loss': epoch_loss, 'P@10': precision[0], 'R@10': recall[0], 'MAP@10': MAP[0], 'NDCG@10': ndcg[0], 'HR@10': hr[0], 'P@20': precision[1], 'R@20': recall[1], 'MAP@20': MAP[1], 'NDCG@20': ndcg[1], 'HR@20': hr[1]})
+                pbar.set_postfix(ordered_dict={'Loss': epoch_loss, 'P@10': precision[0], 'R@10': recall[0]})
 
                 loss_list.append(epoch_loss)
                 precision_list.append(precision[0])
@@ -399,7 +399,13 @@ class Trainer:
 
     def plot_metric(self, metric, metric_name):
         plt.style.use('ggplot')
-        plt.plot(metric)
+        plt.figure()
+        
+        # plot the metric and its moving average
+        plt.plot(metric, label=metric_name)
+        plt.plot(np.convolve(metric, np.ones(10)/10, mode='valid'), label='Moving Average')
+        plt.legend()
+        
         plt.xlabel('Epochs')
         plt.ylabel(metric_name)
         plt.savefig(self.arg.plot_dir + '/' + metric_name + '.png')

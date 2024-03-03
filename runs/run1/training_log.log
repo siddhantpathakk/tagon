@@ -1,4 +1,4 @@
-2024-03-04 06:07:18,947:	CAGSRec(
+2024-03-04 06:19:30,040:	CAGSRec(
   (FFN): Sequential(
     (0): PointWiseFeedForward(
       (conv1): Conv1d(192, 192, kernel_size=(1,), stride=(1,))
@@ -49,5 +49,5 @@
   (predict_emb_b): Embedding(1439, 1, padding_idx=0)
   (node_embeddings): Embedding(2012, 32, padding_idx=0)
 )
-2024-03-04 06:07:18,947:	Optimizer:	Adam with initial lr = 0.001, l2 = 0.0001
-2024-03-04 06:07:18,947:	LR Scheduler:	LinearLR
+2024-03-04 06:19:30,041:	Optimizer:	Adam with initial lr = 0.001, l2 = 0.0001
+2024-03-04 06:19:30,041:	LR Scheduler:	LinearLR
