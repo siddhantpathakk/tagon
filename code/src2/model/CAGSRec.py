@@ -2,8 +2,8 @@ import torch
 import torch.nn as nn
 
 from model.FFN import PointWiseFeedForward, SimpleFeedForward
-from model.improvedGNN_v2 import LongTermGNN, ShortTermGNN
-from model.attention_layers_v2 import TemporalSequentialAttentionLayer_v2, CrossAttentionLayer_v2
+from model.improvedGNN import LongTermGNN, ShortTermGNN
+from model.attention_layers import TemporalSequentialAttentionLayer_v2, CrossAttentionLayer_v2
 
 
 class CAGSRec(nn.Module):
@@ -126,6 +126,17 @@ class CAGSRec(nn.Module):
         # print('user_embeddings:', user_embeddings.size())
         # print('item_embeddings:', item_embeddings.size())
         # print('items_to_predict:', items_to_predict.size(), 'for_pred:', for_pred)
+        
+        if for_pred:
+            pe_w = pe_w.squeeze()
+            pe_b = pe_b.squeeze()
+            # user-pred_item
+            res = user_embeddings.mm(pe_w.t()) + pe_b 
+            # item-item 
+            rel_score = torch.matmul(item_embeddings, pe_w.t().unsqueeze(0)) 
+            rel_score = torch.sum(rel_score, dim=1) 
+            res += rel_score  
+            return res 
         
         res = torch.baddbmm(pe_b, pe_w, user_embeddings.unsqueeze(2)).squeeze()
         rel_score = item_embeddings.bmm(pe_w.permute(0, 2, 1))

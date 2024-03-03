@@ -14,14 +14,12 @@ def str2bool(v):
         raise argparse.ArgumentTypeError('Boolean value expected.')
 
 
-def parse_opt():
+def parse_opt(runCount):
     parser = argparse.ArgumentParser(description='Trainer for FYP GNN')
     pp = pprint.PrettyPrinter(indent=4)  # PrettyPrinter is used to print the arguments in a clean way
 
     # directory based parameters
-    parser.add_argument('--dataset', type=str, default='ml100k', help='ml100k, ml1m')
-    parser.add_argument('--out_path', type=str, default='', help='output path')
-    parser.add_argument('--file_path', type=str, default='', help='director for dataset')
+    parser.add_argument('--file_path', type=str, default='', help='directory for dataset')
     
     # data based parameters
     parser.add_argument('--L', type=int, default=10, help='length of sequence')
@@ -50,33 +48,38 @@ def parse_opt():
 
     # other parameters
     parser.add_argument('--seed', type=int, default=42, help='seed for reproducibility')
-    parser.add_argument('--verbose', type=str2bool, nargs='?', const=True, default=False, help='whether to print verbose logs or not')
+    parser.add_argument('--verbose', type=str2bool, nargs='?', const=True, default=True, help='whether to print verbose logs or not')
     parser.add_argument('--debug', type=str2bool, nargs='?', const=True, default=False, help='whether to run in debug mode or not')
     parser.add_argument('--block_backprop', type=str2bool, nargs='?', const=True,default=False, help='whether to block backpropagation or not')
-    parser.add_argument('--log_file', type=str, default='logs.log', help='log path')
     
-    args = fix_args(parser.parse_args())
+    args = fix_args(parser.parse_args(), runCount)
     
     pp.pprint(vars(args))
 
     return args
 
-def fix_args(config):
+def fix_args(config, runCount):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     # config.device = device
     config.device = 'cpu'
     
+    # get dataset name from file path
+    if config.file_path:
+        config.dataset = config.file_path.split('/')[-2]
+    
     if config.debug:
-        if config.dataset == 'ml100k':
+        if config.dataset == 'ml-100k':
             config.epoch_num = 30
-        elif config.dataset == 'ml1m':
+        elif config.dataset == 'ml-1m':
             config.epoch_num = 10
             
         config.verbose = True
 
-    if config.dataset == 'ml100k':
+    if config.dataset == 'ml-100k':
         config.batch_size = 128
-    elif config.dataset == 'ml1m':
+    elif config.dataset == 'ml-1m':
         config.batch_size = 1024
-        
+    
+    config.plot_dir = f'runs/run{runCount}/plots'
+    
     return config

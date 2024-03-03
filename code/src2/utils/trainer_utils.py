@@ -1,21 +1,69 @@
 import random
 import numpy as np
 import torch
+from model.CAGSRec import CAGSRec
+from model.improvedGNN import ImprovedGNNunit
 
-class NegativeSampler:
-    def __init__(self, config, H):
-        self.config = config
-        self.H = H
+from utils.seed import seed_everything
 
-    def sample(self, user2item, batch_users, item_set):
-        negatives_np = list()
-        for i in range(batch_users.shape[0]):
-            user_item_set = set(user2item[batch_users[i]])
-            difference_set = item_set - user_item_set
-            negtive_list_ = random.sample(sorted(difference_set), self.H)
-            negatives_np.append(negtive_list_)
-        negatives_np = np.array(negatives_np)
-        return negatives_np
+def build_model(config, item_num, node_num, relation_num, logger):
+    seed_everything(config.seed)
+    model = CAGSRec(config, item_num, node_num, relation_num, gcn=ImprovedGNNunit).to(config.device)
+    
+    if config.optimizer == 'adam':
+        optimizer = torch.optim.Adam(model.parameters(), 
+                                     lr=config.learning_rate, 
+                                     weight_decay=config.l2)
+    elif config.optimizer == 'sgd':
+        optimizer = torch.optim.SGD(model.parameters(), 
+                                    lr=config.learning_rate, 
+                                    momentum=0.9, 
+                                    weight_decay=config.l2)
+    elif config.optimizer == 'rmsprop':
+        optimizer = torch.optim.RMSprop(model.parameters(), 
+                                        lr=config.learning_rate, 
+                                        momentum=0.9, 
+                                        weight_decay=config.l2)
+    else:
+        raise Exception('Unknown optimizer {}'.format(config.optimizer))
+        
+    lr_scheduler = torch.optim.lr_scheduler.LinearLR(optimizer)
+    
+    if config.verbose:
+        logger.info(model)
+        logger.info(f'Optimizer:\t{optimizer.__class__.__name__} with initial lr = {config.learning_rate}, l2 = {config.l2}')
+        logger.info(f'LR Scheduler:\t{lr_scheduler.__class__.__name__}')
+    
+    return model, optimizer, lr_scheduler
+
+def load_model_from_ckpt(config, model_ckpt):
+    model = CAGSRec(config)
+    model.load_state_dict(torch.load(model_ckpt))
+    return model
+
+
+
+def Negative_Sampling(H, user2item, batch_users, item_set):
+    """
+    Negative sampling
+
+    Args:
+        user2item (dict): user to item mapping
+        batch_users (np.array): batch of users
+        item_set (set): set of items
+
+    Returns:
+        np.array: negative samples
+    """
+    negatives_np = list()
+    for i in range(batch_users.shape[0]):
+        user_item_set = set(user2item[batch_users[i]])
+        difference_set = item_set - user_item_set
+        negtive_list_ = random.sample(sorted(difference_set), H)
+        negatives_np.append(negtive_list_)
+    negatives_np = np.array(negatives_np)
+    return negatives_np
+
 
 
 class SubGraphExtractor:
