@@ -60,8 +60,8 @@ def parse_opt(runCount):
 
 def fix_args(config, runCount):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    # config.device = device
-    config.device = 'cpu'
+    config.device = device
+    # config.device = 'cpu'
     
     # get dataset name from file path
     if config.file_path:
