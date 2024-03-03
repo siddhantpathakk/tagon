@@ -1,0 +1,23 @@
+INFO:	main:	2024-03-04 06:35:25,196:	Outputs will be saved in: runs/run4
+INFO:	main:	2024-03-04 06:35:25,197:	Using seed: 42
+INFO:	main:	2024-03-04 06:35:25,197:	Using device: cuda
+INFO:	main:	2024-03-04 06:35:25,197:	Commencing data collection for ml-100k
+INFO:	dataloader:	2024-03-04 06:35:25,426:	Data preprocessing completed
+INFO:	dataloader:	2024-03-04 06:35:25,426:	uid2locid_time: 568 
+INFO:	dataloader:	2024-03-04 06:35:25,426:	locid2detail: 1439 
+INFO:	dataloader:	2024-03-04 06:35:25,426:	node_num: 2012 
+INFO:	dataloader:	2024-03-04 06:35:25,426:	relation_num: 4 
+INFO:	dataloader:	2024-03-04 06:35:25,426:	user_num: 568 
+INFO:	dataloader:	2024-03-04 06:35:25,426:	train_num: 4544 
+INFO:	dataloader:	2024-03-04 06:35:25,426:	test_num: 568 
+INFO:	dataloader:	2024-03-04 06:35:25,426:	train_set: (4544, 13) 
+INFO:	dataloader:	2024-03-04 06:35:25,426:	test_set: (568, 10) 
+INFO:	dataloader:	2024-03-04 06:35:25,426:	uid_list_: 568 
+INFO:	dataloader:	2024-03-04 06:35:25,426:	u2v: 568 
+INFO:	dataloader:	2024-03-04 06:35:25,426:	u2vc: 568 
+INFO:	dataloader:	2024-03-04 06:35:25,426:	v2u: 1439 
+INFO:	dataloader:	2024-03-04 06:35:25,426:	v2vc: 1439 
+INFO:	main:	2024-03-04 06:35:25,426:	Commencing training for 500 epochs. Please follow Training Logger from here on.
+INFO:	main:	2024-03-04 06:44:27,015:	Completed training for 500 epochs
+INFO:	main:	2024-03-04 06:44:27,047:	Model saved at runs/run4/model.pth
+INFO:	main:	2024-03-04 06:44:27,047:	Completed run 4
