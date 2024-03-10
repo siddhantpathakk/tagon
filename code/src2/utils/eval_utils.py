@@ -98,3 +98,14 @@ def hit_ratio_at_k(actual, predicted, topk):
         if len(act_set & pred_set) != 0:
             num_hits += 1
     return num_hits / num_users
+
+
+def mean_reciprocal_rank(actual, predicted):
+    sum_mrr = 0.0
+    num_users = len(predicted)
+    for i in range(num_users):
+        act_set = set(actual[i])
+        pred_set = set(predicted[i])
+        if len(act_set & pred_set) != 0:
+            sum_mrr += 1 / (list(pred_set).index(list(act_set & pred_set)[0]) + 1)
+    return sum_mrr / num_users
