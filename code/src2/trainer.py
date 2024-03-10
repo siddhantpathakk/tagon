@@ -2,16 +2,15 @@ import matplotlib.pyplot as plt
 import numpy as np
 import torch
 torch.cuda.empty_cache()
-from tqdm import tqdm
 
-from utils.eval_utils import precision_at_k, recall_at_k, mapk, ndcg_k, hit_ratio_at_k
+from utils.eval_utils import precision_at_k, recall_at_k, mapk, ndcg_k, hit_ratio_at_k, mean_reciprocal_rank
 from utils.callbacks import EarlyStoppingCallback
 from utils.trainer_utils import build_model, load_model_from_ckpt, Negative_Sampling
 
 
 class Trainer:
     """
-    Trainer class
+    Trainer class for training the model
     """
     def __init__(self, config, info, edges, device, logger, resume=False, model_ckpt=None, eval_mode=False):
         
@@ -27,8 +26,7 @@ class Trainer:
         item_num = len(v_list_)
         self.item_set = set(self.v2u.keys())
         
-        self.gnn_sr_model, self.optimizer, self.lr_scheduler = build_model(
-            config, item_num, node_num, relation_num, logger)
+        self.gnn_sr_model, self.optimizer, self.lr_scheduler = build_model(config, item_num, node_num, relation_num, logger)
         
         if resume:
             assert model_ckpt is not None, 'model_ckpt must be provided if resume is True'
@@ -45,7 +43,7 @@ class Trainer:
         self.node_num = node_num
         self.short_term_window_num = 3
         self.pred_list = None
-        self.K_eval_list = [10, 20]
+        self.K_eval_list = [10]
         
         self.logger = logger
 
@@ -182,7 +180,7 @@ class Trainer:
 
         return new_user_no, new_seq_no, edge_index, edge_type, node_no, node2ids
 
-    def Evaluation(self, users_np_test, sequences_np_test, test_set):
+    def evaluate(self, users_np_test, sequences_np_test, test_set):
         # seq_np_test: validation split
         # test_set: test split
         
@@ -240,14 +238,15 @@ class Trainer:
                 self.pred_list = np.append(
                     self.pred_list, batch_pred_list, axis=0)
 
-        precision, recall, MAP, ndcg, hr = [], [], [], [], []
+        precision, recall, MAP, ndcg, hr, mrr = [], [], [], [], [], []
         for k in self.K_eval_list:
             precision.append(precision_at_k(test_set, self.pred_list, k))
             recall.append(recall_at_k(test_set, self.pred_list, k))
             MAP.append(mapk(test_set, self.pred_list, k))
             ndcg.append(ndcg_k(test_set, self.pred_list, k))
             hr.append(hit_ratio_at_k(test_set, self.pred_list, k))
-        return precision, recall, MAP, ndcg, hr
+            mrr.append(mean_reciprocal_rank(test_set, self.pred_list))
+        return precision, recall, MAP, ndcg, hr, mrr
 
     def save_model(self, path_name):
         torch.save(self.gnn_sr_model.state_dict(), path_name)
@@ -257,8 +256,8 @@ class Trainer:
         earlystopper = EarlyStoppingCallback(patience=10, min_delta=0.0)
 
         loss_list = list()
-        precision_list, recall_list, MAP_list, ndcg_list, hr_list = list(), list(), list(), list(), list()
-        precision_list_20, recall_list_20, MAP_list_20, ndcg_list_20, hr_list_20 = list(), list(), list(), list(), list()
+        precision_list, recall_list, MAP_list, ndcg_list, hr_list, mrr_list = list(), list(), list(), list(), list(), list()
+            # precision_list_20, recall_list_20, MAP_list_20, ndcg_list_20, hr_list_20 = list(), list(), list(), list(), list()
 
         users_np, sequences_np_train = train_part[0], train_part[1]
         sequences_np_test, test_set, uid_list_ = test_part[0], test_part[1], test_part[2]
@@ -276,11 +275,6 @@ class Trainer:
         short_term_window = [0] + [i + short_term_window_size for i in range(self.short_term_window_num-1)] + [-1]
 
         for epoch_ in range(self.arg.epoch_num):
-
-            # set up progress bar with live progress 
-            with tqdm(total=self.arg.epoch_num, leave=True, colour='green',) as pbar:
-            
-                pbar.set_description(f'Epoch {epoch_+1}/{self.arg.epoch_num}')
                 
                 self.optimizer.zero_grad()
                 self.gnn_sr_model.train()
@@ -296,8 +290,7 @@ class Trainer:
                     batch_neg = Negative_Sampling(self.arg.H, self.u2v, batch_users, self.item_set)
 
                     batch_sequences_train = sequences_np_train[batch_record_index]
-                    batch_sequences, batch_targets = batch_sequences_train[:,
-                                                                        :self.arg.L], batch_sequences_train[:, self.arg.L:]
+                    batch_sequences, batch_targets = batch_sequences_train[:, :self.arg.L], batch_sequences_train[:, self.arg.L:]
 
                     # Extracting SUBGraph (long term)
                     batch_users, batch_sequences, edge_index, edge_type, node_no, node2ids = self.Extract_SUBGraph(
@@ -308,8 +301,7 @@ class Trainer:
                     for i in range(len(short_term_window)):
                         if i != len(short_term_window)-1:
                             sub_seq_no = batch_sequences[:, short_term_window[i]:short_term_window[i+1]]
-                            _, _, edge_index, edge_type, _, _ = self.Extract_SUBGraph(
-                                batch_users, batch_sequences, sub_seq_no=sub_seq_no, node2ids=node2ids)
+                            _, _, edge_index, edge_type, _, _ = self.Extract_SUBGraph(batch_users, batch_sequences, sub_seq_no=sub_seq_no, node2ids=node2ids)
                             short_term_part.append((edge_index, edge_type))
 
                     batch_users = torch.tensor(batch_users).to(self.device)
@@ -332,21 +324,16 @@ class Trainer:
                     # RAGCN loss (long term)
                     gcn_loss = 0
                     for gconv in self.gnn_sr_model.long_term_gnn.conv_modulelist:
-                        w = torch.matmul(gconv.att_r, gconv.basis.view(
-                            gconv.num_bases, -1)).view(gconv.num_relations, gconv.in_channels, gconv.out_channels)
-                        gcn_loss = gcn_loss + \
-                            torch.sum((w[1:, :, :] - w[:-1, :, :])**2)
+                        w = torch.matmul(gconv.att_r, gconv.basis.view(gconv.num_bases, -1)).view(gconv.num_relations, gconv.in_channels, gconv.out_channels)
+                        gcn_loss = gcn_loss + torch.sum((w[1:, :, :] - w[:-1, :, :])**2)
                     gcn_loss = gcn_loss/len(self.gnn_sr_model.long_term_gnn.conv_modulelist)
 
                     # RAGCN loss (short term)
                     short_gcn_loss = 0
                     for gconv in self.gnn_sr_model.short_term_gnn.conv_modulelist:
-                        w = torch.matmul(gconv.att_r, gconv.basis.view(
-                            gconv.num_bases, -1)).view(gconv.num_relations, gconv.in_channels, gconv.out_channels)
-                        short_gcn_loss = short_gcn_loss + \
-                            torch.sum((w[1:, :, :] - w[:-1, :, :])**2)
-                    short_gcn_loss = short_gcn_loss / \
-                        len(self.gnn_sr_model.short_term_gnn.conv_modulelist)
+                        w = torch.matmul(gconv.att_r, gconv.basis.view(gconv.num_bases, -1)).view(gconv.num_relations, gconv.in_channels, gconv.out_channels)
+                        short_gcn_loss = short_gcn_loss + torch.sum((w[1:, :, :] - w[:-1, :, :])**2)
+                    short_gcn_loss = short_gcn_loss /  len(self.gnn_sr_model.short_term_gnn.conv_modulelist)
 
                     # Combine GCN short term and long term loss
                     gcn_loss = gcn_loss + short_gcn_loss
@@ -371,31 +358,27 @@ class Trainer:
 
                 with torch.no_grad():
                     self.gnn_sr_model.eval()
-                    precision, recall, MAP, ndcg, hr = self.Evaluation(users_np_test, sequences_np_test, test_set)
+                    precision, recall, MAP, ndcg, hr, mrr = self.evaluate(users_np_test, sequences_np_test, test_set)
                 
-                # self.logger.info(f'Epoch {epoch_+1}/{self.arg.epoch_num}:\tLoss: {epoch_loss:.4f}\tP@10: {precision[0]:.4f}\tR@10: {recall[0]:.4f}\tMAP@10: {MAP[0]:.4f}\tNDCG@10: {ndcg[0]:.4f}\tHR@10: {hr[0]:.4f}\tP@20: {precision[1]:.4f}\tR@20: {recall[1]:.4f}\tMAP@20: {MAP[1]:.4f}\tNDCG@20: {ndcg[1]:.4f}\tHR@20: {hr[1]:.4f}')
-                pbar.set_postfix(ordered_dict={'Loss': epoch_loss, 'P@10': precision[0], 'R@10': recall[0]})
-
+                self.logger.info(f'Epoch {epoch_+1}/{self.arg.epoch_num} Loss: {epoch_loss:.4f} P@10: {precision[0]:.4f} R@10: {recall[0]:.4f} HR@10: {hr[0]:.4f} MRR: {mrr[0]:.4f}')
+                
                 loss_list.append(epoch_loss)
                 precision_list.append(precision[0])
                 recall_list.append(recall[0])
                 MAP_list.append(MAP[0])
                 ndcg_list.append(ndcg[0])
                 hr_list.append(hr[0])
-                precision_list_20.append(precision[1])
-                recall_list_20.append(recall[1])
-                MAP_list_20.append(MAP[1])
-                ndcg_list_20.append(ndcg[1])
-                hr_list_20.append(hr[1])
+                mrr_list.append(mrr[0])
                 
                 if earlystopper.call(epoch_loss):
                     self.logger.info(f'Early stopping at epoch {epoch_+1}')
                     break
             
-        metric_list = [loss_list, precision_list, recall_list, MAP_list, ndcg_list, hr_list, precision_list_20, recall_list_20, MAP_list_20, ndcg_list_20, hr_list_20]
-        for metric, metric_name in zip(metric_list, 
-                                    ['Loss', 'Precision@10', 'Recall@10', 'MAP@10', 'NDCG@10', 'HR@10', 'Precision@20', 'Recall@20', 'MAP@20', 'NDCG@20', 'HR@20']):
+        metric_list = [loss_list, precision_list, recall_list, MAP_list, ndcg_list, hr_list, mrr_list]
+        metric_names = ['Loss', 'P@10', 'R@10', 'MAP@10', 'NDCG@10', 'HR@10', 'MRR']
+        for metric, metric_name in zip(metric_list, metric_names):
             self.plot_metric(metric, metric_name)
+
 
     def plot_metric(self, metric, metric_name):
         plt.style.use('ggplot')
@@ -409,3 +392,4 @@ class Trainer:
         plt.xlabel('Epochs')
         plt.ylabel(metric_name)
         plt.savefig(self.arg.plot_dir + '/' + metric_name + '.png')
+    
