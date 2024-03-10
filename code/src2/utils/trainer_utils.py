@@ -2,45 +2,38 @@ import random
 import numpy as np
 import torch
 from model.CAGSRec import CAGSRec
-from model.improvedGNN import ImprovedGNNunit
-
 from utils.seed import seed_everything
 
 def build_model(config, item_num, node_num, relation_num, logger):
     seed_everything(config.seed)
-    model = CAGSRec(config, item_num, node_num, relation_num, gcn=ImprovedGNNunit).to(config.device)
+    model = CAGSRec(config, item_num, node_num, relation_num).to(config.device)
     
     if config.optimizer == 'adam':
         optimizer = torch.optim.Adam(model.parameters(), 
                                      lr=config.learning_rate, 
                                      weight_decay=config.l2)
-    elif config.optimizer == 'sgd':
-        optimizer = torch.optim.SGD(model.parameters(), 
-                                    lr=config.learning_rate, 
-                                    momentum=0.9, 
-                                    weight_decay=config.l2)
-    elif config.optimizer == 'rmsprop':
-        optimizer = torch.optim.RMSprop(model.parameters(), 
-                                        lr=config.learning_rate, 
-                                        momentum=0.9, 
-                                        weight_decay=config.l2)
+    elif config.optimizer == 'adamw':
+        optimizer = torch.optim.AdamW(model.parameters(), 
+                                      lr=config.learning_rate, 
+                                      weight_decay=config.l2)
     else:
         raise Exception('Unknown optimizer {}'.format(config.optimizer))
         
     lr_scheduler = torch.optim.lr_scheduler.LinearLR(optimizer)
     
     if config.verbose:
+        logger.info(f'Model:\t{model.__class__.__name__} with variant {config.model_variant}')
         logger.info(model)
         logger.info(f'Optimizer:\t{optimizer.__class__.__name__} with initial lr = {config.learning_rate}, l2 = {config.l2}')
         logger.info(f'LR Scheduler:\t{lr_scheduler.__class__.__name__}')
     
     return model, optimizer, lr_scheduler
 
+
 def load_model_from_ckpt(config, model_ckpt):
     model = CAGSRec(config)
     model.load_state_dict(torch.load(model_ckpt))
     return model
-
 
 
 def Negative_Sampling(H, user2item, batch_users, item_set):
