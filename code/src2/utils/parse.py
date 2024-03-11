@@ -37,6 +37,7 @@ def parse_opt(runCount):
     parser.add_argument('--hop', type=int, default=2, help='hop')
 
     # CAGSRec based parameters
+    parser.add_argument('--model_variant', type=int, default=1, help='model variant to use (1-4)')
     parser.add_argument('--dim', type=int, default=32, help='dimension of hidden layers')
     parser.add_argument('--conv_layer_num', type=int, default=3, help='number of long term GCN layers')
     parser.add_argument('--short_conv_layer_num', type=int, default=3, help='number of short term GCN layers')
