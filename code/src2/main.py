@@ -5,7 +5,7 @@ from utils.seed import seed_everything
 from utils.parse import parse_opt
 
 if __name__ == '__main__':
-    runCount, logger, ml_logger = set_logging_tool("runs/")
+    runCount, logger, ml_logger = set_logging_tool("/home/FYP/siddhant005/fyp/runs")
     
     config = parse_opt(runCount)
     seed_everything(config.seed)
@@ -18,11 +18,11 @@ if __name__ == '__main__':
     datacollector = DataCollector(config)
     train_part, test_part, info, edges = datacollector.prepare(verbose=config.verbose, logger=logger)
 
-    logger.info(f'Commencing training for {config.epoch_num} epochs. Please follow Training Logger from here on.')
     trainer = Trainer(config=config,info=info,edges=edges, logger=ml_logger, device=config.device)
+    logger.info(f'Commencing training for {config.epoch_num} epochs.')
     trainer.train(train_part=train_part,test_part=test_part)
     logger.info(f'Completed training for {config.epoch_num} epochs')
     
-    trainer.save_model(path_name=f'runs/run{runCount}/model.pth')
+    trainer.save_model(path_name=f'/home/FYP/siddhant005/fyp/runs/run{runCount}/model.pth')
     logger.info(f'Model saved at runs/run{runCount}/model.pth')
     logger.info(f'Completed run {runCount}')

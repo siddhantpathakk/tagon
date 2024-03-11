@@ -40,7 +40,7 @@ class MovielensPreprocessor:
             row = row.decode('utf-8').split('::')
             user_id, item_id, rating, timestamp = row[0], row[1], row[2], row[3].strip()
             user_id, item_id, rating, timestamp = self._convert_to_int([user_id, item_id, rating, timestamp])
-            timestamp = timestamp - self.min_timestamp
+            timestamp = (timestamp - self.min_timestamp) / self.min_timestamp
             rating = self._binarize_ratings(rating)
             if user_id not in data_dict:
                 data_dict[user_id] = list()
@@ -169,7 +169,7 @@ class MovielensPreprocessor:
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--raw', '-d', type=str, default='./raw/ml-1m/')
-    parser.add_argument('--processed', '-s', type=str, default='./processed_timesteps/ml-1m/')
+    parser.add_argument('--processed', '-s', type=str, default='./processed_divide/ml-1m/')
     args = parser.parse_args()
 
     data_preprocessor = MovielensPreprocessor(args.raw)
