@@ -23,11 +23,7 @@ def build_model(config, item_num, node_num, relation_num, logger):
     lr_scheduler = torch.optim.lr_scheduler.LinearLR(optimizer)
     
     if config.verbose:
-<<<<<<< HEAD
         logger.info(f'Model:\t{model.__class__.__name__} with {config.model_variant} variant')
-=======
-        logger.info(f'Model:\t{model.__class__.__name__} with variant {config.model_variant}')
->>>>>>> 5f39a5b309fbd7211589578d1f40ba9a89413c2a
         logger.info(model)
         logger.info(f'Optimizer:\t{optimizer.__class__.__name__} with initial lr = {config.learning_rate}, l2 = {config.l2}')
         logger.info(f'LR Scheduler:\t{lr_scheduler.__class__.__name__}')
