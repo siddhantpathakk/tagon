@@ -8,7 +8,7 @@ class CAGSRec(nn.Module):
     """
     Main model class for CAGSRec: Cross-Attention Graph for Sequential Recommendation
     """
-    def __init__(self, config, item_num, node_num, relation_num, gcn):
+    def __init__(self, config, item_num, node_num, relation_num):
         super(CAGSRec, self).__init__()
         
         self.args = config
