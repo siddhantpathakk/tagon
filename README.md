@@ -41,3 +41,6 @@
 
 ### Demonstration ideas:
 1. Streamlit app: user enters the site, searches from the database of items (movies), chooses what he likes (at least 20), and then recommend new ones. Show how those movies are recommended, using graphs (pyviz)
+
+
+https://discuss.pytorch.org/t/using-both-learning-rate-warm-up-and-a-learning-rate-scheduler/177767
