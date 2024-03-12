@@ -61,10 +61,10 @@ def reindex(df):
 
 
 def run(data_name):
-    PATH = './processed/{}.csv'.format(data_name)
-    OUT_DF = './processed/ml_{}.csv'.format(data_name)
-    OUT_FEAT = './processed/ml_{}.npy'.format(data_name)
-    OUT_NODE_FEAT = './processed/ml_{}_node.npy'.format(data_name)
+    PATH = './tgat/processed/{}.csv'.format(data_name)
+    OUT_DF = './tgat/processed/ml_{}.csv'.format(data_name)
+    OUT_FEAT = './tgat/processed/ml_{}.npy'.format(data_name)
+    OUT_NODE_FEAT = './tgat/processed/ml_{}_node.npy'.format(data_name)
     
     df, feat = preprocess(PATH)
     new_df = reindex(df)

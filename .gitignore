@@ -18,18 +18,15 @@ ipython_config.py
 
 .pytype/
 cython_debug/
-
-data/processed/ml-100k/ml_100k_main1_data.pickle
-data/processed/ml-100k/ml_100k_main2_data.pickle
-experiments
 train_sh_scripts
 raw
 err
 jupyter
 tmp
-ml-1m
-src
 *.out
 *.err
 *.txt
-# runs
+processed
+saved_models
+saved_checkpoints
+log

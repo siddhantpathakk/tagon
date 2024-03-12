@@ -1,5 +1,4 @@
 import numpy as np
-import torch
 
 class NeighborFinder:
     def __init__(self, adj_list, uniform=False):

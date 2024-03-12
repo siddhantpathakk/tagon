@@ -3,46 +3,21 @@ import math
 import logging
 import time
 import random
-import sys
-import argparse
-
 import torch
 import pandas as pd
 import numpy as np
-#import numba
-
 from sklearn.metrics import average_precision_score
-from sklearn.metrics import f1_score
 from sklearn.metrics import roc_auc_score
 
-from module import TGAN
+from model.TGAN import TGAN
 from graph import NeighborFinder
-from utils import EarlyStopMonitor, RandEdgeSampler
+from utils.loggers import set_logger
+from utils.parse import link_predict_parser
+from utils.utils import RandEdgeSampler
+from utils.callbacks import EarlyStopMonitor
 
-### Argument and global variables
-parser = argparse.ArgumentParser('Interface for TGAT experiments on link predictions')
-parser.add_argument('-d', '--data', type=str, help='data sources to use, try wikipedia or reddit', default='wikipedia')
-parser.add_argument('--bs', type=int, default=200, help='batch_size')
-parser.add_argument('--prefix', type=str, default='', help='prefix to name the checkpoints')
-parser.add_argument('--n_degree', type=int, default=20, help='number of neighbors to sample')
-parser.add_argument('--n_head', type=int, default=2, help='number of heads used in attention layer')
-parser.add_argument('--n_epoch', type=int, default=50, help='number of epochs')
-parser.add_argument('--n_layer', type=int, default=2, help='number of network layers')
-parser.add_argument('--lr', type=float, default=0.0001, help='learning rate')
-parser.add_argument('--drop_out', type=float, default=0.1, help='dropout probability')
-parser.add_argument('--gpu', type=int, default=0, help='idx for the gpu to use')
-parser.add_argument('--node_dim', type=int, default=100, help='Dimentions of the node embedding')
-parser.add_argument('--time_dim', type=int, default=100, help='Dimentions of the time embedding')
-parser.add_argument('--agg_method', type=str, choices=['attn', 'lstm', 'mean'], help='local aggregation method', default='attn')
-parser.add_argument('--attn_mode', type=str, choices=['prod', 'map'], default='prod', help='use dot product attention or mapping based')
-parser.add_argument('--time', type=str, choices=['time', 'pos', 'empty'], help='how to use time information', default='time')
-parser.add_argument('--uniform', action='store_true', help='take uniform sampling from temporal neighbors')
 
-try:
-    args = parser.parse_args()
-except:
-    parser.print_help()
-    sys.exit(0)
+args = link_predict_parser()
 
 BATCH_SIZE = args.bs
 NUM_NEIGHBORS = args.n_degree
@@ -52,7 +27,6 @@ NUM_HEADS = args.n_head
 DROP_OUT = args.drop_out
 GPU = args.gpu
 UNIFORM = args.uniform
-NEW_NODE = args.new_node
 USE_TIME = args.time
 AGG_METHOD = args.agg_method
 ATTN_MODE = args.attn_mode
@@ -64,23 +38,11 @@ NODE_DIM = args.node_dim
 TIME_DIM = args.time_dim
 
 
-MODEL_SAVE_PATH = f'./saved_models/{args.prefix}-{args.agg_method}-{args.attn_mode}-{args.data}.pth'
-get_checkpoint_path = lambda epoch: f'./saved_checkpoints/{args.prefix}-{args.agg_method}-{args.attn_mode}-{args.data}-{epoch}.pth'
+MODEL_SAVE_PATH = f'./tgat/saved_models/{args.prefix}-{args.agg_method}-{args.attn_mode}-{args.data}.pth'
+get_checkpoint_path = lambda epoch: f'./tgat/saved_checkpoints/{args.prefix}-{args.agg_method}-{args.attn_mode}-{args.data}-{epoch}.pth'
 
 ### set up logger
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger()
-logger.setLevel(logging.DEBUG)
-fh = logging.FileHandler('log/{}.log'.format(str(time.time())))
-fh.setLevel(logging.DEBUG)
-ch = logging.StreamHandler()
-ch.setLevel(logging.WARN)
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-fh.setFormatter(formatter)
-ch.setFormatter(formatter)
-logger.addHandler(fh)
-logger.addHandler(ch)
-logger.info(args)
+logger = set_logger(args)
 
 
 def eval_one_epoch(hint, tgan, sampler, src, dst, ts, label):
@@ -117,9 +79,9 @@ def eval_one_epoch(hint, tgan, sampler, src, dst, ts, label):
     return np.mean(val_acc), np.mean(val_ap), np.mean(val_f1), np.mean(val_auc)
 
 ### Load data and train val test split
-g_df = pd.read_csv('./processed/ml_{}.csv'.format(DATA))
-e_feat = np.load('./processed/ml_{}.npy'.format(DATA))
-n_feat = np.load('./processed/ml_{}_node.npy'.format(DATA))
+g_df = pd.read_csv('./tgat/src/processed/ml_{}.csv'.format(DATA))
+e_feat = np.load('./tgat/src/processed/ml_{}.npy'.format(DATA))
+n_feat = np.load('./tgat/src/processed/ml_{}_node.npy'.format(DATA))
 
 val_time, test_time = list(np.quantile(g_df.ts, [0.70, 0.85]))
 
@@ -315,9 +277,3 @@ logger.info('Test statistics: New nodes -- acc: {}, auc: {}, ap: {}'.format(nn_t
 logger.info('Saving TGAN model')
 torch.save(tgan.state_dict(), MODEL_SAVE_PATH)
 logger.info('TGAN models saved')
-
- 
-
-
-
-
