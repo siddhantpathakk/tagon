@@ -8,7 +8,7 @@ import torch.nn.functional as F
 from model.merge import MergeLayer
 from model.pool import LSTMPool, MeanPool
 from model.attention import AttnModel
-from model.encoder import TimeEncode, PosEncode, EmptyEncode
+from model.encoder import DisentangleTimeEncode, TimeEncode, PosEncode, EmptyEncode
 
 class TGAN(torch.nn.Module):
     def __init__(self, ngh_finder, n_feat, e_feat,
@@ -68,6 +68,9 @@ class TGAN(torch.nn.Module):
         elif use_time == 'empty':
             self.logger.info('Using empty encoding')
             self.time_encoder = EmptyEncode(expand_dim=self.n_feat_th.shape[1])
+        elif use_time == 'disentangle':
+            self.logger.info('Using disentangle time encoding')
+            self.time_encoder = DisentangleTimeEncode(components=num_heads, expand_dim=self.n_feat_th.shape[1])
         else:
             raise ValueError('invalid time option!')
         
