@@ -6,6 +6,7 @@ def expand_last_dim(x, num):
     expand_size = list(x.size()) + [num]
     return x.view(view_size).expand(expand_size)
     
+    
 class LSTMPool(torch.nn.Module):
     def __init__(self, feat_dim, edge_dim, time_dim):
         super(LSTMPool, self).__init__()

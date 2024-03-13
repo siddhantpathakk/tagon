@@ -16,6 +16,8 @@ from utils.parse import link_predict_parser
 from utils.utils import RandEdgeSampler
 from utils.callbacks import EarlyStopMonitor
 
+import warnings
+warnings.filterwarnings("ignore")
 
 args = link_predict_parser()
 
@@ -38,8 +40,8 @@ NODE_DIM = args.node_dim
 TIME_DIM = args.time_dim
 
 
-MODEL_SAVE_PATH = f'./tgat/saved_models/{args.prefix}-{args.agg_method}-{args.attn_mode}-{args.data}.pth'
-get_checkpoint_path = lambda epoch: f'./tgat/saved_checkpoints/{args.prefix}-{args.agg_method}-{args.attn_mode}-{args.data}-{epoch}.pth'
+MODEL_SAVE_PATH = f'./log/saved_models/{args.prefix}-{args.agg_method}-{args.attn_mode}-{args.data}.pth'
+get_checkpoint_path = lambda epoch: f'./log/saved_checkpoints/{args.prefix}-{args.agg_method}-{args.attn_mode}-{args.data}-{epoch}.pth'
 
 ### set up logger
 logger = set_logger(args)
@@ -79,9 +81,9 @@ def eval_one_epoch(hint, tgan, sampler, src, dst, ts, label):
     return np.mean(val_acc), np.mean(val_ap), np.mean(val_f1), np.mean(val_auc)
 
 ### Load data and train val test split
-g_df = pd.read_csv('./tgat/src/processed/ml_{}.csv'.format(DATA))
-e_feat = np.load('./tgat/src/processed/ml_{}.npy'.format(DATA))
-n_feat = np.load('./tgat/src/processed/ml_{}_node.npy'.format(DATA))
+g_df = pd.read_csv('./tgat/src/data/processed/{}/{}.csv'.format(DATA, DATA))
+e_feat = np.load('./tgat/src/data/processed/{}/ml_{}.npy'.format(DATA, DATA))
+n_feat = np.load('./tgat/src/data/processed/{}/ml_{}_node.npy'.format(DATA, DATA))
 
 val_time, test_time = list(np.quantile(g_df.ts, [0.70, 0.85]))
 

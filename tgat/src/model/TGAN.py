@@ -2,6 +2,8 @@ import torch
 import torch.nn as nn
 import numpy as np
 import logging
+import torch.nn.functional as F
+
 
 from model.merge import MergeLayer
 from model.pool import LSTMPool, MeanPool
@@ -30,6 +32,8 @@ class TGAN(torch.nn.Module):
         self.model_dim = self.feat_dim
         
         self.use_time = use_time
+        self.time_att_weights = torch.nn.Parameter(torch.from_numpy(np.random.rand(node_dim, time_dim)).float())
+
         self.merge_layer = MergeLayer(self.feat_dim, self.feat_dim, self.feat_dim, self.feat_dim)
         
         if agg_method == 'attn':
@@ -87,6 +91,40 @@ class TGAN(torch.nn.Module):
         neg_score = self.affinity_score(src_embed, background_embed).squeeze(dim=-1)
         return pos_score.sigmoid(), neg_score.sigmoid()
 
+    def contrast_nosigmoid(self, src_idx_l, target_idx_l, background_idx_l, cut_time_l, num_neighbors=20):
+        src_embed = self.tem_conv(src_idx_l, cut_time_l, self.num_layers, num_neighbors)
+        target_embed = self.tem_conv(target_idx_l, cut_time_l, self.num_layers, num_neighbors)
+        background_embed = self.tem_conv(background_idx_l, cut_time_l, self.num_layers, num_neighbors)
+        pos_score = self.affinity_score(src_embed, target_embed).squeeze(dim=-1)
+        neg_score = self.affinity_score(src_embed, background_embed).squeeze(dim=-1)
+        return pos_score, neg_score
+
+
+    def time_att_aggregate(self, node_emb, node_time_emb):
+        """
+        node_emb: [batch_size, node_dim] or [batch_size, L, node_dim]
+        node_time_emb: [batch_size, components, time_emb]
+        """
+        batch_size = node_emb.shape[0]
+
+        #[N, L(optional), node_dim] * [node_dim, time_dim] = [N, L(optional), time_dim]
+        node_emb_to_time = torch.tensordot(node_emb, self.time_att_weights, dims=([-1], [0]))
+
+
+        node_emb_to_time = torch.unsqueeze(node_emb_to_time, dim=-2) #[N, L(optional) 1, time_dim]
+        if len(node_emb.shape) == 2:
+            node_emb_to_time = torch.unsqueeze(node_emb_to_time, dim=-2) #[N, L(optional), 1, 1, time_dim]
+
+        unnormalized_attentions = torch.sum(node_emb_to_time * node_time_emb, dim=-1) #[N, L(optional), components]
+
+        normalized_attentions = F.softmax(unnormalized_attentions, dim=-1) #[N, L(optional), components]
+        normalized_attentions = torch.unsqueeze(normalized_attentions, dim=-1) #[N, L(optional), components, 1]
+
+        weighted_time_emb = torch.sum(normalized_attentions * node_time_emb, dim=-2) #[batch_size, L(optional), time_emb]
+        return weighted_time_emb
+
+
+
     def tem_conv(self, src_idx_l, cut_time_l, curr_layers, num_neighbors=20):
         assert(curr_layers >= 0)
         
@@ -106,11 +144,17 @@ class TGAN(torch.nn.Module):
             return src_node_feat
         else:
             src_node_conv_feat = self.tem_conv(src_idx_l, 
-                                           cut_time_l,
-                                           curr_layers=curr_layers - 1, 
-                                           num_neighbors=num_neighbors)
+                                                cut_time_l,
+                                                curr_layers=curr_layers - 1, 
+                                                num_neighbors=num_neighbors)
+                    
+
+            print(src_node_conv_feat.shape, src_node_t_embed.shape)
+            src_node_t_embed = self.time_att_aggregate(src_node_t_embed, src_node_t_embed) # do self attn
             
+            src_node_t_embed = self.time_att_aggregate(src_node_conv_feat, src_node_t_embed) # do cross attn
             
+  
             src_ngh_node_batch, src_ngh_eidx_batch, src_ngh_t_batch = self.ngh_finder.get_temporal_neighbor( 
                                                                     src_idx_l, 
                                                                     cut_time_l, 

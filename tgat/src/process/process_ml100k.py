@@ -88,14 +88,11 @@ class MovielensProcessor(DataProcessor):
         return new_df
     
     def run(self):
-        df, feat, user_ind_id_map, item_ind_id_map = self.preprocess()
-        df = self.reindex(df)
-        df.to_csv(self.OUT_DF, index=False)
-        np.save(self.OUT_FEAT, feat)
-        np.save(self.OUT_NODE_FEAT, np.array([0 for _ in range(len(user_ind_id_map) + len(item_ind_id_map))]))
+        df, feat, u_ind_id_map, i_ind_id_map = self.preprocess()
         with open(self.u_map_file, 'w') as f:
-            json.dump(user_ind_id_map, f)
+            f.write(json.dumps(u_ind_id_map, sort_keys=True, indent=4))
         with open(self.i_map_file, 'w') as f:
-            json.dump(item_ind_id_map, f)
-            
-        return df, feat, user_ind_id_map, item_ind_id_map
+            f.write(json.dumps(i_ind_id_map, sort_keys=True, indent=4))
+
+        new_df = self.reindex(df)
+        new_df.to_csv(self.OUT_DF, index=False)

@@ -15,7 +15,8 @@ from model.merge import LR
 from utils.loggers import set_logger
 from utils.parse import node_classify_parser
 
-
+import warnings
+warnings.filterwarnings("ignore")
 
 random.seed(222)
 np.random.seed(222)
