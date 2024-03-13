@@ -1,4 +1,5 @@
 import numpy as np
+import logging
 
 class EarlyStopMonitor(object):
     def __init__(self, max_round=3, higher_better=True, tolerance=1e-3):
@@ -11,6 +12,10 @@ class EarlyStopMonitor(object):
         self.last_best = None
         self.higher_better = higher_better
         self.tolerance = tolerance
+        
+        self.logger = logging.getLogger(__name__)
+        
+        self.logger.info(f"Early stopping monitor: max_round={max_round}, higher_better={higher_better}, tolerance={tolerance}")
 
     def early_stop_check(self, curr_val):
         self.epoch_count += 1

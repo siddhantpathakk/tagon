@@ -1,10 +1,14 @@
-import torch
-import torch.nn as nn
-import numpy as np
 import logging
-from model.merge import MergeLayer
 
-class ScaledDotProductAttention(nn.Module):
+import numpy as np
+import torch
+
+import torch.nn as nn
+import torch.nn.functional as F
+
+class ScaledDotProductAttention(torch.nn.Module):
+    ''' Scaled Dot-Product Attention '''
+
     def __init__(self, temperature, attn_dropout=0.1):
         super().__init__()
         self.temperature = temperature
@@ -27,6 +31,8 @@ class ScaledDotProductAttention(nn.Module):
         return output, attn
 
 class MultiHeadAttention(nn.Module):
+    ''' Multi-Head Attention module '''
+
     def __init__(self, n_head, d_model, d_k, d_v, dropout=0.1):
         super().__init__()
 
@@ -84,6 +90,8 @@ class MultiHeadAttention(nn.Module):
     
 
 class MapBasedMultiHeadAttention(nn.Module):
+    ''' Multi-Head Attention module '''
+
     def __init__(self, n_head, d_model, d_k, d_v, dropout=0.1):
         super().__init__()
 
@@ -162,58 +170,4 @@ class MapBasedMultiHeadAttention(nn.Module):
 
         return output, attn
     
-class AttnModel(nn.Module):
-    def __init__(self, feat_dim, edge_dim, time_dim, 
-                 attn_mode='prod', n_head=2, drop_out=0.1):
-        super(AttnModel, self).__init__()
-        
-        self.feat_dim = feat_dim
-        self.time_dim = time_dim
-        
-        self.edge_in_dim = (feat_dim + edge_dim + time_dim)
-        self.model_dim = self.edge_in_dim
-        #self.edge_fc = torch.nn.Linear(self.edge_in_dim, self.feat_dim, bias=False)
 
-        self.merger = MergeLayer(self.model_dim, feat_dim, feat_dim, feat_dim)
-
-        #self.act = torch.nn.ReLU()
-        
-        assert(self.model_dim % n_head == 0)
-        self.logger = logging.getLogger(__name__)
-        self.attn_mode = attn_mode
-        
-        if attn_mode == 'prod':
-            self.multi_head_target = MultiHeadAttention(n_head, 
-                                             d_model=self.model_dim, 
-                                             d_k=self.model_dim // n_head, 
-                                             d_v=self.model_dim // n_head, 
-                                             dropout=drop_out)
-            self.logger.info('Using scaled prod attention')
-            
-        elif attn_mode == 'map':
-            self.multi_head_target = MapBasedMultiHeadAttention(n_head, 
-                                             d_model=self.model_dim, 
-                                             d_k=self.model_dim // n_head, 
-                                             d_v=self.model_dim // n_head, 
-                                             dropout=drop_out)
-            self.logger.info('Using map based attention')
-        else:
-            raise ValueError('attn_mode can only be prod or map')
-        
-        
-    def forward(self, src, src_t, seq, seq_t, seq_e, mask):
-        src_ext = torch.unsqueeze(src, dim=1) # src [B, 1, D]
-        src_e_ph = torch.zeros_like(src_ext)
-        q = torch.cat([src_ext, src_e_ph, src_t], dim=2) # [B, 1, D + De + Dt] -> [B, 1, D]
-        k = torch.cat([seq, seq_e, seq_t], dim=2) # [B, 1, D + De + Dt] -> [B, 1, D]
-        
-        mask = torch.unsqueeze(mask, dim=2) # mask [B, N, 1]
-        mask = mask.permute([0, 2, 1]) #mask [B, 1, N]
-
-        # # target-attention
-        output, attn = self.multi_head_target(q=q, k=k, v=k, mask=mask) # output: [B, 1, D + Dt], attn: [B, 1, N]
-        output = output.squeeze()
-        attn = attn.squeeze()
-
-        output = self.merger(output, src)
-        return output, attn

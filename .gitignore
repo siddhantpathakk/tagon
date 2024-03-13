@@ -19,14 +19,6 @@ ipython_config.py
 .pytype/
 cython_debug/
 train_sh_scripts
-raw
-err
-jupyter
-tmp
-*.out
-*.err
-*.txt
-processed
 saved_models
 saved_checkpoints
-log
+rank_results

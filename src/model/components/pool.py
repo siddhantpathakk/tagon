@@ -1,20 +1,20 @@
-import torch
-from model.merge import MergeLayer
+import logging
 
-def expand_last_dim(x, num):
-    view_size = list(x.size()) + [1]
-    expand_size = list(x.size()) + [num]
-    return x.view(view_size).expand(expand_size)
-    
-    
+import numpy as np
+import torch
+
+import torch.nn as nn
+import torch.nn.functional as F
+
+from model.components.ffn import MergeLayer
+
 class LSTMPool(torch.nn.Module):
-    def __init__(self, feat_dim, edge_dim, time_dim):
+    def __init__(self, feat_dim, time_dim):
         super(LSTMPool, self).__init__()
         self.feat_dim = feat_dim
         self.time_dim = time_dim
-        self.edge_dim = edge_dim
         
-        self.att_dim = feat_dim + edge_dim + time_dim
+        self.att_dim = feat_dim + time_dim
         
         self.act = torch.nn.ReLU()
         
@@ -24,10 +24,10 @@ class LSTMPool(torch.nn.Module):
                                   batch_first=True)
         self.merger = MergeLayer(feat_dim, feat_dim, feat_dim, feat_dim)
 
-    def forward(self, src, src_t, seq, seq_t, seq_e, mask):
+    def forward(self, src, src_t, seq, seq_t,  mask):
         # seq [B, N, D]
         # mask [B, N]
-        seq_x = torch.cat([seq, seq_e, seq_t], dim=2)
+        seq_x = torch.cat([seq, seq_t], dim=2)
             
         _, (hn, _) = self.lstm(seq_x)
         
@@ -38,19 +38,18 @@ class LSTMPool(torch.nn.Module):
     
 
 class MeanPool(torch.nn.Module):
-    def __init__(self, feat_dim, edge_dim):
+    def __init__(self, feat_dim):
         super(MeanPool, self).__init__()
-        self.edge_dim = edge_dim
         self.feat_dim = feat_dim
         self.act = torch.nn.ReLU()
-        self.merger = MergeLayer(edge_dim + feat_dim, feat_dim, feat_dim, feat_dim)
+        self.merger = MergeLayer(feat_dim, feat_dim, feat_dim, feat_dim)
         
-    def forward(self, src, src_t, seq, seq_t, seq_e, mask):
+    def forward(self, src, src_t, seq, seq_t, mask):
         # seq [B, N, D]
         # mask [B, N]
         src_x = src
-        seq_x = torch.cat([seq, seq_e], dim=2) #[B, N, De + D]
-        hn = seq_x.mean(dim=1) #[B, De + D]
+        seq_x = torch.cat([seq], dim=2) #[B, N, D]
+        hn = seq_x.mean(dim=1) #[B, D]
         output = self.merger(hn, src_x)
         return output, None
     
