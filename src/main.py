@@ -28,3 +28,8 @@ if __name__ == "__main__":
     
     logger.info("Plotting results")
     trainer.plot_history()
+    logger.info("Plotting finished")
+
+    trainer.export_history()
+    
+    logger.info('Completed main file execution. Exiting...')

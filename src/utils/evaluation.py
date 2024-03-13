@@ -11,7 +11,7 @@ from tqdm import tqdm
 import math
 
 
-Ks = [1, 5, 10, 20, 40, 50, 60, 70, 80, 90, 100]
+Ks = [10, 20]
 
 def eval_one_user(x):
     result = {'precision': np.zeros(len(Ks)), 'recall': np.zeros(len(Ks)), 'ndcg': np.zeros(len(Ks)),
@@ -75,9 +75,16 @@ def rank_corrected(r, m, n):
 
 
 def eval_users(tgrec, src, dst, ts, train_src, train_dst, args):
-    result = {'precision': np.zeros(len(Ks)), 'recall': np.zeros(len(Ks)), 'ndcg': np.zeros(len(Ks)),
-            'hit_ratio': np.zeros(len(Ks)), 'auc': 0., 'mrr': 0.}
-    cores = multiprocessing.cpu_count() // 2
+    result = {
+        'precision': np.zeros(len(Ks)), 
+        'recall': np.zeros(len(Ks)), 
+        'ndcg': np.zeros(len(Ks)),
+        'hit_ratio': np.zeros(len(Ks)), 
+        'auc': 0.0, 
+        'mrr': 0.0
+        }
+    
+    cores = multiprocessing.cpu_count() // 4
     userset = set(src)
     train_itemset = set(train_dst)
     pos_edges = {}

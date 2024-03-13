@@ -1,3 +1,4 @@
+import logging
 import numpy as np
 import pandas as pd
 import math
@@ -11,6 +12,8 @@ class Data():
         ### Load data and train val test split
         g_df = pd.read_csv('./processed/ml_{}.csv'.format(DATASET))
         self.split_data(g_df, args)
+        
+        # self.logger = logging.getLogger()
 
     def get_num_instances(self):
         return len(self.train_src_l)
@@ -62,7 +65,8 @@ class Data():
         self.val_ts_l = val_ts_l[valid_is_old_node_edge]
         self.val_e_idx_l = val_e_idx_l[valid_is_old_node_edge]
         self.val_label_l = val_label_l[valid_is_old_node_edge]
-        print('#interactions in valid: ', len(self.val_src_l))
+        # print('#interactions in valid: ', len(self.val_src_l))
+        # self.logger.info(f'#interactions in valid: {len(self.val_src_l)}')
 
         test_src_l = src_l[valid_test_flag]
         test_dst_l = dst_l[valid_test_flag]
@@ -76,7 +80,8 @@ class Data():
         self.test_ts_l = test_ts_l[test_is_old_node_edge]
         self.test_e_idx_l = test_e_idx_l[test_is_old_node_edge]
         self.test_label_l = test_label_l[test_is_old_node_edge]
-        print('#interaction in test: ', len(self.test_src_l))
+        # print('#interaction in test: ', len(self.test_src_l))
+        # self.logger.info(f'#interaction in test: {len(self.test_src_l)}')
 
 
 

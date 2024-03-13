@@ -1,0 +1,74 @@
+INFO:	main:	Namespace(n_degree=20, n_head=2, n_layer=2, drop_out=0.1, reg=0.1, node_dim=32, time_dim=32, agg_method='attn', attn_mode='map', uniform=True, new_node=False, time='disentangle', disencomponents=10, data='ml-100k', samplerate=1.0, popnegsample=False, timepopnegsample=False, negsampleeval=-1, bs=256, n_epoch=200, lr=0.001, prefix='ml100k', gpu=0, seed=42, l2=0.0001)
+INFO:	TGSRec:	Aggregation uses attention model
+INFO:	attention_model:	Using map based attention
+INFO:	attention_model:	Using map based attention
+INFO:	TGSRec:	Using disentangle time encoding
+INFO:	trainer:	Model built successfully
+INFO:	trainer:	TGRec(
+  (node_hist_embed): Embedding(2626, 32)
+  (merge_layer): MergeLayer(
+    (fc1): Linear(in_features=64, out_features=32, bias=True)
+    (fc2): Linear(in_features=32, out_features=32, bias=True)
+    (act): ReLU()
+  )
+  (attn_model_list): ModuleList(
+    (0-1): 2 x AttnModel(
+      (merger): MergeLayer(
+        (fc1): Linear(in_features=96, out_features=32, bias=True)
+        (fc2): Linear(in_features=32, out_features=32, bias=True)
+        (act): ReLU()
+      )
+      (multi_head_target): MapBasedMultiHeadAttention(
+        (wq_node_transform): Linear(in_features=64, out_features=64, bias=False)
+        (wk_node_transform): Linear(in_features=64, out_features=64, bias=False)
+        (wv_node_transform): Linear(in_features=64, out_features=64, bias=False)
+        (layer_norm): LayerNorm((64,), eps=1e-05, elementwise_affine=True)
+        (fc): Linear(in_features=64, out_features=64, bias=True)
+        (act): LeakyReLU(negative_slope=0.2)
+        (weight_map): Linear(in_features=64, out_features=1, bias=False)
+        (dropout): Dropout(p=0.1, inplace=False)
+        (softmax): Softmax(dim=2)
+      )
+    )
+  )
+  (time_encoder): DisentangleTimeEncode()
+  (affinity_score): MergeLayer(
+    (fc1): Linear(in_features=64, out_features=32, bias=True)
+    (fc2): Linear(in_features=32, out_features=1, bias=True)
+    (act): ReLU()
+  )
+)
+INFO:	trainer:	Optimizer: Adam with lr: 0.001 and l2: 0.0001
+INFO:	trainer:	Learning rate scheduler: LinearLR
+INFO:	trainer:	Warmup scheduler: LinearWarmup
+INFO:	trainer:	Device: cuda:0
+INFO:	trainer:	Number of nodes: 2625
+INFO:	trainer:	Number of edges: 100000
+INFO:	callbacks:	Early stopping monitor: max_round=3, higher_better=True, tolerance=0.001
+INFO:	main:	Commencing training for 200 epochs
+INFO:	trainer:	Epoch [1/200]:	Train Loss: 13.9613	Train Acc: 0.6611	Train AP: 0.6975	Train F1: 0.7303	Train AUC: 0.7426	Val Acc: 0.5100	Val AP: 0.7179	Val F1: 0.0467	Val AUC: 0.7542	Test Acc: 0.5037	Test AP: 0.7490	Test F1: 0.0215	Test AUC: 0.7880
+INFO:	trainer:	Epoch [2/200]:	Train Loss: 7.6280	Train Acc: 0.6696	Train AP: 0.7712	Train F1: 0.7366	Train AUC: 0.7996	Val Acc: 0.5680	Val AP: 0.7440	Val F1: 0.2676	Val AUC: 0.7622	Test Acc: 0.5471	Test AP: 0.7624	Test F1: 0.1870	Test AUC: 0.7829
+INFO:	trainer:	Epoch [3/200]:	Train Loss: 2.7230	Train Acc: 0.6689	Train AP: 0.8162	Train F1: 0.7394	Train AUC: 0.8299	Val Acc: 0.6355	Val AP: 0.7799	Val F1: 0.4880	Val AUC: 0.7886	Test Acc: 0.5898	Test AP: 0.7927	Test F1: 0.3296	Test AUC: 0.8193
+INFO:	trainer:	Epoch [4/200]:	Train Loss: 0.5806	Train Acc: 0.6867	Train AP: 0.8181	Train F1: 0.7435	Train AUC: 0.8331	Val Acc: 0.6592	Val AP: 0.7688	Val F1: 0.5696	Val AUC: 0.7729	Test Acc: 0.6261	Test AP: 0.7350	Test F1: 0.4864	Test AUC: 0.7700
+INFO:	trainer:	Epoch [5/200]:	Train Loss: 0.4628	Train Acc: 0.7008	Train AP: 0.8188	Train F1: 0.7448	Train AUC: 0.8349	Val Acc: 0.6775	Val AP: 0.7727	Val F1: 0.6227	Val AUC: 0.7807	Test Acc: 0.6553	Test AP: 0.7710	Test F1: 0.5612	Test AUC: 0.7903
+INFO:	trainer:	Epoch [6/200]:	Train Loss: 0.4478	Train Acc: 0.7136	Train AP: 0.8219	Train F1: 0.7505	Train AUC: 0.8363	Val Acc: 0.6621	Val AP: 0.7690	Val F1: 0.5653	Val AUC: 0.7772	Test Acc: 0.6101	Test AP: 0.7785	Test F1: 0.4003	Test AUC: 0.7984
+INFO:	trainer:	Epoch [7/200]:	Train Loss: 0.4364	Train Acc: 0.7357	Train AP: 0.8270	Train F1: 0.7573	Train AUC: 0.8400	Val Acc: 0.6523	Val AP: 0.7729	Val F1: 0.5514	Val AUC: 0.7820	Test Acc: 0.6437	Test AP: 0.7764	Test F1: 0.5033	Test AUC: 0.8114
+INFO:	trainer:	Epoch [8/200]:	Train Loss: 0.4209	Train Acc: 0.7388	Train AP: 0.8324	Train F1: 0.7591	Train AUC: 0.8441	Val Acc: 0.6819	Val AP: 0.7528	Val F1: 0.6775	Val AUC: 0.7612	Test Acc: 0.6899	Test AP: 0.7574	Test F1: 0.6574	Test AUC: 0.7876
+INFO:	trainer:	Epoch [9/200]:	Train Loss: 0.4201	Train Acc: 0.7374	Train AP: 0.8316	Train F1: 0.7483	Train AUC: 0.8434	Val Acc: 0.6848	Val AP: 0.7667	Val F1: 0.6578	Val AUC: 0.7724	Test Acc: 0.6680	Test AP: 0.7577	Test F1: 0.5870	Test AUC: 0.7922
+INFO:	trainer:	Epoch [10/200]:	Train Loss: 0.4082	Train Acc: 0.7453	Train AP: 0.8400	Train F1: 0.7614	Train AUC: 0.8503	Val Acc: 0.6827	Val AP: 0.7709	Val F1: 0.6607	Val AUC: 0.7786	Test Acc: 0.6754	Test AP: 0.7646	Test F1: 0.6043	Test AUC: 0.7962
+INFO:	trainer:	Epoch [11/200]:	Train Loss: 0.4100	Train Acc: 0.7432	Train AP: 0.8353	Train F1: 0.7572	Train AUC: 0.8483	Val Acc: 0.6607	Val AP: 0.7744	Val F1: 0.5637	Val AUC: 0.7831	Test Acc: 0.6079	Test AP: 0.7682	Test F1: 0.4062	Test AUC: 0.7991
+INFO:	trainer:	Epoch [12/200]:	Train Loss: 0.4027	Train Acc: 0.7531	Train AP: 0.8407	Train F1: 0.7581	Train AUC: 0.8514	Val Acc: 0.6632	Val AP: 0.7628	Val F1: 0.5993	Val AUC: 0.7667	Test Acc: 0.6500	Test AP: 0.7785	Test F1: 0.5350	Test AUC: 0.8035
+INFO:	trainer:	Epoch [13/200]:	Train Loss: 0.3984	Train Acc: 0.7467	Train AP: 0.8420	Train F1: 0.7624	Train AUC: 0.8523	Val Acc: 0.6536	Val AP: 0.7531	Val F1: 0.5998	Val AUC: 0.7580	Test Acc: 0.6664	Test AP: 0.7849	Test F1: 0.5812	Test AUC: 0.7989
+INFO:	trainer:	Epoch [14/200]:	Train Loss: 0.4025	Train Acc: 0.7456	Train AP: 0.8385	Train F1: 0.7594	Train AUC: 0.8494	Val Acc: 0.6912	Val AP: 0.7715	Val F1: 0.6602	Val AUC: 0.7783	Test Acc: 0.6724	Test AP: 0.7836	Test F1: 0.6042	Test AUC: 0.8041
+INFO:	trainer:	Epoch [15/200]:	Train Loss: 0.3963	Train Acc: 0.7450	Train AP: 0.8423	Train F1: 0.7464	Train AUC: 0.8520	Val Acc: 0.6768	Val AP: 0.7737	Val F1: 0.6276	Val AUC: 0.7781	Test Acc: 0.6460	Test AP: 0.7873	Test F1: 0.5124	Test AUC: 0.7981
+INFO:	trainer:	Epoch [16/200]:	Train Loss: 0.3963	Train Acc: 0.7360	Train AP: 0.8416	Train F1: 0.7573	Train AUC: 0.8514	Val Acc: 0.6700	Val AP: 0.7738	Val F1: 0.6038	Val AUC: 0.7772	Test Acc: 0.6502	Test AP: 0.7858	Test F1: 0.5233	Test AUC: 0.8059
+INFO:	trainer:	Epoch [17/200]:	Train Loss: 0.3931	Train Acc: 0.7489	Train AP: 0.8456	Train F1: 0.7575	Train AUC: 0.8549	Val Acc: 0.6688	Val AP: 0.7542	Val F1: 0.6647	Val AUC: 0.7626	Test Acc: 0.6931	Test AP: 0.7667	Test F1: 0.6756	Test AUC: 0.7893
+INFO:	trainer:	Epoch [18/200]:	Train Loss: 0.3891	Train Acc: 0.7524	Train AP: 0.8451	Train F1: 0.7651	Train AUC: 0.8552	Val Acc: 0.6982	Val AP: 0.7750	Val F1: 0.6861	Val AUC: 0.7859	Test Acc: 0.7333	Test AP: 0.7865	Test F1: 0.7232	Test AUC: 0.8071
+INFO:	trainer:	Epoch [19/200]:	Train Loss: 0.3894	Train Acc: 0.7447	Train AP: 0.8457	Train F1: 0.7549	Train AUC: 0.8549	Val Acc: 0.6872	Val AP: 0.7737	Val F1: 0.6679	Val AUC: 0.7809	Test Acc: 0.6612	Test AP: 0.7527	Test F1: 0.5818	Test AUC: 0.7778
+INFO:	trainer:	Epoch [20/200]:	Train Loss: 0.3902	Train Acc: 0.7526	Train AP: 0.8444	Train F1: 0.7606	Train AUC: 0.8545	Val Acc: 0.6872	Val AP: 0.7793	Val F1: 0.6643	Val AUC: 0.7822	Test Acc: 0.6824	Test AP: 0.7802	Test F1: 0.6163	Test AUC: 0.8011
+INFO:	trainer:	Early stopping at epoch 21
+INFO:	main:	Training finished
+INFO:	main:	Plotting results
+INFO:	main:	Plotting finished
+INFO:	trainer:	History exported to ./log/140324-053500_history.json
+INFO:	main:	Completed main file execution. Exiting...

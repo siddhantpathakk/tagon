@@ -7,7 +7,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from model.components.ffn import MergeLayer
-from model.attention_model import AttnModel
+from model.attention_model import CrossAttentionModel, SelfAttentionModel
 from model.components.pool import LSTMPool, MeanPool
 from model.components.encode import TimeEncode, PosEncode, EmptyEncode, DisentangleTimeEncode
 
@@ -21,28 +21,29 @@ class TGRec(torch.nn.Module):
         self.ngh_finder = ngh_finder
         self.null_idx = null_idx
         self.logger = logging.getLogger(__name__)
-        #self.n_feat_th = torch.nn.Parameter(torch.from_numpy(np.random.random((n_nodes, node_dim)).astype(np.float32)))
+
         self.node_hist_embed = torch.nn.Embedding(n_nodes, node_dim)
         torch.nn.init.uniform_(self.node_hist_embed.weight, a=-1.0, b=1.0)
         
         self.feat_dim = node_dim
         
         self.use_time = use_time
-        
-        #self.n_feat_dim = self.feat_dim
-        #self.e_feat_dim = self.feat_dim
-        #self.model_dim = self.feat_dim
+
         self.n_feat_dim = node_dim
         self.model_dim = self.n_feat_dim + time_dim
         
         self.use_time = use_time
         self.time_att_weights = torch.nn.Parameter(torch.from_numpy(np.random.rand(node_dim, time_dim)).float())
-
+        
         self.merge_layer = MergeLayer(self.feat_dim, self.feat_dim, self.feat_dim, self.feat_dim)
+        
+        self.self_attn_model_list = torch.nn.ModuleList([SelfAttentionModel(node_dim,
+                                                                            n_head=n_head,
+                                                                            drop_out=drop_out) for _ in range(num_layers)])
         
         if agg_method == 'attn':
             self.logger.info('Aggregation uses attention model')
-            self.attn_model_list = torch.nn.ModuleList([AttnModel(self.n_feat_dim, 
+            self.attn_model_list = torch.nn.ModuleList([CrossAttentionModel(self.n_feat_dim, 
                                                                time_dim,
                                                                attn_mode=attn_mode, 
                                                                n_head=n_head, 
@@ -51,9 +52,11 @@ class TGRec(torch.nn.Module):
             self.logger.info('Aggregation uses LSTM model')
             self.attn_model_list = torch.nn.ModuleList([LSTMPool(self.n_feat_dim,
                                                                  time_dim) for _ in range(num_layers)])
+                        
         elif agg_method == 'mean':
             self.logger.info('Aggregation uses constant mean model')
             self.attn_model_list = torch.nn.ModuleList([MeanPool(self.n_feat_dim) for _ in range(num_layers)])
+            
         else:
         
             raise ValueError('invalid agg_method value, use attn or lstm')
@@ -128,7 +131,6 @@ class TGRec(torch.nn.Module):
         return weighted_time_emb
 
 
-
     def tem_conv(self, src_idx_l, cut_time_l, curr_layers, num_neighbors=20):
         assert(curr_layers >= 0)
         
@@ -151,9 +153,9 @@ class TGRec(torch.nn.Module):
                                            cut_time_l,
                                            curr_layers=curr_layers - 1, 
                                            num_neighbors=num_neighbors)
+            
             if self.use_time == 'disentangle':
                 src_node_t_embed = self.time_att_aggregate(src_node_conv_feat, src_node_t_embed)
-            
             
             src_ngh_node_batch, src_ngh_eidx_batch, src_ngh_t_batch = self.ngh_finder.get_temporal_neighbor( 
                                                                     src_idx_l, 
@@ -172,20 +174,32 @@ class TGRec(torch.nn.Module):
                                                    src_ngh_t_batch_flat,
                                                    curr_layers=curr_layers - 1, 
                                                    num_neighbors=num_neighbors)
+            
             src_ngh_feat = src_ngh_node_conv_feat.view(batch_size, num_neighbors, -1)
             
             # get edge time features and node features
             src_ngh_t_embed = self.time_encoder(src_ngh_t_batch_th)
+            
             if self.use_time == 'disentangle':
-                src_ngh_t_embed = self.time_att_aggregate(src_ngh_feat, src_ngh_t_embed)
+                src_ngh_t_embed = self.time_att_aggregate(src_ngh_feat, src_ngh_t_embed) # cross attention
 
             # attention aggregation
             mask = src_ngh_node_batch_th == 0
+            
+            
+            # self attention
+            self_attn_m = self.self_attn_model_list[curr_layers - 1]
+            src_node_t_embed, _ = self_attn_m(src_ngh_feat, 
+                                              src_ngh_t_embed, 
+                                              mask)
+
+
+            # cross attention
             attn_m = self.attn_model_list[curr_layers - 1]
-                        
-            local, weight = attn_m(src_node_conv_feat, 
-                                   src_node_t_embed,
-                                   src_ngh_feat,
-                                   src_ngh_t_embed, 
+            local, weight = attn_m(src_node_conv_feat, # query
+                                   src_node_t_embed, # query
+                                   src_ngh_feat, # key, value
+                                   src_ngh_t_embed, # key, value
                                    mask)
+            
             return local
