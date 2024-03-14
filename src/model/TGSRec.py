@@ -36,11 +36,7 @@ class TGRec(torch.nn.Module):
         self.time_att_weights = torch.nn.Parameter(torch.from_numpy(np.random.rand(node_dim, time_dim)).float())
         
         self.merge_layer = MergeLayer(self.feat_dim, self.feat_dim, self.feat_dim, self.feat_dim)
-        
-        self.self_attn_model_list = torch.nn.ModuleList([SelfAttentionModel(node_dim,
-                                                                            n_head=n_head,
-                                                                            drop_out=drop_out) for _ in range(num_layers)])
-        
+
         if agg_method == 'attn':
             self.logger.info('Aggregation uses attention model')
             self.attn_model_list = torch.nn.ModuleList([CrossAttentionModel(self.n_feat_dim, 
@@ -48,6 +44,7 @@ class TGRec(torch.nn.Module):
                                                                attn_mode=attn_mode, 
                                                                n_head=n_head, 
                                                                drop_out=drop_out) for _ in range(num_layers)])
+            
         elif agg_method == 'lstm':
             self.logger.info('Aggregation uses LSTM model')
             self.attn_model_list = torch.nn.ModuleList([LSTMPool(self.n_feat_dim,
@@ -90,18 +87,22 @@ class TGRec(torch.nn.Module):
         
         return score
 
+
     def contrast(self, src_idx_l, target_idx_l, background_idx_l, cut_time_l, num_neighbors=20):
         src_embed = self.tem_conv(src_idx_l, cut_time_l, self.num_layers, num_neighbors)
         target_embed = self.tem_conv(target_idx_l, cut_time_l, self.num_layers, num_neighbors)
         background_embed = self.tem_conv(background_idx_l, cut_time_l, self.num_layers, num_neighbors)
+        
         pos_score = self.affinity_score(src_embed, target_embed).squeeze(dim=-1)
         neg_score = self.affinity_score(src_embed, background_embed).squeeze(dim=-1)
         return pos_score.sigmoid(), neg_score.sigmoid()
+
 
     def contrast_nosigmoid(self, src_idx_l, target_idx_l, background_idx_l, cut_time_l, num_neighbors=20):
         src_embed = self.tem_conv(src_idx_l, cut_time_l, self.num_layers, num_neighbors)
         target_embed = self.tem_conv(target_idx_l, cut_time_l, self.num_layers, num_neighbors)
         background_embed = self.tem_conv(background_idx_l, cut_time_l, self.num_layers, num_neighbors)
+        
         pos_score = self.affinity_score(src_embed, target_embed).squeeze(dim=-1)
         neg_score = self.affinity_score(src_embed, background_embed).squeeze(dim=-1)
         return pos_score, neg_score
@@ -116,7 +117,6 @@ class TGRec(torch.nn.Module):
 
         #[N, L(optional), node_dim] * [node_dim, time_dim] = [N, L(optional), time_dim]
         node_emb_to_time = torch.tensordot(node_emb, self.time_att_weights, dims=([-1], [0]))
-
 
         node_emb_to_time = torch.unsqueeze(node_emb_to_time, dim=-2) #[N, L(optional) 1, time_dim]
         if len(node_emb.shape) == 2:
@@ -142,6 +142,7 @@ class TGRec(torch.nn.Module):
         cut_time_l_th = torch.from_numpy(cut_time_l).float().to(device)
         
         cut_time_l_th = torch.unsqueeze(cut_time_l_th, dim=1)
+        
         # query node always has the start time -> time span == 0
         src_node_t_embed = self.time_encoder(torch.zeros_like(cut_time_l_th))
         src_node_feat = self.node_hist_embed(src_node_batch_th)
@@ -185,21 +186,13 @@ class TGRec(torch.nn.Module):
 
             # attention aggregation
             mask = src_ngh_node_batch_th == 0
-            
-            
-            # self attention
-            self_attn_m = self.self_attn_model_list[curr_layers - 1]
-            src_node_t_embed, _ = self_attn_m(src_ngh_feat, 
-                                              src_ngh_t_embed, 
-                                              mask)
-
-
-            # cross attention
+        
+            # cross attention 
             attn_m = self.attn_model_list[curr_layers - 1]
-            local, weight = attn_m(src_node_conv_feat, # query
-                                   src_node_t_embed, # query
-                                   src_ngh_feat, # key, value
-                                   src_ngh_t_embed, # key, value
+            local, weight = attn_m(src_node_conv_feat, # query (user)
+                                   src_node_t_embed, # query (user time embed)
+                                   src_ngh_feat, # key, value (item)
+                                   src_ngh_t_embed, # key, value (item time embed)
                                    mask)
             
             return local
