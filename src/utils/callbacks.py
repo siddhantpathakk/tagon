@@ -2,7 +2,7 @@ import numpy as np
 import logging
 
 class EarlyStopMonitor(object):
-    def __init__(self, max_round=7, higher_better=True, tolerance=1e-3):
+    def __init__(self, max_round=10, higher_better=True, tolerance=1e-3):
         self.max_round = max_round
         self.num_round = 0
 
