@@ -233,7 +233,7 @@ class Trainer:
     
     def plot_history(self):
         
-        plt.figure(figsize=(20, 10))
+        plt.figure(figsize=(20, 20))
         plt.subplot(1, 5, 1)
         plt.plot(self.history['train_loss'], label='train_loss')
         plt.title('Train Loss')

@@ -15,4 +15,4 @@ module load anaconda
 module load cuda/12.1
 source activate retagnn_pyg
 which python
-python /home/FYP/siddhant005/fyp/src/main.py -d ml-100k --uniform --bs 256
+python /home/FYP/siddhant005/fyp/src/main.py -d ml-100k --uniform

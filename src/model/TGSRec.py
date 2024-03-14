@@ -43,7 +43,9 @@ class TGRec(torch.nn.Module):
                                                                time_dim,
                                                                attn_mode=attn_mode, 
                                                                n_head=n_head, 
-                                                               drop_out=drop_out) for _ in range(num_layers)])
+                                                               drop_out=drop_out,
+                                                               bs=args.bs,
+                                                               n=args.n_degree) for _ in range(num_layers)])
             
         elif agg_method == 'lstm':
             self.logger.info('Aggregation uses LSTM model')
@@ -119,6 +121,7 @@ class TGRec(torch.nn.Module):
         node_emb_to_time = torch.tensordot(node_emb, self.time_att_weights, dims=([-1], [0]))
 
         node_emb_to_time = torch.unsqueeze(node_emb_to_time, dim=-2) #[N, L(optional) 1, time_dim]
+        
         if len(node_emb.shape) == 2:
             node_emb_to_time = torch.unsqueeze(node_emb_to_time, dim=-2) #[N, L(optional), 1, 1, time_dim]
 
@@ -189,6 +192,7 @@ class TGRec(torch.nn.Module):
         
             # cross attention 
             attn_m = self.attn_model_list[curr_layers - 1]
+            
             local, weight = attn_m(src_node_conv_feat, # query (user)
                                    src_node_t_embed, # query (user time embed)
                                    src_ngh_feat, # key, value (item)

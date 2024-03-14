@@ -1,6 +1,6 @@
 import logging
 import torch
-from model.components.ffn import MergeLayer
+from model.components.ffn import MergeLayer, MergeSelfAttnLayer
 from model.components.attention import MultiHeadAttention, MapBasedMultiHeadAttention
 
 class BaseAttentionModel(torch.nn.Module):
@@ -46,7 +46,7 @@ class BaseAttentionModel(torch.nn.Module):
 
 
 class CrossAttentionModel(BaseAttentionModel):
-    def __init__(self, feat_dim, time_dim, attn_mode, n_head, drop_out):
+    def __init__(self, feat_dim, time_dim, attn_mode, n_head, drop_out, bs, n):
         """
         args:
           feat_dim: dim for the node features
@@ -56,7 +56,7 @@ class CrossAttentionModel(BaseAttentionModel):
           drop_out: probability of dropping a neural.
         """
         super(CrossAttentionModel, self).__init__(feat_dim, time_dim, attn_mode, n_head, drop_out)
-        self.self_attn_model = SelfAttentionModel(feat_dim, time_dim, attn_mode="prod", n_head=2, drop_out=0.1)
+        self.self_attn_model = SelfAttentionModel(feat_dim, time_dim, attn_mode="prod", n_head=2, drop_out=0.1, bs=bs, n=n)
 
     def forward(self, src, src_t, seq, seq_t, mask):
         """"Attention based temporal attention forward pass
@@ -79,7 +79,7 @@ class CrossAttentionModel(BaseAttentionModel):
         
         k, _ = self.self_attn_model(seq, seq_t, mask)        
         # k = torch.cat([seq, seq_t], dim=2)  # TODO: check for whether to add time encoding or not
-        # print('k:', k.shape)
+        
         mask = torch.unsqueeze(mask, dim=2)
         mask = mask.permute([0, 2, 1])
 
@@ -90,8 +90,9 @@ class CrossAttentionModel(BaseAttentionModel):
 
 
 class SelfAttentionModel(BaseAttentionModel):
-    def __init__(self, feat_dim, time_dim, attn_mode="prod", n_head=2, drop_out=0.1):
+    def __init__(self, feat_dim, time_dim, bs, n, attn_mode="prod", n_head=2, drop_out=0.1):
         super(SelfAttentionModel, self).__init__(feat_dim, time_dim, attn_mode, n_head, drop_out)
+        self.ffn = MergeSelfAttnLayer(feat_dim, time_dim, bs, n)
         
     def forward(self, seq, seq_t, mask):
         
@@ -100,8 +101,8 @@ class SelfAttentionModel(BaseAttentionModel):
         mask = torch.unsqueeze(mask, dim=2)
         mask = mask.permute([0, 2, 1])
 
-        output, attn = self.multi_head_target(q=k, k=k, v=k, mask=mask) # output: [B, 1, D + Dt], attn: [B, 1, N]
+        output, attn = self.multi_head_target(q=k, k=k, v=k, mask=mask)
 
-        # output = self.ffn(output, seq)
+        output = self.ffn(output, seq)
         
         return output, attn

@@ -25,15 +25,15 @@ def parse_opt():
     
     # data based arguments
     parser.add_argument('-d', '--data', type=str, help='data sources to use', default='ml-100k')
-    parser.add_argument('--samplerate', type=float, default=1.0, help='samplerate for each user')
+    parser.add_argument('--samplerate', type=float, default=1.0, help='sample rate for each user')
     parser.add_argument('--popnegsample', action='store_true', help='use popularity based negative sampling')
     parser.add_argument('--timepopnegsample', action='store_true', help='use timely popularity based negative sampling')
-    parser.add_argument('--negsampleeval', type=int, default=1000, help='number of negative sampling evaluation, -1 for all')
+    parser.add_argument('--negsampleeval', type=int, default=3000, help='number of negative sampling evaluation, -1 for all')
     
     # training based arguments
-    parser.add_argument('--bs', type=int, default=1024, help='batch_size')
-    parser.add_argument('--n_epoch', type=int, default=200, help='number of epochs')
-    parser.add_argument('--lr', type=float, default=1e-3, help='learning rate')
+    parser.add_argument('--bs', type=int, default=256, help='batch_size')
+    parser.add_argument('--n_epoch', type=int, default=500, help='number of epochs')
+    parser.add_argument('--lr', type=float, default=1e-4, help='learning rate') # 1e-3  3e-3  1e-4
     parser.add_argument('--prefix', type=str, default='ml100k', help='prefix to name the checkpoints')
     parser.add_argument('--gpu', type=int, default=0, help='idx for the gpu to use')
     parser.add_argument('--seed', type=int, default=42, help='random seed')
