@@ -1,8 +1,8 @@
 import os
 
 def get_model_save_path(args):
-    MODEL_SAVE_PATH = f'./saved_models/{args.prefix}-{args.agg_method}-{args.attn_mode}-{args.data}.pth'
-    get_checkpoint_path = lambda epoch: f'./saved_checkpoints/{args.prefix}-{args.agg_method}-{args.attn_mode}-{args.data}-{epoch}.pth'
+    MODEL_SAVE_PATH = f'/home/FYP/siddhant005/fyp/log/saved_models/{args.prefix}-{args.agg_method}-{args.attn_mode}-{args.data}.pth'
+    get_checkpoint_path = lambda epoch: f'/home/FYP/siddhant005/fyp/log/saved_checkpoints/{args.prefix}-{args.agg_method}-{args.attn_mode}-{args.data}-{epoch}.pth'
     SAVE_MODEL_DIR = f"./log/saved_models/{args.data}"
     
     if not os.path.isdir(SAVE_MODEL_DIR):
@@ -14,7 +14,7 @@ def get_model_save_path(args):
     return SAVE_MODEL_DIR, SAVE_MODEL_PATH, MODEL_SAVE_PATH, get_checkpoint_path
 
 def get_rank_results_paths(args):
-    RANK_RESULTS_DIR = f"./log/rank_results/{args.data}"
+    RANK_RESULTS_DIR = f"/home/FYP/siddhant005/fyp/log/rank_results/{args.data}"
     
     if not os.path.isdir(RANK_RESULTS_DIR):
         os.mkdir(RANK_RESULTS_DIR)

@@ -9,7 +9,7 @@ import torch.nn.functional as F
 class MergeLayer(torch.nn.Module):
     def __init__(self, dim1, dim2, dim3, dim4):
         super().__init__()
-        #self.layer_norm = torch.nn.LayerNorm(dim1 + dim2)
+        # self.layer_norm = torch.nn.LayerNorm(dim1 + dim2)
         self.fc1 = torch.nn.Linear(dim1 + dim2, dim3)
         self.fc2 = torch.nn.Linear(dim3, dim4)
         self.act = torch.nn.ReLU()

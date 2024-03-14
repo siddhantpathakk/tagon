@@ -28,7 +28,7 @@ def parse_opt():
     parser.add_argument('--samplerate', type=float, default=1.0, help='samplerate for each user')
     parser.add_argument('--popnegsample', action='store_true', help='use popularity based negative sampling')
     parser.add_argument('--timepopnegsample', action='store_true', help='use timely popularity based negative sampling')
-    parser.add_argument('--negsampleeval', type=int, default=-1, help='number of negative sampling evaluation, -1 for all')
+    parser.add_argument('--negsampleeval', type=int, default=1000, help='number of negative sampling evaluation, -1 for all')
     
     # training based arguments
     parser.add_argument('--bs', type=int, default=1024, help='batch_size')

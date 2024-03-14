@@ -226,10 +226,10 @@ class Trainer:
     def export_history(self):
         import json
         
-        with open(f'./log/history/{time.strftime("%d%m%y-%H%M%S")}_history.json', 'w') as f:
+        with open(f'/home/FYP/siddhant005/fyp/log/history/{time.strftime("%d%m%y-%H%M%S")}_history.json', 'w') as f:
             json.dump(self.history, f)
         
-        self.logger.info(f'History exported to ./log/{time.strftime("%d%m%y-%H%M%S")}_history.json')
+        self.logger.info(f'History exported to /home/FYP/siddhant005/fyp/log/{time.strftime("%d%m%y-%H%M%S")}_history.json')
     
     def plot_history(self):
         
@@ -267,6 +267,6 @@ class Trainer:
         plt.title('Train AUC vs Val AUC vs Test AUC')
         plt.legend()
         
-        plt.savefig(f'./log/history/{time.strftime("%d%m%y-%H%M%S")}_history.png')
+        plt.savefig(f'/home/FYP/siddhant005/fyp/log/history/{time.strftime("%d%m%y-%H%M%S")}_history.png')
         
         

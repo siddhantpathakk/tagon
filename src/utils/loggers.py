@@ -8,7 +8,7 @@ def set_up_logger():
     
     logger = logging.getLogger()
     
-    fh = logging.FileHandler(f'./log/{time.strftime("%d%m%y-%H%M%S")}.log')
+    fh = logging.FileHandler(f'/home/FYP/siddhant005/fyp/log/{time.strftime("%d%m%y-%H%M%S")}.log')
 
     formatter = logging.Formatter(logging_format)
     fh.setFormatter(formatter)

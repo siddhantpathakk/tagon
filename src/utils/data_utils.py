@@ -1,4 +1,3 @@
-import logging
 import numpy as np
 import pandas as pd
 import math
@@ -10,7 +9,7 @@ class Data():
 
     def __init__(self, DATASET, args):
         ### Load data and train val test split
-        g_df = pd.read_csv('./processed/ml_{}.csv'.format(DATASET))
+        g_df = pd.read_csv('/home/FYP/siddhant005/fyp/processed/ml_{}.csv'.format(DATASET))
         self.split_data(g_df, args)
         
         # self.logger = logging.getLogger()
@@ -82,8 +81,6 @@ class Data():
         self.test_label_l = test_label_l[test_is_old_node_edge]
         # print('#interaction in test: ', len(self.test_src_l))
         # self.logger.info(f'#interaction in test: {len(self.test_src_l)}')
-
-
 
         adj_list = [[] for _ in range(self.max_idx + 1)]
         for src, dst, eidx, ts in zip(self.train_src_l, self.train_dst_l, self.train_e_idx_l, self.train_ts_l):
