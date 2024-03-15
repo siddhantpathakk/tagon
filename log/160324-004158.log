@@ -66,3 +66,4 @@ INFO:	trainer_utils:	Device: cuda:0
 INFO:	trainer_utils:	Number of nodes: 2625
 INFO:	trainer_utils:	Number of edges: 100000
 INFO:	main:	Commencing training for 200 epochs
+INFO:	trainer:	Epoch [1/200]	[Training]:	Loss: 50.292	Acc: 0.653	AP: 0.594	F1: 0.723	AUC: 0.653
