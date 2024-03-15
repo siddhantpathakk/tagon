@@ -39,7 +39,7 @@ class Trainer:
         m_loss, acc_arr, ap_arr, f1_arr, auc_arr = [], [], [], [], []
 
         for k in range(self.num_batch):
-            self.logger.info(f'Epoch {epoch+1}, batch {k+1}/{self.num_batch}')
+            # self.logger.info(f'Epoch {epoch+1}, batch {k+1}/{self.num_batch}')
             start_index = k * self.args.bs
             end_index = min(self.num_instance - 1, start_index + self.args.bs)
             
@@ -91,6 +91,7 @@ class Trainer:
 
     def train(self):
         for epoch in range(self.args.n_epoch):
+            tr_time = time.time()
             mean_loss, mean_acc, mean_ap, mean_f1, mean_auc = self.train_for_one_epoch(epoch)
                     
             self.history['train_loss'].append(mean_loss)
@@ -99,25 +100,29 @@ class Trainer:
             self.history['train_f1'].append(mean_f1)
             self.history['train_auc'].append(mean_auc)
             
-            self.logger.info(f'Epoch {epoch+1} training results: loss: {mean_loss:.2f}, acc: {mean_acc:.2f}, ap: {mean_ap:.2f}, f1: {mean_f1:.2f}, auc: {mean_auc:.2f}')
+            self.logger.info(f'Epoch [{epoch+1}/{self.args.n_epoch}]\t[Training]:\tTime: {time.time() - tr_time:.2f}sec\tLoss: {mean_loss:.4f}\tAcc: {mean_acc:.4f}\tAP: {mean_ap:.4f}\tF1: {mean_f1:.4f}\tAUC: {mean_auc:.4f}')
             
             if ((epoch+1) % self.args.ckpt_epoch == 0 and (epoch+1) >= 200) or (epoch+1) == self.args.n_epoch:
-                self.export_model_opt_state(np.mean(mean_loss))
+                self.export_model_optim_state(np.mean(mean_loss))
             
-            
+            val_time = time.time()
             valid_result = self.evaluate('validate')
-            self.logger.info(f'Validation results: {valid_result}')
+            val_r10, val_r20, val_mrr = valid_result[0]['recall'][0], valid_result[0]['recall'][1], valid_result[0]['mrr']
+            self.logger.info(f'Epoch [{epoch+1}/{self.args.n_epoch}]\t[Validation]:\tTime: {time.time() - val_time:.2f}sec\tR@10: {val_r10:.4f}\tR@20: {val_r20:.4f}\tMRR: {val_mrr:.4f}')
         
-        
+        test_time = time.time()
         test_results = self.evaluate('test')
-        self.logger.info(f'Test results: {test_results}')
+        test_r10, test_r20, test_mrr = test_results[0]['recall'][0], test_results[0]['recall'][1], test_results[0]['mrr']
+        self.logger.info('\n')
+        self.logger.info(f'Final Test:\tTime: {time.time() - test_time:.2f}sec\tR@10: {test_r10:.4f}\tR@20: {test_r20:.4f}\tMRR: {test_mrr:.4f}')
         
         self.export_history()
         self.export_model_optim_state(mean_loss)
+        self.logger.info('Training completed, model and optimizer state saved locally.')
     
 
     def evaluate(self, type='validate'):
-        self.logger.info(f'Commencing evaluation for {type}')
+        # self.logger.info(f'Commencing evaluation for {type}')
         self.model.ngh_finder = self.data.full_ngh_finder
         if type == 'validate':
             return eval_users(self.model, 
@@ -161,7 +166,7 @@ class Trainer:
             'loss': np.mean(m_loss),
         } 
         torch.save(model_state, self.SAVE_MODEL_PATH)
-        self.logger.info(f'Model saved at {self.SAVE_MODEL_PATH}')
+        # self.logger.info(f'Model saved at {self.SAVE_MODEL_PATH}')
     
     
     def export_history(self):

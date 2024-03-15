@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 import math
-
+import logging
 from utils.graph_utils import NeighborFinder
 from utils.graph_utils import RandEdgeSampler
 
@@ -19,7 +19,18 @@ class Data:
     
     def split_data(self, g_df, args):
         
-        val_time, test_time = list(np.quantile(g_df.ts, [0.20, 0.25]))
+        self.logger = logging.getLogger(__name__)
+        train_test_val_ratio = list(map(int, args.train_test_val.split('-')))
+        assert len(train_test_val_ratio) == 3 and sum(train_test_val_ratio) == 100
+        
+        self.logger.info(f'Train split: {train_test_val_ratio[0]}%, Val split: {train_test_val_ratio[1]}%, Test split: {train_test_val_ratio[2]}%')
+        
+        train_test_val_ratio = [x / sum(train_test_val_ratio) for x in train_test_val_ratio]
+        
+        train_quantile = train_test_val_ratio[0]
+        val_quantile = train_test_val_ratio[0] + train_test_val_ratio[1]
+        
+        val_time, test_time = list(np.quantile(g_df.ts, [train_quantile, val_quantile]))
         
         src_l = g_df.u.values
         dst_l = g_df.i.values
