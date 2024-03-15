@@ -67,3 +67,5 @@ INFO:	trainer_utils:	Number of nodes: 2625
 INFO:	trainer_utils:	Number of edges: 100000
 INFO:	main:	Commencing training for 200 epochs
 INFO:	trainer:	Epoch [1/200]	[Training]:	Loss: 50.292	Acc: 0.653	AP: 0.594	F1: 0.723	AUC: 0.653
+INFO:	trainer:	Epoch [2/200]	[Training]:	Loss: 49.210	Acc: 0.698	AP: 0.630	F1: 0.739	AUC: 0.698
+INFO:	trainer:	Epoch [3/200]	[Training]:	Loss: 48.187	Acc: 0.704	AP: 0.637	F1: 0.736	AUC: 0.704

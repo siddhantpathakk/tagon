@@ -25,5 +25,5 @@ saved_checkpoints
 rank_results
 
 
-datasets
-processed
+amazon
+ml-1m
