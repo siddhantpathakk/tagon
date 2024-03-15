@@ -1,10 +1,88 @@
-import logging
-
-import numpy as np
 import torch
-
 import torch.nn as nn
-import torch.nn.functional as F
+import numpy as np
+
+
+class MergeLayer(torch.nn.Module):
+    def __init__(self, dim1, dim2, dim3, dim4):
+        super().__init__()
+        # self.layer_norm = torch.nn.LayerNorm(dim1 + dim2)
+        self.fc1 = torch.nn.Linear(dim1 + dim2, dim3)
+        self.fc2 = torch.nn.Linear(dim3, dim4)
+        self.act = torch.nn.ReLU()
+
+        torch.nn.init.xavier_normal_(self.fc1.weight)
+        torch.nn.init.xavier_normal_(self.fc2.weight)
+        
+    def forward(self, x1, x2):
+        x = torch.cat([x1, x2], dim=1)
+        #x = self.layer_norm(x)
+        h = self.act(self.fc1(x))
+        return self.fc2(h)
+    
+
+class MergeSelfAttnLayer(nn.Module):
+    def __init__(self, feat_dim, time_dim, batch_size, n):
+        super(MergeSelfAttnLayer, self).__init__()
+        self.fc1 = nn.Linear(feat_dim+time_dim+feat_dim, batch_size * n)
+        self.fc2 = nn.Linear(batch_size * n, feat_dim+time_dim)
+        self.act = nn.ReLU()            
+        
+    def forward(self, seq, seq_t):
+        x = torch.cat([seq, seq_t], dim=-1)
+        bs, n, _ = x.size()
+        x = x.view(bs * n, -1)
+        x = self.fc2(self.act(self.fc1(x)))
+        x = x.view(bs, n, -1)
+        return x
+    
+    
+
+class LSTMPool(torch.nn.Module):
+    def __init__(self, feat_dim, time_dim):
+        super(LSTMPool, self).__init__()
+        self.feat_dim = feat_dim
+        self.time_dim = time_dim
+        
+        self.att_dim = feat_dim + time_dim
+        
+        self.act = torch.nn.ReLU()
+        
+        self.lstm = torch.nn.LSTM(input_size=self.att_dim, 
+                                  hidden_size=self.feat_dim, 
+                                  num_layers=1, 
+                                  batch_first=True)
+        self.merger = MergeLayer(feat_dim, feat_dim, feat_dim, feat_dim)
+
+    def forward(self, src, src_t, seq, seq_t,  mask):
+        # seq [B, N, D]
+        # mask [B, N]
+        seq_x = torch.cat([seq, seq_t], dim=2)
+            
+        _, (hn, _) = self.lstm(seq_x)
+        
+        hn = hn[-1, :, :] #hn.squeeze(dim=0)
+
+        out = self.merger.forward(hn, src)
+        return out, None
+    
+
+class MeanPool(torch.nn.Module):
+    def __init__(self, feat_dim):
+        super(MeanPool, self).__init__()
+        self.feat_dim = feat_dim
+        self.act = torch.nn.ReLU()
+        self.merger = MergeLayer(feat_dim, feat_dim, feat_dim, feat_dim)
+        
+    def forward(self, src, src_t, seq, seq_t, mask):
+        # seq [B, N, D]
+        # mask [B, N]
+        src_x = src
+        seq_x = torch.cat([seq], dim=2) #[B, N, D]
+        hn = seq_x.mean(dim=1) #[B, D]
+        output = self.merger(hn, src_x)
+        return output, None
+        
 
 class ScaledDotProductAttention(torch.nn.Module):
     ''' Scaled Dot-Product Attention '''
@@ -29,6 +107,7 @@ class ScaledDotProductAttention(torch.nn.Module):
         output = torch.bmm(attn, v)
         
         return output, attn
+
 
 class MultiHeadAttention(nn.Module):
     ''' Multi-Head Attention module '''
@@ -170,4 +249,3 @@ class MapBasedMultiHeadAttention(nn.Module):
 
         return output, attn
     
-

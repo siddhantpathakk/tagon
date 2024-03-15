@@ -5,15 +5,12 @@ import math
 from utils.graph_utils import NeighborFinder
 from utils.graph_utils import RandEdgeSampler
 
-class Data():
-
+class Data:
     def __init__(self, DATASET, args):
         ### Load data and train val test split
-        g_df = pd.read_csv('/home/FYP/siddhant005/fyp/processed/ml_{}.csv'.format(DATASET))
+        g_df = pd.read_csv('/home/FYP/siddhant005/fyp/processed/ml-100k/ml_{}.csv'.format(DATASET))
         self.split_data(g_df, args)
         
-        # self.logger = logging.getLogger()
-
     def get_num_instances(self):
         return len(self.train_src_l)
 
@@ -22,7 +19,7 @@ class Data():
     
     def split_data(self, g_df, args):
         
-        val_time, test_time = list(np.quantile(g_df.ts, [0.80, 0.90]))
+        val_time, test_time = list(np.quantile(g_df.ts, [0.20, 0.25]))
         
         src_l = g_df.u.values
         dst_l = g_df.i.values

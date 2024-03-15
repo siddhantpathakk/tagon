@@ -1,15 +1,12 @@
 import logging
-
 import numpy as np
-import torch
 
-import torch.nn as nn
+import torch
 import torch.nn.functional as F
 
-from model.components.ffn import MergeLayer
-from model.attention_model import CrossAttentionModel, SelfAttentionModel
-from model.components.pool import LSTMPool, MeanPool
-from model.components.encode import TimeEncode, PosEncode, EmptyEncode, DisentangleTimeEncode
+from model.attention import CrossAttentionModel
+from model.layers import LSTMPool, MeanPool, MergeLayer
+from model.encode import TimeEncode, PosEncode, EmptyEncode, DisentangleTimeEncode
 
 class TGRec(torch.nn.Module):
     def __init__(self, ngh_finder, n_nodes, args,
@@ -79,12 +76,11 @@ class TGRec(torch.nn.Module):
         
         self.affinity_score = MergeLayer(self.feat_dim, self.feat_dim, self.feat_dim, 1) #torch.nn.Bilinear(self.feat_dim, self.feat_dim, 1, bias=True)
         
+        
     def forward(self, src_idx_l, target_idx_l, cut_time_l, num_neighbors=20):
         
         src_embed = self.tem_conv(src_idx_l, cut_time_l, self.num_layers, num_neighbors)
         target_embed = self.tem_conv(target_idx_l, cut_time_l, self.num_layers, num_neighbors)
-        
- 
         score = self.affinity_score(src_embed, target_embed).squeeze(dim=-1)
         
         return score

@@ -1,21 +1,126 @@
-import pandas as pd
-import numpy as np
+import warnings
+warnings.filterwarnings("ignore")
 
-from sklearn.metrics import average_precision_score, f1_score, roc_auc_score
-from sklearn.preprocessing import MinMaxScaler
-
-import multiprocessing
-from utils import metrics
-import torch
-from tqdm import tqdm
 import math
+import torch
+import logging
+import numpy as np
+import multiprocessing
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.metrics import average_precision_score, f1_score, roc_auc_score
+
+
+def recall(rank, ground_truth, N):
+    return len(set(rank[:N]) & set(ground_truth)) / float(len(set(ground_truth)))
+
+
+def precision_at_k(r, k):
+    """Score is precision @ k
+    Relevance is binary (nonzero is relevant).
+    Returns:
+        Precision @ k
+    Raises:
+        ValueError: len(r) must be >= k
+    """
+    assert k >= 1
+    r = np.asarray(r)[:k]
+    return np.mean(r)
+
+
+def average_precision(r,cut):
+    """Score is average precision (area under PR curve)
+    Relevance is binary (nonzero is relevant).
+    Returns:
+        Average precision
+    """
+    r = np.asarray(r)
+    out = [precision_at_k(r, k + 1) for k in range(cut) if r[k]]
+    if not out:
+        return 0.
+    return np.sum(out)/float(min(cut, np.sum(r)))
+
+
+def mean_average_precision(rs):
+    """Score is mean average precision
+    Relevance is binary (nonzero is relevant).
+    Returns:
+        Mean average precision
+    """
+    return np.mean([average_precision(r) for r in rs])
+
+
+def dcg_at_k(r, k, method=1):
+    """Score is discounted cumulative gain (dcg)
+    Relevance is positive real values.  Can use binary
+    as the previous methods.
+    Returns:
+        Discounted cumulative gain
+    """
+    r = np.asfarray(r)[:k]
+    if r.size:
+        if method == 0:
+            return r[0] + np.sum(r[1:] / np.log2(np.arange(2, r.size + 1)))
+        elif method == 1:
+            return np.sum(r / np.log2(np.arange(2, r.size + 2)))
+        else:
+            raise ValueError('method must be 0 or 1.')
+    return 0.
+
+
+def ndcg_at_k(r, k, method=1):
+    """Score is normalized discounted cumulative gain (ndcg)
+    Relevance is positive real values.  Can use binary
+    as the previous methods.
+    Returns:
+        Normalized discounted cumulative gain
+    """
+    dcg_max = dcg_at_k(sorted(r, reverse=True), k, method)
+    if not dcg_max:
+        return 0.
+    return dcg_at_k(r, k, method) / dcg_max
+
+
+def recall_at_k(r, k, all_pos_num):
+    r = np.asfarray(r)[:k]
+    return np.sum(r) / all_pos_num
+
+
+def hit_at_k(r, k):
+    r = np.array(r)[:k]
+    if np.sum(r) > 0:
+        return 1.
+    else:
+        return 0.
+
+def F1(pre, rec):
+    if pre + rec > 0:
+        return (2.0 * pre * rec) / (pre + rec)
+    else:
+        return 0.
+
+def area_under_curve(ground_truth, prediction):
+    try:
+        res = roc_auc_score(y_true=ground_truth, y_score=prediction)
+    except Exception:
+        res = 0.
+    return res
+
+def mean_reciprocal_rank(r):
+    r = np.array(r)
+    if np.sum(r) == 0:
+        return 0.
+    return np.reciprocal(np.where(r==1)[0]+1, dtype=np.float64)[0]
 
 
 Ks = [10, 20]
 
 def eval_one_user(x):
-    result = {'precision': np.zeros(len(Ks)), 'recall': np.zeros(len(Ks)), 'ndcg': np.zeros(len(Ks)),
-            'hit_ratio': np.zeros(len(Ks)), 'auc': 0., 'mrr': 0.}
+    logger = logging.getLogger()
+    
+    result = {'precision': np.zeros(len(Ks)), 
+              'recall': np.zeros(len(Ks)), 
+              'ndcg': np.zeros(len(Ks)),
+                'hit_ratio': np.zeros(len(Ks)), 'auc': 0., 'mrr': 0.}
     preds = np.transpose(x[0])
 
     pos_label = np.ones(1)
@@ -44,12 +149,12 @@ def eval_one_user(x):
 
     precision, recall, ndcg, hit_ratio = [], [], [], []
     for K in Ks:
-        precision.append(metrics.precision_at_k(r, K))
-        recall.append(metrics.recall_at_k(r, K, 1))
-        ndcg.append(metrics.ndcg_at_k(r, K))
-        hit_ratio.append(metrics.hit_at_k(r, K))
-    auc = metrics.auc(ground_truth=labels, prediction=posterior)
-    mrr = metrics.mrr(r)
+        precision.append(precision_at_k(r, K))
+        recall.append(recall_at_k(r, K, 1))
+        ndcg.append(ndcg_at_k(r, K))
+        hit_ratio.append(hit_at_k(r, K))
+    auc = area_under_curve(ground_truth=labels, prediction=posterior)
+    mrr = mean_reciprocal_rank(r)
 
 
     result['precision'] += precision
@@ -58,7 +163,7 @@ def eval_one_user(x):
     result['hit_ratio'] += hit_ratio
     result['auc'] += auc
     result['mrr'] += mrr
-
+    # logger.info(f'User {uit[0]}: precision@{Ks} {precision}, recall@{Ks} {recall}, ndcg@{Ks} {ndcg}, hit_ratio@{Ks} {hit_ratio}, auc {auc}, mrr {mrr}')
     return (result, rankeditems[:max(Ks)], uit, rec_items)
 
 
@@ -75,16 +180,10 @@ def rank_corrected(r, m, n):
 
 
 def eval_users(tgrec, src, dst, ts, train_src, train_dst, args):
-    result = {
-        'precision': np.zeros(len(Ks)), 
-        'recall': np.zeros(len(Ks)), 
-        'ndcg': np.zeros(len(Ks)),
-        'hit_ratio': np.zeros(len(Ks)), 
-        'auc': 0.0, 
-        'mrr': 0.0
-        }
-    
-    cores = multiprocessing.cpu_count() // 4
+    logger = logging.getLogger()
+    result = {'precision': np.zeros(len(Ks)), 'recall': np.zeros(len(Ks)), 'ndcg': np.zeros(len(Ks)),
+            'hit_ratio': np.zeros(len(Ks)), 'auc': 0., 'mrr': 0.}
+    cores = multiprocessing.cpu_count() // 2
     userset = set(src)
     train_itemset = set(train_dst)
     pos_edges = {}
@@ -123,7 +222,8 @@ def eval_users(tgrec, src, dst, ts, train_src, train_dst, args):
         batch_ts = []
         #batch_len = []
         batch_i = 0
-        for u, i, t in zip(src, dst, ts):
+        for idx2, (u, i, t) in enumerate(zip(src, dst, ts)):
+            
             num_test_instances += 1
             if u not in train_src or i not in train_itemset or u not in pos_edges:
                 continue
@@ -177,7 +277,7 @@ def eval_users(tgrec, src, dst, ts, train_src, train_dst, args):
 
                 batchset_predictions = zip(preds_list, preds_len_preditems, preds_uit, preds_rec_items, preds_sampled_neg, preds_num_candidates)
                 batch_preds = pool.map(eval_one_user, batchset_predictions)
-                for oneresult in batch_preds:
+                for idx, oneresult in enumerate(batch_preds):
                     re = oneresult[0]
                     result['precision'] += re['precision']
                     result['recall'] += re['recall']
@@ -254,7 +354,7 @@ def eval_users(tgrec, src, dst, ts, train_src, train_dst, args):
     return result, test_outputs
 
 
-def eval_one_epoch(hint, tgrec, sampler, src, dst, ts, NUM_NEIGHBORS, label):
+def eval_one_epoch(hint, tgrec, sampler, src, dst, ts, label, NUM_NEIGHBORS=20):
     val_acc, val_ap, val_f1, val_auc = [], [], [], []
     with torch.no_grad():
         tgrec = tgrec.eval()
@@ -285,4 +385,5 @@ def eval_one_epoch(hint, tgrec, sampler, src, dst, ts, NUM_NEIGHBORS, label):
             val_ap.append(average_precision_score(true_label, pred_score))
             val_f1.append(f1_score(true_label, pred_label))
             val_auc.append(roc_auc_score(true_label, pred_score))
+            
     return np.mean(val_acc), np.mean(val_ap), np.mean(val_f1), np.mean(val_auc)

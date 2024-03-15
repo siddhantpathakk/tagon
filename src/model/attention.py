@@ -1,7 +1,6 @@
 import logging
 import torch
-from model.components.ffn import MergeLayer, MergeSelfAttnLayer
-from model.components.attention import MultiHeadAttention, MapBasedMultiHeadAttention
+from model.layers import MultiHeadAttention, MapBasedMultiHeadAttention,  MergeLayer, MergeSelfAttnLayer
 
 class BaseAttentionModel(torch.nn.Module):
     def __init__(self, feat_dim, time_dim, 
@@ -28,7 +27,7 @@ class BaseAttentionModel(torch.nn.Module):
                                            d_k=self.model_dim // n_head, 
                                            d_v=self.model_dim // n_head, 
                                            dropout=drop_out)
-          self.logger.info('Using scaled prod attention')
+        #   self.logger.info('Using scaled prod attention')
           
       elif attn_mode == 'map':
           self.multi_head_target = MapBasedMultiHeadAttention(n_head, 
@@ -36,7 +35,7 @@ class BaseAttentionModel(torch.nn.Module):
                                            d_k=self.model_dim // n_head, 
                                            d_v=self.model_dim // n_head, 
                                            dropout=drop_out)
-          self.logger.info('Using map based attention')
+        #   self.logger.info('Using map based attention')
           
       else:
           raise ValueError('attn_mode can only be prod or map')

@@ -1,9 +1,7 @@
 from trainer import Trainer
-from utils.main_utils import get_rank_results_paths, get_model_save_path
-from utils.seed import seed_everything
 from utils.data_utils import Data
-from utils.loggers import set_up_logger
-from utils.parser import parse_opt
+from utils.main_utils import parse_opt, get_model_save_path, get_rank_results_paths, set_up_logger, seed_everything
+
 
 if __name__ == "__main__":
     args = parse_opt()
@@ -24,12 +22,4 @@ if __name__ == "__main__":
     
     logger.info(f'Commencing training for {args.n_epoch} epochs')
     trainer.train()
-    logger.info(f'Training finished')
-    
-    logger.info("Plotting results")
-    trainer.plot_history()
-    logger.info("Plotting finished")
-
-    trainer.export_history()
-    
-    logger.info('Completed main file execution. Exiting...')
+    logger.info(f'Training finished. Completed main file execution. Exiting...')
