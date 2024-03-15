@@ -5,7 +5,7 @@ import numpy as np
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import average_precision_score, f1_score, roc_auc_score
 
-from utils.evaluation_utils import eval_users
+from utils.evaluation_utils import eval_users, eval_one_epoch
 from utils.trainer_utils import EarlyStopMonitor, bpr_loss, build_model, get_new_history
 
 
@@ -32,7 +32,7 @@ class Trainer:
    
     
     def train_for_one_epoch(self, epoch):
-        self.logger.info(f'Commencing training for epoch # {epoch+1}')   
+        # self.logger.info(f'Commencing training for epoch # {epoch+1}')   
         self.model.train()
         self.model.ngh_finder = self.data.train_ngh_finder
         np.random.shuffle(self.idx_list)
@@ -91,7 +91,6 @@ class Trainer:
 
     def train(self):
         for epoch in range(self.args.n_epoch):
-            tr_time = time.time()
             mean_loss, mean_acc, mean_ap, mean_f1, mean_auc = self.train_for_one_epoch(epoch)
                     
             self.history['train_loss'].append(mean_loss)
@@ -100,21 +99,29 @@ class Trainer:
             self.history['train_f1'].append(mean_f1)
             self.history['train_auc'].append(mean_auc)
             
-            self.logger.info(f'Epoch [{epoch+1}/{self.args.n_epoch}]\t[Training]:\tTime: {time.time() - tr_time:.2f}sec\tLoss: {mean_loss:.4f}\tAcc: {mean_acc:.4f}\tAP: {mean_ap:.4f}\tF1: {mean_f1:.4f}\tAUC: {mean_auc:.4f}')
+            self.logger.info(f'Epoch [{epoch+1}/{self.args.n_epoch}]\t[Training]:\tLoss: {mean_loss:.3f}\tAcc: {mean_acc:.3f}\tAP: {mean_ap:.3f}\tF1: {mean_f1:.3f}\tAUC: {mean_auc:.3f}')
             
-            if ((epoch+1) % self.args.ckpt_epoch == 0 and (epoch+1) >= 200) or (epoch+1) == self.args.n_epoch:
+            if (epoch+1) % self.args.ckpt_epoch == 0:
                 self.export_model_optim_state(np.mean(mean_loss))
             
-            val_time = time.time()
-            valid_result = self.evaluate('validate')
-            val_r10, val_r20, val_mrr = valid_result[0]['recall'][0], valid_result[0]['recall'][1], valid_result[0]['mrr']
-            self.logger.info(f'Epoch [{epoch+1}/{self.args.n_epoch}]\t[Validation]:\tTime: {time.time() - val_time:.2f}sec\tR@10: {val_r10:.4f}\tR@20: {val_r20:.4f}\tMRR: {val_mrr:.4f}')
-        
+            if ((epoch+1) % self.args.ckpt_epoch == 0 and (epoch+1) >= 200) or (epoch+1) == self.args.n_epoch:
+                valid_result = self.evaluate('validate')
+                val_r10, val_r20, val_mrr = valid_result['recall'][0], valid_result['recall'][1], valid_result['mrr']
+                self.logger.info(f'Epoch [{epoch+1}/{self.args.n_epoch}]\t[Validation]:\tR@10: {val_r10:.3f}\tR@20: {val_r20:.3f}\tMRR: {val_mrr:.3f}')
+                
+                self.history['val_recall10'].append(val_r10)
+                self.history['val_recall20'].append(val_r20)
+                self.history['val_mrr'].append(val_mrr)
+            
+
         test_time = time.time()
         test_results = self.evaluate('test')
-        test_r10, test_r20, test_mrr = test_results[0]['recall'][0], test_results[0]['recall'][1], test_results[0]['mrr']
-        self.logger.info('\n')
-        self.logger.info(f'Final Test:\tTime: {time.time() - test_time:.2f}sec\tR@10: {test_r10:.4f}\tR@20: {test_r20:.4f}\tMRR: {test_mrr:.4f}')
+        test_r10, test_r20, test_mrr = test_results['recall'][0], test_results['recall'][1], test_results['mrr']
+        self.logger.info(f'Final Test:\tTime: {time.time() - test_time:.2f}sec\tR@10: {test_r10:.3f}\tR@20: {test_r20:.3f}\tMRR: {test_mrr:.3f}')
+        
+        self.history['test_recall10'].append(test_r10)
+        self.history['test_recall20'].append(test_r20)
+        self.history['test_mrr'].append(test_mrr)
         
         self.export_history()
         self.export_model_optim_state(mean_loss)
@@ -123,13 +130,18 @@ class Trainer:
 
     def evaluate(self, type='validate'):
         # self.logger.info(f'Commencing evaluation for {type}')
-        self.model.ngh_finder = self.data.full_ngh_finder
         if type == 'validate':
+            self.model.ngh_finder = self.data.test_train_ngh_finder
             return eval_users(self.model, 
                             self.data.val_src_l, self.data.val_dst_l, self.data.val_ts_l, 
                             self.data.train_src_l, self.data.train_dst_l, 
                             self.args)
+            # return eval_one_epoch('val for old nodes', self.model, 
+            #                       self.data.val_rand_sampler, 
+            #                       self.data.val_src_l, self.data.val_dst_l, self.data.val_ts_l, self.data.val_label_l)
+                                  
         elif type == 'test':
+            self.model.ngh_finder = self.data.full_ngh_finder
             return eval_users(self.model, 
                             self.data.test_src_l, self.data.test_dst_l, self.data.test_ts_l, 
                             self.data.train_src_l, self.data.train_dst_l, 

@@ -55,14 +55,17 @@ def build_model(args, data, logger):
     warmup_period = 15
     warmup_scheduler = warmup.LinearWarmup(optimizer, warmup_period=warmup_period)
     
-    # logger.info("Model built successfully")
-    # logger.info(model)
-    # logger.info(f'Optimizer: {optimizer.__class__.__name__} with lr: {args.lr} and l2: {args.l2}')
-    # logger.info(f'Learning rate scheduler: {lr_scheduler.__class__.__name__}')
-    # logger.info(f'Warmup scheduler: {warmup_scheduler.__class__.__name__}')
-    # logger.info(f'Device: {device}')
-    # logger.info(f'Number of nodes: {n_nodes}')
-    # logger.info(f'Number of edges: {n_edges}')
+    logger.info("Model built successfully")
+    logger.info(model)
+    logger.info(f'Number of parameters: {sum(p.numel() for p in model.parameters())}'
+                f' (trainable: {sum(p.numel() for p in model.parameters() if p.requires_grad)})')
+    logger.info(f'Loss function: BPR + L2 regularization')
+    logger.info(f'Optimizer: {optimizer.__class__.__name__} with lr: {args.lr} and l2: {args.l2}')
+    logger.info(f'Learning rate scheduler: {lr_scheduler.__class__.__name__}')
+    logger.info(f'Warmup scheduler: {warmup_scheduler.__class__.__name__} with warmup period: {warmup_period}')
+    logger.info(f'Device: {device}')
+    logger.info(f'Number of nodes: {n_nodes}')
+    logger.info(f'Number of edges: {n_edges}')
     
     return model, optimizer, lr_scheduler, warmup_scheduler, device
     
@@ -80,7 +83,6 @@ class EarlyStopMonitor(object):
         self.tolerance = tolerance
         
         self.logger = logging.getLogger(__name__)
-        
         # self.logger.info(f"Early stopping monitor: max_round={max_round}, higher_better={higher_better}, tolerance={tolerance}")
 
 

@@ -80,9 +80,6 @@ def ndcg_at_k(r, k, method=1):
     return dcg_at_k(r, k, method) / dcg_max
 
 
-def recall_at_k(r, k, all_pos_num):
-    r = np.asfarray(r)[:k]
-    return np.sum(r) / all_pos_num
 
 
 def hit_at_k(r, k):
@@ -105,6 +102,10 @@ def area_under_curve(ground_truth, prediction):
         res = 0.
     return res
 
+def recall_at_k(r, k, all_pos_num):
+    r = np.asfarray(r)[:k]
+    return np.sum(r) / all_pos_num
+
 def mean_reciprocal_rank(r):
     r = np.array(r)
     if np.sum(r) == 0:
@@ -115,28 +116,19 @@ def mean_reciprocal_rank(r):
 Ks = [10, 20]
 
 def eval_one_user(x):    
-    # print('eval_one_user')
-    result = {'precision': np.zeros(len(Ks)), 
+    result = {
               'recall': np.zeros(len(Ks)), 
               'ndcg': np.zeros(len(Ks)),
-                'hit_ratio': np.zeros(len(Ks)), 'auc': 0., 'mrr': 0.}
+                'mrr': 0.}
     
     preds = np.transpose(x[0])
-
-    pos_label = np.ones(1)
-
     num_preditems = x[1]
 
-    uit = x[2]
-    rec_items = x[3]
-
-    num_neg_sample_items = x[4]
-    num_candidate_items = x[5]
+    num_neg_sample_items = x[2]
+    num_candidate_items = x[3]
 
     labels = np.zeros(num_preditems)
     labels[0] = 1
-    scaler = MinMaxScaler()
-    posterior = np.transpose(scaler.fit_transform(np.transpose([preds])))[0]
     r = []
     rankeditems = np.argsort(-preds)[:max(Ks)]
     for i in rankeditems:
@@ -147,24 +139,17 @@ def eval_one_user(x):
     if num_neg_sample_items != -1:
         r = rank_corrected(np.array(r), num_preditems, num_candidate_items)
 
-    precision, recall, ndcg, hit_ratio = [], [], [], []
+    recall, ndcg = [], []
     for K in Ks:
-        precision.append(precision_at_k(r, K))
         recall.append(recall_at_k(r, K, 1))
         ndcg.append(ndcg_at_k(r, K))
-        hit_ratio.append(hit_at_k(r, K))
-    auc = area_under_curve(ground_truth=labels, prediction=posterior)
     mrr = mean_reciprocal_rank(r)
 
 
-    result['precision'] += precision
     result['recall'] += recall
     result['ndcg'] += ndcg
-    result['hit_ratio'] += hit_ratio
-    result['auc'] += auc
     result['mrr'] += mrr
-    # logger.info(f'User {uit[0]}: precision@{Ks} {precision}, recall@{Ks} {recall}, ndcg@{Ks} {ndcg}, hit_ratio@{Ks} {hit_ratio}, auc {auc}, mrr {mrr}')
-    return (result, rankeditems[:max(Ks)], uit, rec_items)
+    return result
 
 
 def rank_corrected(r, m, n):
@@ -180,13 +165,15 @@ def rank_corrected(r, m, n):
 
 
 def eval_users(tgrec, src, dst, ts, train_src, train_dst, args):
-    logger = logging.getLogger()
-    result = {'precision': np.zeros(len(Ks)), 'recall': np.zeros(len(Ks)), 'ndcg': np.zeros(len(Ks)),
-            'hit_ratio': np.zeros(len(Ks)), 'auc': 0., 'mrr': 0.}
+    result = {
+              'recall': np.zeros(len(Ks)), 
+              'ndcg': np.zeros(len(Ks)),
+                'mrr': 0.}
+    
     cores = multiprocessing.cpu_count() // 2
-    userset = set(src)
     train_itemset = set(train_dst)
     pos_edges = {}
+    
     for u, i, t in zip(src, dst, ts):
         if i not in train_itemset:
             continue
@@ -194,6 +181,7 @@ def eval_users(tgrec, src, dst, ts, train_src, train_dst, args):
             pos_edges[u].add((i, t))
         else:
             pos_edges[u] = set([(i, t)])
+            
     train_pos_edges = {}
     for u, i in zip(train_src, train_dst):
         if u in train_pos_edges:
@@ -204,17 +192,11 @@ def eval_users(tgrec, src, dst, ts, train_src, train_dst, args):
     pool = multiprocessing.Pool(cores)
     batch_users = 1000
 
-    preds_list = []
-    preds_len_preditems = []
-    preds_uit = []
-    preds_rec_items = []
-    preds_sampled_neg = []
-    preds_num_candidates = []
+    preds_list, preds_len_preditems, preds_sampled_neg, preds_num_candidates = [], [], [], []
 
-    test_outputs = []
 
-    num_interactions = 0
-    num_test_instances = 0
+    num_interactions,num_test_instances = 0, 0
+
     with torch.no_grad():
         tgrec = tgrec.eval()
         batch_src_l = []
@@ -222,7 +204,7 @@ def eval_users(tgrec, src, dst, ts, train_src, train_dst, args):
         batch_ts = []
         batch_i = 0
         
-        for _, (u, i, t) in enumerate(zip(src, dst, ts)):
+        for u, i, t in zip(src, dst, ts):
             
             num_test_instances += 1
             if u not in train_src or i not in train_itemset or u not in pos_edges:
@@ -233,7 +215,6 @@ def eval_users(tgrec, src, dst, ts, train_src, train_dst, args):
             pos_items = [i]
             pos_ts = [t]
             src_l = [u for _ in range(len(pos_items))]
-            pos_label = np.ones(len(pos_items))
 
             interacted_dst = train_pos_edges[u]
 
@@ -241,19 +222,14 @@ def eval_users(tgrec, src, dst, ts, train_src, train_dst, args):
             if args.negsampleeval == -1:
                 neg_items = neg_candidates
             else:
-                # print('len train_itemset', len(train_itemset))
-                # print('len pos_items', len(set(pos_items)))
-                # print('len interacted_dst', len(interacted_dst))
-                # print('len neg_cand', len(neg_candidates))
                 neg_items = list(np.random.choice(neg_candidates, size=args.negsampleeval, replace=False))
-            #neg_items = list(train_itemset - set(pos_items))
+
             neg_ts = [t for _ in range(len(neg_items))]
             neg_src_l = [u for _ in range(len(neg_items))]
 
             batch_src_l += src_l + neg_src_l
             batch_test_items += pos_items + neg_items
             batch_ts += pos_ts + neg_ts
-            #batch_len.append(len(src_l+neg_src_l))
 
             test_items = np.array(batch_test_items)
             test_ts = np.array(batch_ts)
@@ -261,152 +237,34 @@ def eval_users(tgrec, src, dst, ts, train_src, train_dst, args):
 
             pred_scores = tgrec(test_src_l, test_items, test_ts, args.n_degree)
             preds = pred_scores.cpu().numpy()
-            #start_ind = 0
-            #for i_len in batch_len:
+
             preds_list.append(preds)
             preds_len_preditems.append(len(src_l+neg_src_l))
-            preds_uit.append((u,i,t))
-            rec_items = []
-            rec_items += pos_items + neg_items
-            preds_rec_items.append(rec_items)
             preds_sampled_neg.append(args.negsampleeval)
             preds_num_candidates.append(len(pos_items+neg_candidates))
-                #start_ind = i_len
             batch_src_l = []
             batch_test_items = []
             batch_ts = []
-            #batch_len = []
 
             if len(preds_list) % batch_users == 0 or num_test_instances == len(ts):
 
-                batchset_predictions = zip(preds_list, preds_len_preditems, preds_uit, preds_rec_items, preds_sampled_neg, preds_num_candidates)
+                batchset_predictions = zip(preds_list, preds_len_preditems, preds_sampled_neg, preds_num_candidates)
                 batch_preds = pool.map(eval_one_user, batchset_predictions)
-                for idx, oneresult in enumerate(batch_preds):
-                    re = oneresult[0]
-                    result['precision'] += re['precision']
-                    result['recall'] += re['recall']
-                    result['ndcg'] += re['ndcg']
-                    result['hit_ratio'] += re['hit_ratio']
-                    result['auc'] += re['auc']
-                    result['mrr'] += re['mrr']
+                for oneresult in batch_preds:
+                    result['recall'] += oneresult['recall']
+                    result['ndcg'] += oneresult['ndcg']
+                    result['mrr'] += oneresult['mrr']
+                    # print(result)
 
-                    uit = oneresult[2]
-                    pred_rank_list = oneresult[1]
-                    rec_items = oneresult[3]
+                preds_list, preds_len_preditems, preds_sampled_neg, preds_num_candidates = [], [], [], []
+                batch_src_l, batch_test_items,batch_ts = [], [], []
 
-                    one_pred_result = {"u_ind": int(uit[0]), "u_pos_gd": int(uit[1]), "timestamp": float(uit[2])}
-                    one_pred_result["predicted"] = [int(rec_items[int(rec_ind)]) for rec_ind in pred_rank_list]
-                    test_outputs.append(one_pred_result)
-
-
-                preds_list = []
-                preds_len_preditems = []
-                preds_uit = []
-                preds_rec_items = []
-                preds_sampled_neg = []
-                preds_num_candidates = []
-                batch_src_l = []
-                batch_test_items = []
-                batch_ts = []
-
-
-    result['precision'] /= num_interactions
+    # print(result)
     result['recall'] /= num_interactions
     result['ndcg'] /= num_interactions
-    result['hit_ratio'] /= num_interactions
-    result['auc'] /= num_interactions
     result['mrr'] /= num_interactions
-
-    return result, test_outputs
-
-
-def eval_users_withoutMP(tgrec, src, dst, ts, train_src, train_dst, args):
-    logger = logging.getLogger()
-    result = {'precision': np.zeros(len(Ks)), 'recall': np.zeros(len(Ks)), 'ndcg': np.zeros(len(Ks)),
-              'hit_ratio': np.zeros(len(Ks)), 'auc': 0., 'mrr': 0.}
-    userset = set(src)
-    train_itemset = set(train_dst)
-    pos_edges = {}
-    for u, i, t in zip(src, dst, ts):
-        if i not in train_itemset:
-            continue
-        if u in pos_edges:
-            pos_edges[u].add((i, t))
-        else:
-            pos_edges[u] = set([(i, t)])
-    train_pos_edges = {}
-    for u, i in zip(train_src, train_dst):
-        if u in train_pos_edges:
-            train_pos_edges[u].add(i)
-        else:
-            train_pos_edges[u] = set([i])
-
-    test_outputs = []
-    num_interactions = 0
-    num_test_instances = 0
-    
-    with torch.no_grad():
-        tgrec = tgrec.eval()
-        
-        for _, (u, i, t) in enumerate(zip(src, dst, ts)):
-            num_test_instances += 1
-            if u not in train_src or i not in train_itemset or u not in pos_edges:
-                continue
-            num_interactions += 1
-
-            pos_items = [i]
-            pos_ts = [t]
-            src_l = [u for _ in range(len(pos_items))]
-            pos_label = np.ones(len(pos_items))
-
-            interacted_dst = train_pos_edges[u]
-
-            neg_candidates = list(train_itemset - set(pos_items) - interacted_dst)
-            if args.negsampleeval == -1:
-                neg_items = neg_candidates
-            else:
-                neg_items = list(np.random.choice(neg_candidates, size=args.negsampleeval, replace=False))
-
-            neg_ts = [t for _ in range(len(neg_items))]
-            neg_src_l = [u for _ in range(len(neg_items))]
-
-            batch_src_l = src_l + neg_src_l
-            batch_test_items = pos_items + neg_items
-            batch_ts = pos_ts + neg_ts
-
-            test_items = np.array(batch_test_items)
-            test_ts = np.array(batch_ts)
-            test_src_l = np.array(batch_src_l)
-
-            pred_scores = tgrec(test_src_l, test_items, test_ts, args.n_degree)
-            preds = pred_scores.cpu().numpy()
-
-            # Evaluate predictions for the current user
-            eval_result = eval_one_user((preds, len(batch_src_l), (u, i, t), batch_test_items, args.negsampleeval, len(pos_items+neg_candidates)))
-            re = eval_result[0]
-            result['precision'] += re['precision']
-            result['recall'] += re['recall']
-            result['ndcg'] += re['ndcg']
-            result['hit_ratio'] += re['hit_ratio']
-            result['auc'] += re['auc']
-            result['mrr'] += re['mrr']
-
-            uit = eval_result[2]
-            pred_rank_list = eval_result[1]
-            rec_items = eval_result[3]
-
-            one_pred_result = {"u_ind": int(uit[0]), "u_pos_gd": int(uit[1]), "timestamp": float(uit[2])}
-            one_pred_result["predicted"] = [int(rec_items[int(rec_ind)]) for rec_ind in pred_rank_list]
-            test_outputs.append(one_pred_result)
-
-    result['precision'] /= num_interactions
-    result['recall'] /= num_interactions
-    result['ndcg'] /= num_interactions
-    result['hit_ratio'] /= num_interactions
-    result['auc'] /= num_interactions
-    result['mrr'] /= num_interactions
-
-    return result, test_outputs
+    # print(result)
+    return result
 
 def eval_one_epoch(hint, tgrec, sampler, src, dst, ts, label, NUM_NEIGHBORS=20):
     val_acc, val_ap, val_f1, val_auc = [], [], [], []

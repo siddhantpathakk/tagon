@@ -15,11 +15,11 @@ def parse_opt():
     parser = argparse.ArgumentParser('Interface for TGSRec experiments on link predictions')
     
     # model hparam based arguments
-    parser.add_argument('--n_degree', type=int, default=20, help='number of neighbors to sample')
+    parser.add_argument('--n_degree', type=int, default=30, help='number of neighbors to sample')
     parser.add_argument('--n_head', type=int, default=2, help='number of heads used in attention layer') # [1,2,4]
     parser.add_argument('--n_layer', type=int, default=2, help='number of network layers') # [1,2,3]
-    parser.add_argument('--drop_out', type=float, default=0.1, help='dropout probability')
-    parser.add_argument('--reg', type=float, default=0.1, help='regularization')
+    parser.add_argument('--drop_out', type=float, default=0.3, help='dropout probability')
+    parser.add_argument('--reg', type=float, default=0.3, help='regularization')
     
     # model dimension based arguments
     parser.add_argument('--node_dim', type=int, default=32, help='Dimentions of the node embedding') # [8,16,32,64]
@@ -41,7 +41,7 @@ def parse_opt():
     
     # training based arguments
     parser.add_argument('--bs', type=int, default=256, help='batch_size')
-    parser.add_argument('--n_epoch', type=int, default=500, help='number of epochs')
+    parser.add_argument('--n_epoch', type=int, default=200, help='number of epochs')
     parser.add_argument('--lr', type=float, default=1e-4, help='learning rate') # [1e-2, 1e-3, 1e-4]
     parser.add_argument('--prefix', type=str, default='ml100k', help='prefix to name the checkpoints')
     parser.add_argument('--gpu', type=int, default=0, help='idx for the gpu to use')
