@@ -1,0 +1,10 @@
+INFO:	main:	Namespace(n_degree=20, n_head=2, n_layer=2, drop_out=0.1, reg=0.1, node_dim=32, time_dim=32, agg_method='attn', attn_mode='map', uniform=True, new_node=False, time='disentangle', disencomponents=10, data='ml-100k', samplerate=1.0, popnegsample=False, timepopnegsample=False, negsampleeval=-1, bs=256, n_epoch=500, lr=0.0001, prefix='ml100k', gpu=0, seed=42, l2=0.0001, ckpt_epoch=10)
+INFO:	TGSRec:	Aggregation uses attention model
+INFO:	attention_model:	Using map based attention
+INFO:	attention_model:	Using scaled prod attention
+INFO:	attention_model:	Using map based attention
+INFO:	attention_model:	Using scaled prod attention
+INFO:	TGSRec:	Using disentangle time encoding
+INFO:	main:	Commencing training for 500 epochs
+INFO:	trainer:	Commencing training for epoch # 1
+INFO:	trainer:	Epoch 1 training results: loss: 17.44, acc: 0.54, ap: 0.52, f1: 0.49, auc: 0.54

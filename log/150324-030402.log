@@ -1,0 +1,454 @@
+INFO:	main:	Namespace(n_degree=20, n_head=2, n_layer=2, drop_out=0.1, reg=0.1, node_dim=32, time_dim=32, agg_method='attn', attn_mode='map', uniform=True, new_node=False, time='disentangle', disencomponents=10, data='ml-100k', samplerate=1.0, popnegsample=False, timepopnegsample=False, negsampleeval=-1, bs=256, n_epoch=500, lr=0.0001, prefix='ml100k', gpu=0, seed=42, l2=0.0001, ckpt_epoch=10)
+INFO:	TGSRec:	Aggregation uses attention model
+INFO:	TGSRec:	Using disentangle time encoding
+INFO:	main:	Commencing training for 500 epochs
+INFO:	trainer:	Commencing training for epoch # 1
+INFO:	trainer:	Epoch 1, batch 1/313
+INFO:	trainer:	Epoch 1, batch 2/313
+INFO:	trainer:	Epoch 1, batch 3/313
+INFO:	trainer:	Epoch 1, batch 4/313
+INFO:	trainer:	Epoch 1, batch 5/313
+INFO:	trainer:	Epoch 1, batch 6/313
+INFO:	trainer:	Epoch 1, batch 7/313
+INFO:	trainer:	Epoch 1, batch 8/313
+INFO:	trainer:	Epoch 1, batch 9/313
+INFO:	trainer:	Epoch 1, batch 10/313
+INFO:	trainer:	Epoch 1, batch 11/313
+INFO:	trainer:	Epoch 1, batch 12/313
+INFO:	trainer:	Epoch 1, batch 13/313
+INFO:	trainer:	Epoch 1, batch 14/313
+INFO:	trainer:	Epoch 1, batch 15/313
+INFO:	trainer:	Epoch 1, batch 16/313
+INFO:	trainer:	Epoch 1, batch 17/313
+INFO:	trainer:	Epoch 1, batch 18/313
+INFO:	trainer:	Epoch 1, batch 19/313
+INFO:	trainer:	Epoch 1, batch 20/313
+INFO:	trainer:	Epoch 1, batch 21/313
+INFO:	trainer:	Epoch 1, batch 22/313
+INFO:	trainer:	Epoch 1, batch 23/313
+INFO:	trainer:	Epoch 1, batch 24/313
+INFO:	trainer:	Epoch 1, batch 25/313
+INFO:	trainer:	Epoch 1, batch 26/313
+INFO:	trainer:	Epoch 1, batch 27/313
+INFO:	trainer:	Epoch 1, batch 28/313
+INFO:	trainer:	Epoch 1, batch 29/313
+INFO:	trainer:	Epoch 1, batch 30/313
+INFO:	trainer:	Epoch 1, batch 31/313
+INFO:	trainer:	Epoch 1, batch 32/313
+INFO:	trainer:	Epoch 1, batch 33/313
+INFO:	trainer:	Epoch 1, batch 34/313
+INFO:	trainer:	Epoch 1, batch 35/313
+INFO:	trainer:	Epoch 1, batch 36/313
+INFO:	trainer:	Epoch 1, batch 37/313
+INFO:	trainer:	Epoch 1, batch 38/313
+INFO:	trainer:	Epoch 1, batch 39/313
+INFO:	trainer:	Epoch 1, batch 40/313
+INFO:	trainer:	Epoch 1, batch 41/313
+INFO:	trainer:	Epoch 1, batch 42/313
+INFO:	trainer:	Epoch 1, batch 43/313
+INFO:	trainer:	Epoch 1, batch 44/313
+INFO:	trainer:	Epoch 1, batch 45/313
+INFO:	trainer:	Epoch 1, batch 46/313
+INFO:	trainer:	Epoch 1, batch 47/313
+INFO:	trainer:	Epoch 1, batch 48/313
+INFO:	trainer:	Epoch 1, batch 49/313
+INFO:	trainer:	Epoch 1, batch 50/313
+INFO:	trainer:	Epoch 1, batch 51/313
+INFO:	trainer:	Epoch 1, batch 52/313
+INFO:	trainer:	Epoch 1, batch 53/313
+INFO:	trainer:	Epoch 1, batch 54/313
+INFO:	trainer:	Epoch 1, batch 55/313
+INFO:	trainer:	Epoch 1, batch 56/313
+INFO:	trainer:	Epoch 1, batch 57/313
+INFO:	trainer:	Epoch 1, batch 58/313
+INFO:	trainer:	Epoch 1, batch 59/313
+INFO:	trainer:	Epoch 1, batch 60/313
+INFO:	trainer:	Epoch 1, batch 61/313
+INFO:	trainer:	Epoch 1, batch 62/313
+INFO:	trainer:	Epoch 1, batch 63/313
+INFO:	trainer:	Epoch 1, batch 64/313
+INFO:	trainer:	Epoch 1, batch 65/313
+INFO:	trainer:	Epoch 1, batch 66/313
+INFO:	trainer:	Epoch 1, batch 67/313
+INFO:	trainer:	Epoch 1, batch 68/313
+INFO:	trainer:	Epoch 1, batch 69/313
+INFO:	trainer:	Epoch 1, batch 70/313
+INFO:	trainer:	Epoch 1, batch 71/313
+INFO:	trainer:	Epoch 1, batch 72/313
+INFO:	trainer:	Epoch 1, batch 73/313
+INFO:	trainer:	Epoch 1, batch 74/313
+INFO:	trainer:	Epoch 1, batch 75/313
+INFO:	trainer:	Epoch 1, batch 76/313
+INFO:	trainer:	Epoch 1, batch 77/313
+INFO:	trainer:	Epoch 1, batch 78/313
+INFO:	trainer:	Epoch 1, batch 79/313
+INFO:	trainer:	Epoch 1, batch 80/313
+INFO:	trainer:	Epoch 1, batch 81/313
+INFO:	trainer:	Epoch 1, batch 82/313
+INFO:	trainer:	Epoch 1, batch 83/313
+INFO:	trainer:	Epoch 1, batch 84/313
+INFO:	trainer:	Epoch 1, batch 85/313
+INFO:	trainer:	Epoch 1, batch 86/313
+INFO:	trainer:	Epoch 1, batch 87/313
+INFO:	trainer:	Epoch 1, batch 88/313
+INFO:	trainer:	Epoch 1, batch 89/313
+INFO:	trainer:	Epoch 1, batch 90/313
+INFO:	trainer:	Epoch 1, batch 91/313
+INFO:	trainer:	Epoch 1, batch 92/313
+INFO:	trainer:	Epoch 1, batch 93/313
+INFO:	trainer:	Epoch 1, batch 94/313
+INFO:	trainer:	Epoch 1, batch 95/313
+INFO:	trainer:	Epoch 1, batch 96/313
+INFO:	trainer:	Epoch 1, batch 97/313
+INFO:	trainer:	Epoch 1, batch 98/313
+INFO:	trainer:	Epoch 1, batch 99/313
+INFO:	trainer:	Epoch 1, batch 100/313
+INFO:	trainer:	Epoch 1, batch 101/313
+INFO:	trainer:	Epoch 1, batch 102/313
+INFO:	trainer:	Epoch 1, batch 103/313
+INFO:	trainer:	Epoch 1, batch 104/313
+INFO:	trainer:	Epoch 1, batch 105/313
+INFO:	trainer:	Epoch 1, batch 106/313
+INFO:	trainer:	Epoch 1, batch 107/313
+INFO:	trainer:	Epoch 1, batch 108/313
+INFO:	trainer:	Epoch 1, batch 109/313
+INFO:	trainer:	Epoch 1, batch 110/313
+INFO:	trainer:	Epoch 1, batch 111/313
+INFO:	trainer:	Epoch 1, batch 112/313
+INFO:	trainer:	Epoch 1, batch 113/313
+INFO:	trainer:	Epoch 1, batch 114/313
+INFO:	trainer:	Epoch 1, batch 115/313
+INFO:	trainer:	Epoch 1, batch 116/313
+INFO:	trainer:	Epoch 1, batch 117/313
+INFO:	trainer:	Epoch 1, batch 118/313
+INFO:	trainer:	Epoch 1, batch 119/313
+INFO:	trainer:	Epoch 1, batch 120/313
+INFO:	trainer:	Epoch 1, batch 121/313
+INFO:	trainer:	Epoch 1, batch 122/313
+INFO:	trainer:	Epoch 1, batch 123/313
+INFO:	trainer:	Epoch 1, batch 124/313
+INFO:	trainer:	Epoch 1, batch 125/313
+INFO:	trainer:	Epoch 1, batch 126/313
+INFO:	trainer:	Epoch 1, batch 127/313
+INFO:	trainer:	Epoch 1, batch 128/313
+INFO:	trainer:	Epoch 1, batch 129/313
+INFO:	trainer:	Epoch 1, batch 130/313
+INFO:	trainer:	Epoch 1, batch 131/313
+INFO:	trainer:	Epoch 1, batch 132/313
+INFO:	trainer:	Epoch 1, batch 133/313
+INFO:	trainer:	Epoch 1, batch 134/313
+INFO:	trainer:	Epoch 1, batch 135/313
+INFO:	trainer:	Epoch 1, batch 136/313
+INFO:	trainer:	Epoch 1, batch 137/313
+INFO:	trainer:	Epoch 1, batch 138/313
+INFO:	trainer:	Epoch 1, batch 139/313
+INFO:	trainer:	Epoch 1, batch 140/313
+INFO:	trainer:	Epoch 1, batch 141/313
+INFO:	trainer:	Epoch 1, batch 142/313
+INFO:	trainer:	Epoch 1, batch 143/313
+INFO:	trainer:	Epoch 1, batch 144/313
+INFO:	trainer:	Epoch 1, batch 145/313
+INFO:	trainer:	Epoch 1, batch 146/313
+INFO:	trainer:	Epoch 1, batch 147/313
+INFO:	trainer:	Epoch 1, batch 148/313
+INFO:	trainer:	Epoch 1, batch 149/313
+INFO:	trainer:	Epoch 1, batch 150/313
+INFO:	trainer:	Epoch 1, batch 151/313
+INFO:	trainer:	Epoch 1, batch 152/313
+INFO:	trainer:	Epoch 1, batch 153/313
+INFO:	trainer:	Epoch 1, batch 154/313
+INFO:	trainer:	Epoch 1, batch 155/313
+INFO:	trainer:	Epoch 1, batch 156/313
+INFO:	trainer:	Epoch 1, batch 157/313
+INFO:	trainer:	Epoch 1, batch 158/313
+INFO:	trainer:	Epoch 1, batch 159/313
+INFO:	trainer:	Epoch 1, batch 160/313
+INFO:	trainer:	Epoch 1, batch 161/313
+INFO:	trainer:	Epoch 1, batch 162/313
+INFO:	trainer:	Epoch 1, batch 163/313
+INFO:	trainer:	Epoch 1, batch 164/313
+INFO:	trainer:	Epoch 1, batch 165/313
+INFO:	trainer:	Epoch 1, batch 166/313
+INFO:	trainer:	Epoch 1, batch 167/313
+INFO:	trainer:	Epoch 1, batch 168/313
+INFO:	trainer:	Epoch 1, batch 169/313
+INFO:	trainer:	Epoch 1, batch 170/313
+INFO:	trainer:	Epoch 1, batch 171/313
+INFO:	trainer:	Epoch 1, batch 172/313
+INFO:	trainer:	Epoch 1, batch 173/313
+INFO:	trainer:	Epoch 1, batch 174/313
+INFO:	trainer:	Epoch 1, batch 175/313
+INFO:	trainer:	Epoch 1, batch 176/313
+INFO:	trainer:	Epoch 1, batch 177/313
+INFO:	trainer:	Epoch 1, batch 178/313
+INFO:	trainer:	Epoch 1, batch 179/313
+INFO:	trainer:	Epoch 1, batch 180/313
+INFO:	trainer:	Epoch 1, batch 181/313
+INFO:	trainer:	Epoch 1, batch 182/313
+INFO:	trainer:	Epoch 1, batch 183/313
+INFO:	trainer:	Epoch 1, batch 184/313
+INFO:	trainer:	Epoch 1, batch 185/313
+INFO:	trainer:	Epoch 1, batch 186/313
+INFO:	trainer:	Epoch 1, batch 187/313
+INFO:	trainer:	Epoch 1, batch 188/313
+INFO:	trainer:	Epoch 1, batch 189/313
+INFO:	trainer:	Epoch 1, batch 190/313
+INFO:	trainer:	Epoch 1, batch 191/313
+INFO:	trainer:	Epoch 1, batch 192/313
+INFO:	trainer:	Epoch 1, batch 193/313
+INFO:	trainer:	Epoch 1, batch 194/313
+INFO:	trainer:	Epoch 1, batch 195/313
+INFO:	trainer:	Epoch 1, batch 196/313
+INFO:	trainer:	Epoch 1, batch 197/313
+INFO:	trainer:	Epoch 1, batch 198/313
+INFO:	trainer:	Epoch 1, batch 199/313
+INFO:	trainer:	Epoch 1, batch 200/313
+INFO:	trainer:	Epoch 1, batch 201/313
+INFO:	trainer:	Epoch 1, batch 202/313
+INFO:	trainer:	Epoch 1, batch 203/313
+INFO:	trainer:	Epoch 1, batch 204/313
+INFO:	trainer:	Epoch 1, batch 205/313
+INFO:	trainer:	Epoch 1, batch 206/313
+INFO:	trainer:	Epoch 1, batch 207/313
+INFO:	trainer:	Epoch 1, batch 208/313
+INFO:	trainer:	Epoch 1, batch 209/313
+INFO:	trainer:	Epoch 1, batch 210/313
+INFO:	trainer:	Epoch 1, batch 211/313
+INFO:	trainer:	Epoch 1, batch 212/313
+INFO:	trainer:	Epoch 1, batch 213/313
+INFO:	trainer:	Epoch 1, batch 214/313
+INFO:	trainer:	Epoch 1, batch 215/313
+INFO:	trainer:	Epoch 1, batch 216/313
+INFO:	trainer:	Epoch 1, batch 217/313
+INFO:	trainer:	Epoch 1, batch 218/313
+INFO:	trainer:	Epoch 1, batch 219/313
+INFO:	trainer:	Epoch 1, batch 220/313
+INFO:	trainer:	Epoch 1, batch 221/313
+INFO:	trainer:	Epoch 1, batch 222/313
+INFO:	trainer:	Epoch 1, batch 223/313
+INFO:	trainer:	Epoch 1, batch 224/313
+INFO:	trainer:	Epoch 1, batch 225/313
+INFO:	trainer:	Epoch 1, batch 226/313
+INFO:	trainer:	Epoch 1, batch 227/313
+INFO:	trainer:	Epoch 1, batch 228/313
+INFO:	trainer:	Epoch 1, batch 229/313
+INFO:	trainer:	Epoch 1, batch 230/313
+INFO:	trainer:	Epoch 1, batch 231/313
+INFO:	trainer:	Epoch 1, batch 232/313
+INFO:	trainer:	Epoch 1, batch 233/313
+INFO:	trainer:	Epoch 1, batch 234/313
+INFO:	trainer:	Epoch 1, batch 235/313
+INFO:	trainer:	Epoch 1, batch 236/313
+INFO:	trainer:	Epoch 1, batch 237/313
+INFO:	trainer:	Epoch 1, batch 238/313
+INFO:	trainer:	Epoch 1, batch 239/313
+INFO:	trainer:	Epoch 1, batch 240/313
+INFO:	trainer:	Epoch 1, batch 241/313
+INFO:	trainer:	Epoch 1, batch 242/313
+INFO:	trainer:	Epoch 1, batch 243/313
+INFO:	trainer:	Epoch 1, batch 244/313
+INFO:	trainer:	Epoch 1, batch 245/313
+INFO:	trainer:	Epoch 1, batch 246/313
+INFO:	trainer:	Epoch 1, batch 247/313
+INFO:	trainer:	Epoch 1, batch 248/313
+INFO:	trainer:	Epoch 1, batch 249/313
+INFO:	trainer:	Epoch 1, batch 250/313
+INFO:	trainer:	Epoch 1, batch 251/313
+INFO:	trainer:	Epoch 1, batch 252/313
+INFO:	trainer:	Epoch 1, batch 253/313
+INFO:	trainer:	Epoch 1, batch 254/313
+INFO:	trainer:	Epoch 1, batch 255/313
+INFO:	trainer:	Epoch 1, batch 256/313
+INFO:	trainer:	Epoch 1, batch 257/313
+INFO:	trainer:	Epoch 1, batch 258/313
+INFO:	trainer:	Epoch 1, batch 259/313
+INFO:	trainer:	Epoch 1, batch 260/313
+INFO:	trainer:	Epoch 1, batch 261/313
+INFO:	trainer:	Epoch 1, batch 262/313
+INFO:	trainer:	Epoch 1, batch 263/313
+INFO:	trainer:	Epoch 1, batch 264/313
+INFO:	trainer:	Epoch 1, batch 265/313
+INFO:	trainer:	Epoch 1, batch 266/313
+INFO:	trainer:	Epoch 1, batch 267/313
+INFO:	trainer:	Epoch 1, batch 268/313
+INFO:	trainer:	Epoch 1, batch 269/313
+INFO:	trainer:	Epoch 1, batch 270/313
+INFO:	trainer:	Epoch 1, batch 271/313
+INFO:	trainer:	Epoch 1, batch 272/313
+INFO:	trainer:	Epoch 1, batch 273/313
+INFO:	trainer:	Epoch 1, batch 274/313
+INFO:	trainer:	Epoch 1, batch 275/313
+INFO:	trainer:	Epoch 1, batch 276/313
+INFO:	trainer:	Epoch 1, batch 277/313
+INFO:	trainer:	Epoch 1, batch 278/313
+INFO:	trainer:	Epoch 1, batch 279/313
+INFO:	trainer:	Epoch 1, batch 280/313
+INFO:	trainer:	Epoch 1, batch 281/313
+INFO:	trainer:	Epoch 1, batch 282/313
+INFO:	trainer:	Epoch 1, batch 283/313
+INFO:	trainer:	Epoch 1, batch 284/313
+INFO:	trainer:	Epoch 1, batch 285/313
+INFO:	trainer:	Epoch 1, batch 286/313
+INFO:	trainer:	Epoch 1, batch 287/313
+INFO:	trainer:	Epoch 1, batch 288/313
+INFO:	trainer:	Epoch 1, batch 289/313
+INFO:	trainer:	Epoch 1, batch 290/313
+INFO:	trainer:	Epoch 1, batch 291/313
+INFO:	trainer:	Epoch 1, batch 292/313
+INFO:	trainer:	Epoch 1, batch 293/313
+INFO:	trainer:	Epoch 1, batch 294/313
+INFO:	trainer:	Epoch 1, batch 295/313
+INFO:	trainer:	Epoch 1, batch 296/313
+INFO:	trainer:	Epoch 1, batch 297/313
+INFO:	trainer:	Epoch 1, batch 298/313
+INFO:	trainer:	Epoch 1, batch 299/313
+INFO:	trainer:	Epoch 1, batch 300/313
+INFO:	trainer:	Epoch 1, batch 301/313
+INFO:	trainer:	Epoch 1, batch 302/313
+INFO:	trainer:	Epoch 1, batch 303/313
+INFO:	trainer:	Epoch 1, batch 304/313
+INFO:	trainer:	Epoch 1, batch 305/313
+INFO:	trainer:	Epoch 1, batch 306/313
+INFO:	trainer:	Epoch 1, batch 307/313
+INFO:	trainer:	Epoch 1, batch 308/313
+INFO:	trainer:	Epoch 1, batch 309/313
+INFO:	trainer:	Epoch 1, batch 310/313
+INFO:	trainer:	Epoch 1, batch 311/313
+INFO:	trainer:	Epoch 1, batch 312/313
+INFO:	trainer:	Epoch 1, batch 313/313
+INFO:	trainer:	Epoch 1 training results: loss: 17.44, acc: 0.54, ap: 0.52, f1: 0.49, auc: 0.54
+INFO:	trainer:	Commencing evaluation for validate
+INFO:	evaluation_utils:	User 1/1516
+INFO:	evaluation_utils:	User 2/1516
+INFO:	evaluation_utils:	User 3/1516
+INFO:	evaluation_utils:	User 4/1516
+INFO:	evaluation_utils:	User 5/1516
+INFO:	evaluation_utils:	User 270: precision@[10, 20] [0.0, 0.0], recall@[10, 20] [0.0, 0.0], ndcg@[10, 20] [0.0, 0.0], hit_ratio@[10, 20] [0.0, 0.0], auc 0.8164556962025317, mrr 0.0
+INFO:	evaluation_utils:	User 270: precision@[10, 20] [0.0, 0.0], recall@[10, 20] [0.0, 0.0], ndcg@[10, 20] [0.0, 0.0], hit_ratio@[10, 20] [0.0, 0.0], auc 0.8164556962025317, mrr 0.0
+INFO:	evaluation_utils:	User 270: precision@[10, 20] [0.0, 0.0], recall@[10, 20] [0.0, 0.0], ndcg@[10, 20] [0.0, 0.0], hit_ratio@[10, 20] [0.0, 0.0], auc 0.42721518987341767, mrr 0.0
+INFO:	evaluation_utils:	User 270: precision@[10, 20] [0.0, 0.0], recall@[10, 20] [0.0, 0.0], ndcg@[10, 20] [0.0, 0.0], hit_ratio@[10, 20] [0.0, 0.0], auc 0.9835443037974684, mrr 0.0
+INFO:	evaluation_utils:	User 270: precision@[10, 20] [0.0, 0.0], recall@[10, 20] [0.0, 0.0], ndcg@[10, 20] [0.0, 0.0], hit_ratio@[10, 20] [0.0, 0.0], auc 0.9012658227848102, mrr 0.0
+INFO:	evaluation_utils:	User 6/1516
+INFO:	evaluation_utils:	User 7/1516
+INFO:	evaluation_utils:	User 8/1516
+INFO:	evaluation_utils:	User 9/1516
+INFO:	evaluation_utils:	User 10/1516
+INFO:	evaluation_utils:	User 270: precision@[10, 20] [0.0, 0.0], recall@[10, 20] [0.0, 0.0], ndcg@[10, 20] [0.0, 0.0], hit_ratio@[10, 20] [0.0, 0.0], auc 0.44683544303797473, mrr 0.0
+INFO:	evaluation_utils:	User 270: precision@[10, 20] [0.0, 0.0], recall@[10, 20] [0.0, 0.0], ndcg@[10, 20] [0.0, 0.0], hit_ratio@[10, 20] [0.0, 0.0], auc 0.7170886075949368, mrr 0.0
+INFO:	evaluation_utils:	User 270: precision@[10, 20] [0.0, 0.0], recall@[10, 20] [0.0, 0.0], ndcg@[10, 20] [0.0, 0.0], hit_ratio@[10, 20] [0.0, 0.0], auc 0.1373417721518987, mrr 0.0
+INFO:	evaluation_utils:	User 270: precision@[10, 20] [0.0, 0.0], recall@[10, 20] [0.0, 0.0], ndcg@[10, 20] [0.0, 0.0], hit_ratio@[10, 20] [0.0, 0.0], auc 0.3493670886075949, mrr 0.0
+INFO:	evaluation_utils:	User 270: precision@[10, 20] [0.0, 0.0], recall@[10, 20] [0.0, 0.0], ndcg@[10, 20] [0.0, 0.0], hit_ratio@[10, 20] [0.0, 0.0], auc 0.5379746835443038, mrr 0.0
+INFO:	evaluation_utils:	User 11/1516
+INFO:	evaluation_utils:	User 12/1516
+INFO:	evaluation_utils:	User 13/1516
+INFO:	evaluation_utils:	User 14/1516
+INFO:	evaluation_utils:	User 15/1516
+INFO:	evaluation_utils:	User 270: precision@[10, 20] [0.0, 0.0], recall@[10, 20] [0.0, 0.0], ndcg@[10, 20] [0.0, 0.0], hit_ratio@[10, 20] [0.0, 0.0], auc 0.6291139240506329, mrr 0.0
+INFO:	evaluation_utils:	User 270: precision@[10, 20] [0.0, 0.0], recall@[10, 20] [0.0, 0.0], ndcg@[10, 20] [0.0, 0.0], hit_ratio@[10, 20] [0.0, 0.0], auc 0.17911392405063287, mrr 0.0
+INFO:	evaluation_utils:	User 270: precision@[10, 20] [0.0, 0.0], recall@[10, 20] [0.0, 0.0], ndcg@[10, 20] [0.0, 0.0], hit_ratio@[10, 20] [0.0, 0.0], auc 0.8183544303797469, mrr 0.0
+INFO:	evaluation_utils:	User 270: precision@[10, 20] [0.0, 0.0], recall@[10, 20] [0.0, 0.0], ndcg@[10, 20] [0.0, 0.0], hit_ratio@[10, 20] [0.0, 0.0], auc 0.7253164556962025, mrr 0.0
+INFO:	evaluation_utils:	User 270: precision@[10, 20] [0.0, 0.0], recall@[10, 20] [0.0, 0.0], ndcg@[10, 20] [0.0, 0.0], hit_ratio@[10, 20] [0.0, 0.0], auc 0.26582278481012656, mrr 0.0
+INFO:	evaluation_utils:	User 16/1516
+INFO:	evaluation_utils:	User 17/1516
+INFO:	evaluation_utils:	User 18/1516
+INFO:	evaluation_utils:	User 19/1516
+INFO:	evaluation_utils:	User 20/1516
+INFO:	evaluation_utils:	User 270: precision@[10, 20] [0.0, 0.0], recall@[10, 20] [0.0, 0.0], ndcg@[10, 20] [0.0, 0.0], hit_ratio@[10, 20] [0.0, 0.0], auc 0.7911392405063291, mrr 0.0
+INFO:	evaluation_utils:	User 270: precision@[10, 20] [0.0, 0.0], recall@[10, 20] [0.0, 0.0], ndcg@[10, 20] [0.0, 0.0], hit_ratio@[10, 20] [0.0, 0.0], auc 0.8879746835443038, mrr 0.0
+INFO:	evaluation_utils:	User 270: precision@[10, 20] [0.0, 0.0], recall@[10, 20] [0.0, 0.0], ndcg@[10, 20] [0.0, 0.0], hit_ratio@[10, 20] [0.0, 0.0], auc 0.9272151898734178, mrr 0.0
+INFO:	evaluation_utils:	User 134: precision@[10, 20] [0.0, 0.0], recall@[10, 20] [0.0, 0.0], ndcg@[10, 20] [0.0, 0.0], hit_ratio@[10, 20] [0.0, 0.0], auc 0.7241153342070773, mrr 0.0
+INFO:	evaluation_utils:	User 270: precision@[10, 20] [0.0, 0.0], recall@[10, 20] [0.0, 0.0], ndcg@[10, 20] [0.0, 0.0], hit_ratio@[10, 20] [0.0, 0.0], auc 0.2253164556962025, mrr 0.0
+INFO:	evaluation_utils:	User 21/1516
+INFO:	evaluation_utils:	User 22/1516
+INFO:	evaluation_utils:	User 23/1516
+INFO:	evaluation_utils:	User 24/1516
+INFO:	evaluation_utils:	User 25/1516
+INFO:	evaluation_utils:	User 134: precision@[10, 20] [0.0, 0.0], recall@[10, 20] [0.0, 0.0], ndcg@[10, 20] [0.0, 0.0], hit_ratio@[10, 20] [0.0, 0.0], auc 0.7011795543905636, mrr 0.0
+INFO:	evaluation_utils:	User 134: precision@[10, 20] [0.0, 0.0], recall@[10, 20] [0.0, 0.0], ndcg@[10, 20] [0.0, 0.0], hit_ratio@[10, 20] [0.0, 0.0], auc 0.18872870249017037, mrr 0.0
+INFO:	evaluation_utils:	User 134: precision@[10, 20] [0.0, 0.0], recall@[10, 20] [0.0, 0.0], ndcg@[10, 20] [0.0, 0.0], hit_ratio@[10, 20] [0.0, 0.0], auc 0.25163826998689387, mrr 0.0
+INFO:	evaluation_utils:	User 134: precision@[10, 20] [0.0, 0.0], recall@[10, 20] [0.0, 0.0], ndcg@[10, 20] [0.0, 0.0], hit_ratio@[10, 20] [0.0, 0.0], auc 0.18676277850589773, mrr 0.0
+INFO:	evaluation_utils:	User 134: precision@[10, 20] [0.0, 0.0], recall@[10, 20] [0.0, 0.0], ndcg@[10, 20] [0.0, 0.0], hit_ratio@[10, 20] [0.0, 0.0], auc 0.8433813892529489, mrr 0.0
+INFO:	evaluation_utils:	User 26/1516
+INFO:	evaluation_utils:	User 27/1516
+INFO:	evaluation_utils:	User 28/1516
+INFO:	evaluation_utils:	User 29/1516
+INFO:	evaluation_utils:	User 30/1516
+INFO:	evaluation_utils:	User 134: precision@[10, 20] [0.0, 0.0], recall@[10, 20] [0.0, 0.0], ndcg@[10, 20] [0.0, 0.0], hit_ratio@[10, 20] [0.0, 0.0], auc 0.47706422018348627, mrr 0.0
+INFO:	evaluation_utils:	User 134: precision@[10, 20] [0.0, 0.0], recall@[10, 20] [0.0, 0.0], ndcg@[10, 20] [0.0, 0.0], hit_ratio@[10, 20] [0.0, 0.0], auc 0.8990825688073394, mrr 0.0
+INFO:	evaluation_utils:	User 134: precision@[10, 20] [0.0, 0.0], recall@[10, 20] [0.0, 0.0], ndcg@[10, 20] [0.0, 0.0], hit_ratio@[10, 20] [0.0, 0.0], auc 0.5157273918741809, mrr 0.0
+INFO:	evaluation_utils:	User 134: precision@[10, 20] [0.0, 0.0], recall@[10, 20] [0.0, 0.0], ndcg@[10, 20] [0.0, 0.0], hit_ratio@[10, 20] [0.0, 0.0], auc 0.916775884665793, mrr 0.0
+INFO:	evaluation_utils:	User 134: precision@[10, 20] [0.0, 0.0], recall@[10, 20] [0.0, 0.0], ndcg@[10, 20] [0.0, 0.0], hit_ratio@[10, 20] [0.0, 0.0], auc 0.5288335517693317, mrr 0.0
+INFO:	evaluation_utils:	User 31/1516
+INFO:	evaluation_utils:	User 32/1516
+INFO:	evaluation_utils:	User 33/1516
+INFO:	evaluation_utils:	User 34/1516
+INFO:	evaluation_utils:	User 35/1516
+INFO:	evaluation_utils:	User 134: precision@[10, 20] [0.0, 0.0], recall@[10, 20] [0.0, 0.0], ndcg@[10, 20] [0.0, 0.0], hit_ratio@[10, 20] [0.0, 0.0], auc 0.18020969855832236, mrr 0.0
+INFO:	evaluation_utils:	User 134: precision@[10, 20] [0.0, 0.0], recall@[10, 20] [0.0, 0.0], ndcg@[10, 20] [0.0, 0.0], hit_ratio@[10, 20] [0.0, 0.0], auc 0.8787680209698558, mrr 0.0
+INFO:	evaluation_utils:	User 134: precision@[10, 20] [0.0, 0.0], recall@[10, 20] [0.0, 0.0], ndcg@[10, 20] [0.0, 0.0], hit_ratio@[10, 20] [0.0, 0.0], auc 0.6467889908256881, mrr 0.0
+INFO:	evaluation_utils:	User 134: precision@[10, 20] [0.0, 0.0], recall@[10, 20] [0.0, 0.0], ndcg@[10, 20] [0.0, 0.0], hit_ratio@[10, 20] [0.0, 0.0], auc 0.3446920052424639, mrr 0.0
+INFO:	evaluation_utils:	User 134: precision@[10, 20] [0.0, 0.0], recall@[10, 20] [0.0, 0.0], ndcg@[10, 20] [0.0, 0.0], hit_ratio@[10, 20] [0.0, 0.0], auc 0.744429882044561, mrr 0.0
+INFO:	evaluation_utils:	User 36/1516
+INFO:	evaluation_utils:	User 37/1516
+INFO:	evaluation_utils:	User 38/1516
+INFO:	evaluation_utils:	User 39/1516
+INFO:	evaluation_utils:	User 40/1516
+INFO:	evaluation_utils:	User 134: precision@[10, 20] [0.0, 0.0], recall@[10, 20] [0.0, 0.0], ndcg@[10, 20] [0.0, 0.0], hit_ratio@[10, 20] [0.0, 0.0], auc 0.42660550458715596, mrr 0.0
+INFO:	evaluation_utils:	User 134: precision@[10, 20] [0.0, 0.0], recall@[10, 20] [0.0, 0.0], ndcg@[10, 20] [0.0, 0.0], hit_ratio@[10, 20] [0.0, 0.0], auc 0.4148099606815203, mrr 0.0
+INFO:	evaluation_utils:	User 134: precision@[10, 20] [0.0, 0.0], recall@[10, 20] [0.0, 0.0], ndcg@[10, 20] [0.0, 0.0], hit_ratio@[10, 20] [0.0, 0.0], auc 0.5838794233289646, mrr 0.0
+INFO:	evaluation_utils:	User 134: precision@[10, 20] [0.0, 0.0], recall@[10, 20] [0.0, 0.0], ndcg@[10, 20] [0.0, 0.0], hit_ratio@[10, 20] [0.0, 0.0], auc 0.3315858453473133, mrr 0.0
+INFO:	evaluation_utils:	User 134: precision@[10, 20] [0.0, 0.0], recall@[10, 20] [0.0, 0.0], ndcg@[10, 20] [0.0, 0.0], hit_ratio@[10, 20] [0.0, 0.0], auc 0.8505897771952818, mrr 0.0
+INFO:	evaluation_utils:	User 41/1516
+INFO:	evaluation_utils:	User 42/1516
+INFO:	evaluation_utils:	User 43/1516
+INFO:	evaluation_utils:	User 44/1516
+INFO:	evaluation_utils:	User 45/1516
+INFO:	evaluation_utils:	User 134: precision@[10, 20] [0.0, 0.0], recall@[10, 20] [0.0, 0.0], ndcg@[10, 20] [0.0, 0.0], hit_ratio@[10, 20] [0.0, 0.0], auc 0.573394495412844, mrr 0.0
+INFO:	evaluation_utils:	User 134: precision@[10, 20] [0.0, 0.0], recall@[10, 20] [0.0, 0.0], ndcg@[10, 20] [0.0, 0.0], hit_ratio@[10, 20] [0.0, 0.0], auc 0.1526867627785059, mrr 0.0
+INFO:	evaluation_utils:	User 134: precision@[10, 20] [0.0, 0.0], recall@[10, 20] [0.0, 0.0], ndcg@[10, 20] [0.0, 0.0], hit_ratio@[10, 20] [0.0, 0.0], auc 0.5681520314547838, mrr 0.0
+INFO:	evaluation_utils:	User 134: precision@[10, 20] [0.0, 0.0], recall@[10, 20] [0.0, 0.0], ndcg@[10, 20] [0.0, 0.0], hit_ratio@[10, 20] [0.0, 0.0], auc 0.8027522935779816, mrr 0.0
+INFO:	evaluation_utils:	User 134: precision@[10, 20] [0.0, 0.0], recall@[10, 20] [0.0, 0.0], ndcg@[10, 20] [0.0, 0.0], hit_ratio@[10, 20] [0.0, 0.0], auc 0.2647444298820446, mrr 0.0
+INFO:	evaluation_utils:	User 46/1516
+INFO:	evaluation_utils:	User 47/1516
+INFO:	evaluation_utils:	User 48/1516
+INFO:	evaluation_utils:	User 49/1516
+INFO:	evaluation_utils:	User 50/1516
+INFO:	evaluation_utils:	User 134: precision@[10, 20] [0.0, 0.0], recall@[10, 20] [0.0, 0.0], ndcg@[10, 20] [0.0, 0.0], hit_ratio@[10, 20] [0.0, 0.0], auc 0.2903014416775884, mrr 0.0
+INFO:	evaluation_utils:	User 134: precision@[10, 20] [0.0, 0.0], recall@[10, 20] [0.0, 0.0], ndcg@[10, 20] [0.0, 0.0], hit_ratio@[10, 20] [0.0, 0.0], auc 0.8571428571428572, mrr 0.0
+INFO:	evaluation_utils:	User 134: precision@[10, 20] [0.0, 0.0], recall@[10, 20] [0.0, 0.0], ndcg@[10, 20] [0.0, 0.0], hit_ratio@[10, 20] [0.0, 0.0], auc 0.15858453473132372, mrr 0.0
+INFO:	evaluation_utils:	User 134: precision@[10, 20] [0.0, 0.0], recall@[10, 20] [0.0, 0.0], ndcg@[10, 20] [0.0, 0.0], hit_ratio@[10, 20] [0.0, 0.0], auc 0.46133682830930534, mrr 0.0
+INFO:	evaluation_utils:	User 134: precision@[10, 20] [0.0, 0.0], recall@[10, 20] [0.0, 0.0], ndcg@[10, 20] [0.0, 0.0], hit_ratio@[10, 20] [0.0, 0.0], auc 0.9187418086500655, mrr 0.0
+INFO:	evaluation_utils:	User 51/1516
+INFO:	evaluation_utils:	User 52/1516
+INFO:	evaluation_utils:	User 53/1516
+INFO:	evaluation_utils:	User 54/1516
+INFO:	evaluation_utils:	User 55/1516
+INFO:	evaluation_utils:	User 134: precision@[10, 20] [0.0, 0.0], recall@[10, 20] [0.0, 0.0], ndcg@[10, 20] [0.0, 0.0], hit_ratio@[10, 20] [0.0, 0.0], auc 0.37155963302752293, mrr 0.0
+INFO:	evaluation_utils:	User 134: precision@[10, 20] [0.0, 0.0], recall@[10, 20] [0.0, 0.0], ndcg@[10, 20] [0.0, 0.0], hit_ratio@[10, 20] [0.0, 0.0], auc 0.8892529488859764, mrr 0.0
+INFO:	evaluation_utils:	User 134: precision@[10, 20] [0.0, 0.0], recall@[10, 20] [0.0, 0.0], ndcg@[10, 20] [0.0, 0.0], hit_ratio@[10, 20] [0.0, 0.0], auc 0.2549148099606815, mrr 0.0
+INFO:	evaluation_utils:	User 134: precision@[10, 20] [0.0, 0.0], recall@[10, 20] [0.0, 0.0], ndcg@[10, 20] [0.0, 0.0], hit_ratio@[10, 20] [0.0, 0.0], auc 0.1343381389252949, mrr 0.0
+INFO:	evaluation_utils:	User 134: precision@[10, 20] [0.0, 0.0], recall@[10, 20] [0.0, 0.0], ndcg@[10, 20] [0.0, 0.0], hit_ratio@[10, 20] [0.0, 0.0], auc 0.2647444298820446, mrr 0.0
+INFO:	evaluation_utils:	User 56/1516
+INFO:	evaluation_utils:	User 57/1516
+INFO:	evaluation_utils:	User 58/1516
+INFO:	evaluation_utils:	User 59/1516
+INFO:	evaluation_utils:	User 60/1516
+INFO:	evaluation_utils:	User 134: precision@[10, 20] [0.0, 0.0], recall@[10, 20] [0.0, 0.0], ndcg@[10, 20] [0.0, 0.0], hit_ratio@[10, 20] [0.0, 0.0], auc 0.38007863695937094, mrr 0.0
+INFO:	evaluation_utils:	User 134: precision@[10, 20] [0.0, 0.0], recall@[10, 20] [0.0, 0.0], ndcg@[10, 20] [0.0, 0.0], hit_ratio@[10, 20] [0.0, 0.0], auc 0.9842726081258192, mrr 0.0
+INFO:	evaluation_utils:	User 134: precision@[10, 20] [0.0, 0.0], recall@[10, 20] [0.0, 0.0], ndcg@[10, 20] [0.0, 0.0], hit_ratio@[10, 20] [0.0, 0.0], auc 0.7732634338138925, mrr 0.0
+INFO:	evaluation_utils:	User 134: precision@[10, 20] [0.0, 0.0], recall@[10, 20] [0.0, 0.0], ndcg@[10, 20] [0.0, 0.0], hit_ratio@[10, 20] [0.0, 0.0], auc 0.5740498034076016, mrr 0.0
+INFO:	evaluation_utils:	User 134: precision@[10, 20] [0.0, 0.0], recall@[10, 20] [0.0, 0.0], ndcg@[10, 20] [0.0, 0.0], hit_ratio@[10, 20] [0.0, 0.0], auc 0.19200524246395811, mrr 0.0
+INFO:	evaluation_utils:	User 61/1516
+INFO:	evaluation_utils:	User 62/1516
+INFO:	evaluation_utils:	User 63/1516
+INFO:	evaluation_utils:	User 64/1516
+INFO:	evaluation_utils:	User 65/1516
+INFO:	evaluation_utils:	User 134: precision@[10, 20] [0.0, 0.0], recall@[10, 20] [0.0, 0.0], ndcg@[10, 20] [0.0, 0.0], hit_ratio@[10, 20] [0.0, 0.0], auc 0.06946264744429886, mrr 0.0
+INFO:	evaluation_utils:	User 134: precision@[10, 20] [0.0, 0.0], recall@[10, 20] [0.0, 0.0], ndcg@[10, 20] [0.0, 0.0], hit_ratio@[10, 20] [0.0, 0.0], auc 0.9023591087811271, mrr 0.0
+INFO:	evaluation_utils:	User 134: precision@[10, 20] [0.0, 0.0], recall@[10, 20] [0.0, 0.0], ndcg@[10, 20] [0.0, 0.0], hit_ratio@[10, 20] [0.0, 0.0], auc 0.4947575360419397, mrr 0.0
+INFO:	evaluation_utils:	User 134: precision@[10, 20] [0.0, 0.0], recall@[10, 20] [0.0, 0.0], ndcg@[10, 20] [0.0, 0.0], hit_ratio@[10, 20] [0.0, 0.0], auc 0.36369593709043246, mrr 0.0
+INFO:	evaluation_utils:	User 134: precision@[10, 20] [0.0, 0.0], recall@[10, 20] [0.0, 0.0], ndcg@[10, 20] [0.0, 0.0], hit_ratio@[10, 20] [0.0, 0.0], auc 0.17169069462647446, mrr 0.0
+INFO:	evaluation_utils:	User 66/1516
+INFO:	evaluation_utils:	User 67/1516
+INFO:	evaluation_utils:	User 68/1516
+INFO:	evaluation_utils:	User 69/1516

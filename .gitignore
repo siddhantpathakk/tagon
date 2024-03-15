@@ -1,0 +1,29 @@
+*.pyc
+# *.png
+*.pickle
+*.pkl
+*.tsv
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+.pytype/
+cython_debug/
+train_sh_scripts
+slurm_logs
+# saved_models
+saved_checkpoints
+rank_results
+
+
+datasets
+processed
