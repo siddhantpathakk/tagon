@@ -33,6 +33,7 @@ def parse_opt():
     
     # data based arguments
     parser.add_argument('-d', '--data', type=str, help='data sources to use', default='ml-100k')
+    parser.add_argument('--train_test_val', type=str, default='80-10-10', help='train-test-validation split')
     parser.add_argument('--samplerate', type=float, default=1.0, help='sample rate for each user')
     parser.add_argument('--popnegsample', action='store_true', help='use popularity based negative sampling')
     parser.add_argument('--timepopnegsample', action='store_true', help='use timely popularity based negative sampling')
@@ -47,6 +48,7 @@ def parse_opt():
     parser.add_argument('--seed', type=int, default=42, help='random seed')
     parser.add_argument('--l2', type=float, default=1e-4, help='l2 regularization') # [5e-1, 1e-1, 1e-2, 1e-3]
     parser.add_argument('--ckpt_epoch', type=int, default=10, help='save model per k epochs')
+
     
     try:
         args = parser.parse_args()
@@ -60,6 +62,8 @@ def set_up_logger():
     logging_format =  f"%(levelname)s:\t%(module)s:\t%(message)s"
     
     logging.basicConfig(level=logging.INFO, format=logging_format)
+    
+    logging.addLevelName(logging.WARNING, 'WARN')
     
     logger = logging.getLogger()
     

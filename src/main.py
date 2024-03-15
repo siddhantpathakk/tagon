@@ -14,6 +14,10 @@ if __name__ == "__main__":
     logger = set_up_logger()
     logger.info(args)
     
+    if args.negsampleeval == -1:
+        # warn user that they are using the default value and that it may not be optimal
+        logger.warning('Using default value for negsampleeval. This may not be optimal.')
+    
     data = Data(args.data, args)
 
     seed_everything(seed=args.seed)
