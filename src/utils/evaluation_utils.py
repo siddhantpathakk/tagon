@@ -1,52 +1,9 @@
 import warnings
 warnings.filterwarnings("ignore")
 
-import math
 import torch
-import logging
 import numpy as np
 import multiprocessing
-from sklearn.preprocessing import MinMaxScaler
-from sklearn.metrics import average_precision_score, f1_score, roc_auc_score
-
-
-def recall(rank, ground_truth, N):
-    return len(set(rank[:N]) & set(ground_truth)) / float(len(set(ground_truth)))
-
-
-def precision_at_k(r, k):
-    """Score is precision @ k
-    Relevance is binary (nonzero is relevant).
-    Returns:
-        Precision @ k
-    Raises:
-        ValueError: len(r) must be >= k
-    """
-    assert k >= 1
-    r = np.asarray(r)[:k]
-    return np.mean(r)
-
-
-def average_precision(r,cut):
-    """Score is average precision (area under PR curve)
-    Relevance is binary (nonzero is relevant).
-    Returns:
-        Average precision
-    """
-    r = np.asarray(r)
-    out = [precision_at_k(r, k + 1) for k in range(cut) if r[k]]
-    if not out:
-        return 0.
-    return np.sum(out)/float(min(cut, np.sum(r)))
-
-
-def mean_average_precision(rs):
-    """Score is mean average precision
-    Relevance is binary (nonzero is relevant).
-    Returns:
-        Mean average precision
-    """
-    return np.mean([average_precision(r) for r in rs])
 
 
 def dcg_at_k(r, k, method=1):
@@ -78,29 +35,6 @@ def ndcg_at_k(r, k, method=1):
     if not dcg_max:
         return 0.
     return dcg_at_k(r, k, method) / dcg_max
-
-
-
-
-def hit_at_k(r, k):
-    r = np.array(r)[:k]
-    if np.sum(r) > 0:
-        return 1.
-    else:
-        return 0.
-
-def F1(pre, rec):
-    if pre + rec > 0:
-        return (2.0 * pre * rec) / (pre + rec)
-    else:
-        return 0.
-
-def area_under_curve(ground_truth, prediction):
-    try:
-        res = roc_auc_score(y_true=ground_truth, y_score=prediction)
-    except Exception:
-        res = 0.
-    return res
 
 def recall_at_k(r, k, all_pos_num):
     r = np.asfarray(r)[:k]
@@ -265,37 +199,3 @@ def eval_users(tgrec, src, dst, ts, train_src, train_dst, args):
     result['mrr'] /= num_interactions
     # print(result)
     return result
-
-def eval_one_epoch(hint, tgrec, sampler, src, dst, ts, label, NUM_NEIGHBORS=20):
-    val_acc, val_ap, val_f1, val_auc = [], [], [], []
-    with torch.no_grad():
-        tgrec = tgrec.eval()
-        TEST_BATCH_SIZE=1024
-        num_test_instance = len(src)
-        num_test_batch = math.ceil(num_test_instance / TEST_BATCH_SIZE)
-        for k in range(num_test_batch):
-            # percent = 100 * k / num_test_batch
-            # if k % int(0.2 * num_test_batch) == 0:
-            #     logger.info('{0} progress: {1:10.4f}'.format(hint, percent))
-            s_idx = k * TEST_BATCH_SIZE
-            e_idx = min(num_test_instance - 1, s_idx + TEST_BATCH_SIZE)
-            src_l_cut = src[s_idx:e_idx]
-            dst_l_cut = dst[s_idx:e_idx]
-            ts_l_cut = ts[s_idx:e_idx]
-            # label_l_cut = label[s_idx:e_idx]
-
-            size = len(src_l_cut)
-            dst_l_fake = sampler.sample_neg(src_l_cut)
-
-            pos_prob, neg_prob = tgrec.contrast(src_l_cut, dst_l_cut, dst_l_fake, ts_l_cut, NUM_NEIGHBORS)
-            
-            pred_score = np.concatenate([(pos_prob).cpu().numpy(), (neg_prob).cpu().numpy()])
-            pred_label = pred_score > 0.5
-            true_label = np.concatenate([np.ones(size), np.zeros(size)])
-            
-            val_acc.append((pred_label == true_label).mean())
-            val_ap.append(average_precision_score(true_label, pred_score))
-            val_f1.append(f1_score(true_label, pred_label))
-            val_auc.append(roc_auc_score(true_label, pred_score))
-            
-    return np.mean(val_acc), np.mean(val_ap), np.mean(val_f1), np.mean(val_auc)

@@ -23,6 +23,8 @@ slurm_logs
 # saved_models
 saved_checkpoints
 rank_results
+repo
+
 
 
 amazon

@@ -9,6 +9,10 @@ from model.layers import LSTMPool, MeanPool, MergeLayer
 from model.encode import TimeEncode, PosEncode, EmptyEncode, DisentangleTimeEncode
 
 class TGRec(torch.nn.Module):
+    """
+    Main model class for the proposed architecture.
+    Comprises of all the individual components and the forward method.
+    """
     def __init__(self, ngh_finder, n_nodes, args,
                  attn_mode='prod', use_time='time', agg_method='attn', 
                  node_dim=32, time_dim=32,
@@ -73,6 +77,13 @@ class TGRec(torch.nn.Module):
         
         
     def forward(self, src_idx_l, target_idx_l, cut_time_l, num_neighbors=20):
+        """
+        Forward method for the model. Scores the affinity between the source and target nodes.
+        Calculation helpful for the prediction approach.
+
+        Look for the contrast() and contrast_nosigmoid() methods for the score calculation using 
+        negative and positive sampling.
+        """
         src_embed = self.tem_conv(src_idx_l, cut_time_l, self.num_layers, num_neighbors)
         target_embed = self.tem_conv(target_idx_l, cut_time_l, self.num_layers, num_neighbors)
         score = self.affinity_score(src_embed, target_embed).squeeze(dim=-1)
@@ -80,6 +91,9 @@ class TGRec(torch.nn.Module):
 
 
     def contrast(self, src_idx_l, target_idx_l, background_idx_l, cut_time_l, num_neighbors=20):
+        """
+        Probability calculation using negative and positive sampling.
+        """
         src_embed = self.tem_conv(src_idx_l, cut_time_l, self.num_layers, num_neighbors)
         target_embed = self.tem_conv(target_idx_l, cut_time_l, self.num_layers, num_neighbors)
         background_embed = self.tem_conv(background_idx_l, cut_time_l, self.num_layers, num_neighbors)
@@ -90,6 +104,9 @@ class TGRec(torch.nn.Module):
 
 
     def contrast_nosigmoid(self, src_idx_l, target_idx_l, background_idx_l, cut_time_l, num_neighbors=20):
+        """
+        Score calculation using negative and positive sampling.
+        """
         src_embed = self.tem_conv(src_idx_l, cut_time_l, self.num_layers, num_neighbors)
         target_embed = self.tem_conv(target_idx_l, cut_time_l, self.num_layers, num_neighbors)
         background_embed = self.tem_conv(background_idx_l, cut_time_l, self.num_layers, num_neighbors)
@@ -100,6 +117,9 @@ class TGRec(torch.nn.Module):
 
 
     def time_att_aggregate(self, node_emb, node_time_emb):
+        """
+        Attention aggregation based on time encoding.
+        """
         node_emb_to_time = torch.tensordot(node_emb, self.time_att_weights, dims=([-1], [0]))
         node_emb_to_time = torch.unsqueeze(node_emb_to_time, dim=-2) #[N, L(optional) 1, time_dim]
         
@@ -116,6 +136,9 @@ class TGRec(torch.nn.Module):
 
 
     def tem_conv(self, src_idx_l, cut_time_l, curr_layers, num_neighbors=20):
+        """
+        Temporal convolution method for the model.
+        """
         assert(curr_layers >= 0)
         
         device = torch.device('cuda:{}'.format(0))

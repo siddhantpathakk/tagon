@@ -1,24 +1,29 @@
-import numpy as np
-import pandas as pd
 import math
 import logging
+import numpy as np
+import pandas as pd
 from utils.graph_utils import NeighborFinder
 from utils.graph_utils import RandEdgeSampler
 
 class Data:
+    """
+    Main data manager class for the proposed architecture.
+    """
     def __init__(self, DATASET, args):
-        ### Load data and train val test split
+        """Load data and train val test split"""
         g_df = pd.read_csv('/home/FYP/siddhant005/fyp/processed/ml-100k/ml_{}.csv'.format(DATASET))
         self.split_data(g_df, args)
         
     def get_num_instances(self):
+        """Returns the number of instances in the training data."""
         return len(self.train_src_l)
 
     def get_num_batches(self, args):
+        """Returns the number of batches in the training data."""
         return math.ceil(self.get_num_instances() / args.bs)
     
     def split_data(self, g_df, args):
-        
+        """Split the data into training, validation and test set."""
         self.logger = logging.getLogger(__name__)
         train_test_val_ratio = list(map(int, args.train_test_val.split('-')))
         assert len(train_test_val_ratio) == 3 and sum(train_test_val_ratio) == 100
@@ -72,8 +77,6 @@ class Data:
         self.val_ts_l = val_ts_l[valid_is_old_node_edge]
         self.val_e_idx_l = val_e_idx_l[valid_is_old_node_edge]
         self.val_label_l = val_label_l[valid_is_old_node_edge]
-        # print('#interactions in valid: ', len(self.val_src_l))
-        # self.logger.info(f'#interactions in valid: {len(self.val_src_l)}')
 
         test_src_l = src_l[valid_test_flag]
         test_dst_l = dst_l[valid_test_flag]
@@ -87,8 +90,6 @@ class Data:
         self.test_ts_l = test_ts_l[test_is_old_node_edge]
         self.test_e_idx_l = test_e_idx_l[test_is_old_node_edge]
         self.test_label_l = test_label_l[test_is_old_node_edge]
-        # print('#interaction in test: ', len(self.test_src_l))
-        # self.logger.info(f'#interaction in test: {len(self.test_src_l)}')
 
         adj_list = [[] for _ in range(self.max_idx + 1)]
         for src, dst, eidx, ts in zip(self.train_src_l, self.train_dst_l, self.train_e_idx_l, self.train_ts_l):
@@ -105,7 +106,6 @@ class Data:
             test_train_adj_list[dst].append((src, eidx, ts))
         self.test_train_ngh_finder = NeighborFinder(test_train_adj_list, uniform=args.uniform)
 
-
         # full graph with all the data for the test and validation purpose
         full_adj_list = [[] for _ in range(self.max_idx + 1)]
         for src, dst, eidx, ts in zip(src_l, dst_l, e_idx_l, ts_l):
@@ -116,3 +116,6 @@ class Data:
         self.train_rand_sampler = RandEdgeSampler(self.train_src_l, self.train_dst_l, self.train_ts_l)
         self.val_rand_sampler = RandEdgeSampler(src_l, dst_l, ts_l)
         self.test_rand_sampler = RandEdgeSampler(src_l, dst_l, ts_l)
+
+        self.logger.info(f'#Interactions in VALID: {len(self.val_src_l)}')
+        self.logger.info(f'#Interactions in TEST: {len(self.test_src_l)}')

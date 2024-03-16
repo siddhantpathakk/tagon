@@ -15,6 +15,11 @@ def get_new_history():
             'train_f1':[],
             'train_auc':[],
             
+            'val_acc':[],
+            'val_ap':[],
+            'val_f1':[],
+            'val_auc':[],
+            
             'val_recall10': [],
             'val_recall20': [],
             'val_mrr': [],
@@ -31,7 +36,6 @@ def bpr_loss(pos_score, neg_score):
 
 
 def build_model(args, data, logger):
-    # seed_everything(self.args.seed)
     device = torch.device('cuda:{}'.format(args.gpu))
     
     n_nodes = data.max_idx
@@ -43,6 +47,10 @@ def build_model(args, data, logger):
                     seq_len=args.n_degree, n_head=args.n_head, 
                     drop_out=args.drop_out, 
                     node_dim=args.node_dim, time_dim=args.time_dim)
+    
+    if args.pretrain:
+        model.load_state_dict(torch.load(args.pretrain))
+        logger.info(f"Pretrained model loaded from {args.pretrain}")
     
     optimizer = torch.optim.Adam(model.parameters(), 
                                         lr=args.lr,
@@ -83,8 +91,7 @@ class EarlyStopMonitor(object):
         self.tolerance = tolerance
         
         self.logger = logging.getLogger(__name__)
-        # self.logger.info(f"Early stopping monitor: max_round={max_round}, higher_better={higher_better}, tolerance={tolerance}")
-
+        self.logger.info(f"Early stopping monitor: max_round={max_round}, higher_better={higher_better}, tolerance={tolerance}")
 
     def early_stop_check(self, curr_val):
         self.epoch_count += 1

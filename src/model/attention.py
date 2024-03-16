@@ -3,6 +3,9 @@ import torch
 from model.layers import MultiHeadAttention, MapBasedMultiHeadAttention,  MergeLayer, MergeSelfAttnLayer
 
 class BaseAttentionModel(torch.nn.Module):
+    """
+    Base class for attention based models. 
+    """
     def __init__(self, feat_dim, time_dim, 
                  attn_mode='prod', n_head=2, drop_out=0.1):
       super(BaseAttentionModel, self).__init__()
@@ -45,6 +48,10 @@ class BaseAttentionModel(torch.nn.Module):
 
 
 class CrossAttentionModel(BaseAttentionModel):
+    """
+    CrossAttentionModel is a class for attention based models.
+    It is a subclass of BaseAttentionModel. Used for cross attention between source users and target sequences.
+    """
     def __init__(self, feat_dim, time_dim, attn_mode, n_head, drop_out, bs, n):
         """
         args:
@@ -76,6 +83,7 @@ class CrossAttentionModel(BaseAttentionModel):
         src_ext = torch.unsqueeze(src, dim=1) 
         q = torch.cat([src_ext, src_t], dim=2) 
         
+        # Self attention step
         k, _ = self.self_attn_model(seq, seq_t, mask)        
         # k = torch.cat([seq, seq_t], dim=2)  # TODO: check for whether to add time encoding or not
         
@@ -89,12 +97,34 @@ class CrossAttentionModel(BaseAttentionModel):
 
 
 class SelfAttentionModel(BaseAttentionModel):
+    """
+    SelfAttentionModel is a class for attention based models. It is a subclass of BaseAttentionModel. 
+    Used for self attention.
+    """
     def __init__(self, feat_dim, time_dim, bs, n, attn_mode="prod", n_head=2, drop_out=0.1):
+        """
+        Args:
+            feat_dim: dim for the node features
+            time_dim: dim for the time encoding
+            bs: batch size
+            n: number of neighbors
+            attn_mode: choose from 'prod' and 'map' (default is prod)
+            n_head: number of heads in attention (default is 2)
+            drop_out: probability of dropping a neuron (default is 0.1)
+        """
         super(SelfAttentionModel, self).__init__(feat_dim, time_dim, attn_mode, n_head, drop_out)
         self.ffn = MergeSelfAttnLayer(feat_dim, time_dim, bs, n)
         
     def forward(self, seq, seq_t, mask):
-        
+        """
+        Args:
+            seq: item features
+            seq_t: time encoding
+            mask: mask for the sequence
+
+        Returns:
+            output, attn
+        """
         k = torch.cat([seq, seq_t], dim=2) 
         
         mask = torch.unsqueeze(mask, dim=2)
