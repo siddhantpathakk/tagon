@@ -15,6 +15,7 @@ def get_new_history():
             'train_f1':[],
             'train_auc':[],
             
+            'val_loss': [],
             'val_acc':[],
             'val_ap':[],
             'val_f1':[],
@@ -49,7 +50,8 @@ def build_model(args, data, logger):
                     node_dim=args.node_dim, time_dim=args.time_dim)
     
     if args.pretrain:
-        model.load_state_dict(torch.load(args.pretrain))
+        checkpoint = torch.load(args.pretrain)
+        model.load_state_dict(checkpoint['model_state_dict'], strict=False)
         logger.info(f"Pretrained model loaded from {args.pretrain}")
     
     optimizer = torch.optim.Adam(model.parameters(), 
@@ -78,34 +80,24 @@ def build_model(args, data, logger):
     return model, optimizer, lr_scheduler, warmup_scheduler, device
     
 
-class EarlyStopMonitor(object):
-    def __init__(self, max_round=10, higher_better=True, tolerance=1e-3):
-        self.max_round = max_round
-        self.num_round = 0
-
-        self.epoch_count = 0
-        self.best_epoch = 0
-
-        self.last_best = None
-        self.higher_better = higher_better
-        self.tolerance = tolerance
+class EarlyStopper:
+    def __init__(self, patience=1, min_delta=0):
+        logger = logging.getLogger()
+        self.patience = patience
+        self.min_delta = min_delta
+        self.counter = 0
+        self.min_validation_loss = float('inf')
         
-        self.logger = logging.getLogger(__name__)
-        self.logger.info(f"Early stopping monitor: max_round={max_round}, higher_better={higher_better}, tolerance={tolerance}")
+        logger.info(f'Early stopping callback initialized with patience: {patience} and min_delta: {min_delta}')
 
-    def early_stop_check(self, curr_val):
-        self.epoch_count += 1
-        
-        if not self.higher_better:
-            curr_val *= -1
-        if self.last_best is None:
-            self.last_best = curr_val
-        elif (curr_val - self.last_best) / np.abs(self.last_best) > self.tolerance:
-            self.last_best = curr_val
-            self.num_round = 0
-            self.best_epoch = self.epoch_count
-        else:
-            self.num_round += 1
-        return self.num_round >= self.max_round
+    def early_stop(self, validation_loss):
+        if validation_loss < self.min_validation_loss:
+            self.min_validation_loss = validation_loss
+            self.counter = 0
+        elif validation_loss > (self.min_validation_loss + self.min_delta):
+            self.counter += 1
+            if self.counter >= self.patience:
+                return True
+        return False
     
     

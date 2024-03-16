@@ -7,7 +7,7 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import average_precision_score, f1_score, roc_auc_score
 
 from utils.evaluation_utils import eval_users
-from utils.trainer_utils import EarlyStopMonitor, bpr_loss, build_model, get_new_history
+from utils.trainer_utils import EarlyStopper, bpr_loss, build_model, get_new_history
 
 
 class Trainer:
@@ -24,7 +24,7 @@ class Trainer:
         
         self.num_batch = self.data.get_num_batches(self.args)
         
-        self.early_stopper = EarlyStopMonitor(higher_better=True)
+        self.early_stopper = EarlyStopper(patience=5)
         
         self.SAVE_MODEL_PATH = SAVE_MODEL_PATH
         self.SAVE_MODEL_DIR = SAVE_MODEL_DIR
@@ -36,14 +36,13 @@ class Trainer:
    
     
     def train_for_one_epoch(self, epoch):
-        self.logger.info(f'Commencing training for epoch # {epoch+1}')   
+        # self.logger.info(f'Commencing training for epoch # {epoch+1}')   
         self.model.train()
         self.model.ngh_finder = self.data.train_ngh_finder
         np.random.shuffle(self.idx_list)
         m_loss, acc_arr, ap_arr, f1_arr, auc_arr = [], [], [], [], []
-        # self.args.bs = 1024
         for k in range(self.num_batch):
-            self.logger.info(f'Epoch {epoch+1}, batch {k+1}/{self.num_batch}')
+            # print(f'Epoch {epoch+1}, batch {k+1}/{self.num_batch}')
             start_index = k * self.args.bs
             end_index = min(self.num_instance - 1, start_index + self.args.bs)
             
@@ -94,7 +93,7 @@ class Trainer:
             num_test_instance = len(src)
             num_test_batch = math.ceil(num_test_instance / TEST_BATCH_SIZE)
             for k in range(num_test_batch):
-                self.logger.info(f'Validation batch {k+1}/{num_test_batch}')
+                print(f'Validation batch {k+1}/{num_test_batch}')
                 s_idx = k * TEST_BATCH_SIZE
                 e_idx = min(num_test_instance - 1, s_idx + TEST_BATCH_SIZE)
                 src_l_cut = src[s_idx:e_idx]
@@ -153,8 +152,8 @@ class Trainer:
             
             self.export_model_optim_state(np.mean(mean_loss), epoch+1)
                 
-            if not self.args.pretrain and self.early_stopper.early_stop_check(acc):
-                self.logger.info(f'Early stopping activated at epoch {epoch+1}')
+            if not self.args.pretrain and (epoch+1 > self.warmup_period) and self.early_stopper.early_stop(loss):      
+                self.logger.info(f'Early stopping at epoch {epoch+1} due to validation loss {loss:.3f}')       
                 break
             
             if (epoch+1) == self.args.n_epoch:
@@ -167,7 +166,6 @@ class Trainer:
                 self.history['val_recall20'].append(val_r20)
                 self.history['val_mrr'].append(val_mrr)
                 
-        
         test_time = time.time()
         test_results = self.evaluate('test')
         test_r10, test_r20, test_mrr = test_results['recall'][0], test_results['recall'][1], test_results['mrr']
@@ -183,9 +181,9 @@ class Trainer:
     
 
     def evaluate(self, type='validate'):
-        self.logger.info(f'Commencing evaluation for {type}')
         
         if type == "validate_last":
+            self.logger.info(f'Commencing evaluation for {type}')
             self.model.ngh_finder = self.data.test_train_ngh_finder
             return eval_users(self.model, 
                             self.data.val_src_l, self.data.val_dst_l, self.data.val_ts_l, 
@@ -200,6 +198,7 @@ class Trainer:
             
                                   
         elif type == 'test':
+            self.logger.info(f'Commencing evaluation for {type}')
             self.model.ngh_finder = self.data.full_ngh_finder
             return eval_users(self.model, 
                             self.data.test_src_l, self.data.test_dst_l, self.data.test_ts_l, 
@@ -240,7 +239,7 @@ class Trainer:
             'loss': np.mean(m_loss),
         } 
         torch.save(model_state, model_name)
-        self.logger.info(f'Model saved at {model_name}')
+        # self.logger.info(f'Model saved at {model_name}')
     
     def export_history(self):
         import json

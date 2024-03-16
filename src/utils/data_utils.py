@@ -9,10 +9,12 @@ class Data:
     """
     Main data manager class for the proposed architecture.
     """
-    def __init__(self, DATASET, args):
+    def __init__(self, DATASET, args, split=True):
         """Load data and train val test split"""
         g_df = pd.read_csv('/home/FYP/siddhant005/fyp/processed/ml-100k/ml_{}.csv'.format(DATASET))
-        self.split_data(g_df, args)
+        if split:
+            self.split_data(g_df, args)
+        self.g_df = g_df
         
     def get_num_instances(self):
         """Returns the number of instances in the training data."""
@@ -21,6 +23,11 @@ class Data:
     def get_num_batches(self, args):
         """Returns the number of batches in the training data."""
         return math.ceil(self.get_num_instances() / args.bs)
+    
+    def get_user_data(self, user_id):
+        # get the user data given user_id, return src, dst, ts
+        user_data = self.g_df[self.g_df['u'] == user_id]
+        return user_data['u'].values, user_data['i'].values, user_data['ts'].values
     
     def split_data(self, g_df, args):
         """Split the data into training, validation and test set."""

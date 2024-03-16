@@ -1,3 +1,4 @@
+from datetime import datetime
 import multiprocessing
 import torch
 import logging
@@ -5,6 +6,8 @@ import numpy as np
 from utils.data_utils import Data
 from utils.main_utils import parse_opt
 from utils.trainer_utils import  build_model, get_new_history
+import json
+import pandas as pd
 
 def eval_user(tgrec, src, dst, ts, train_src, train_dst, args):
     cores = multiprocessing.cpu_count() // 2
@@ -25,7 +28,7 @@ def eval_user(tgrec, src, dst, ts, train_src, train_dst, args):
             train_pos_edges[u] = set([i])
 
     pool = multiprocessing.Pool(cores)
-    batch_users = 1
+    batch_users = 5
 
     preds_list = []
     preds_len_preditems = []
@@ -60,14 +63,12 @@ def eval_user(tgrec, src, dst, ts, train_src, train_dst, args):
                 neg_items = neg_candidates
             else:
                 neg_items = list(np.random.choice(neg_candidates, size=args.negsampleeval, replace=False))
-            #neg_items = list(train_itemset - set(pos_items))
             neg_ts = [t for _ in range(len(neg_items))]
             neg_src_l = [u for _ in range(len(neg_items))]
 
             batch_src_l += src_l + neg_src_l
             batch_test_items += pos_items + neg_items
             batch_ts += pos_ts + neg_ts
-            #batch_len.append(len(src_l+neg_src_l))
 
             test_items = np.array(batch_test_items)
             test_ts = np.array(batch_ts)
@@ -75,8 +76,6 @@ def eval_user(tgrec, src, dst, ts, train_src, train_dst, args):
 
             pred_scores = tgrec(test_src_l, test_items, test_ts, args.n_degree)
             preds = pred_scores.cpu().numpy()
-            #start_ind = 0
-            #for i_len in batch_len:
             preds_list.append(preds)
             preds_len_preditems.append(len(src_l+neg_src_l))
             preds_uit.append((u,i,t))
@@ -110,7 +109,6 @@ def eval_user(tgrec, src, dst, ts, train_src, train_dst, args):
                 batch_src_l = []
                 batch_test_items = []
                 batch_ts = []
-                #batch_len = []
 
     return test_outputs
 
@@ -145,25 +143,30 @@ class InferenceEngine:
         
         self.history = get_new_history()
         
+        self.i_map = json.load(open('/home/FYP/siddhant005/fyp/processed/ml-100k/ml-100k_i_map.json'))
+        self.u_map = json.load(open('/home/FYP/siddhant005/fyp/processed/ml-100k/ml-100k_u_map.json'))
+        self.u_i_csv = pd.read_csv('/home/FYP/siddhant005/fyp/processed/ml-100k/ml_ml-100k.csv')
     
+    def get_mapped_user_id(self, user_id):
+        return self.u_map[str(user_id)]
+     
     def run(self, user_id):
         self.model.ngh_finder = self.data.full_ngh_finder
-        src, dst, ts = self.get_src_dst_ts(user_id)
+        src, dst, ts = self.data.get_user_data(user_id)
+        
+        print(f'User id (real) : {user_id} mapped to {self.get_mapped_user_id(user_id)}')
+        
         return eval_user(self.model, src, dst, ts, 
-                         self.data.train_src, self.data.train_dst, self.args)
-
-    def get_src_dst_ts(self, user_id):
-        src = self.data.test_src[self.data.test_user_id == user_id]
-        dst = self.data.test_dst[self.data.test_user_id == user_id]
-        ts = self.data.test_ts[self.data.test_user_id == user_id]
-        return src, dst, ts
+                         self.data.train_src_l, self.data.train_dst_l, self.args)
+    
     
 if __name__ == "__main__":
     
     args = parse_opt()
-    data = Data(args.data, args)
+    
+    data = Data(args.data, args, split=True)
     inference = InferenceEngine(args, data)
     
-    
-    user_id = str(input("Enter user id: "))
+    user_id = 850
+    print(f'Running inference for user {user_id}...')
     print(inference.run(user_id))
