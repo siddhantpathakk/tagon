@@ -2,8 +2,8 @@ import math
 import logging
 import numpy as np
 import pandas as pd
-from utils.graph_utils import NeighborFinder
-from utils.graph_utils import RandEdgeSampler
+from .graph_utils import NeighborFinder
+from .graph_utils import RandEdgeSampler
 
 class Data:
     """
@@ -11,10 +11,15 @@ class Data:
     """
     def __init__(self, DATASET, args, split=True):
         """Load data and train val test split"""
-        g_df = pd.read_csv('/home/FYP/siddhant005/fyp/processed/ml-100k/ml_{}.csv'.format(DATASET))
+        # g_df = pd.read_csv('/home/FYP/siddhant005/fyp/processed/ml_{}.csv'.format(DATASET))
+        self.logger = logging.getLogger(__name__)
+        amazon_path = 'Digital_Music'
+        self.logger.info(f'Accessing Amazon Dataset:\t{amazon_path}')
+        g_df = pd.read_csv(f'/home/FYP/siddhant005/fyp/processed/{DATASET}/{amazon_path}/ml_{amazon_path}.csv')
+        # print(g_df.info())
+        self.g_df = g_df
         if split:
             self.split_data(g_df, args)
-        self.g_df = g_df
         
     def get_num_instances(self):
         """Returns the number of instances in the training data."""
@@ -26,12 +31,13 @@ class Data:
     
     def get_user_data(self, user_id):
         # get the user data given user_id, return src, dst, ts
-        user_data = self.g_df[self.g_df['u'] == user_id]
+        # print(f'Getting user data for user {user_id}')
+        user_data = self.g_df[self.g_df['u'] == int(user_id)]
+        # print(user_data['i'])
         return user_data['u'].values, user_data['i'].values, user_data['ts'].values
     
     def split_data(self, g_df, args):
         """Split the data into training, validation and test set."""
-        self.logger = logging.getLogger(__name__)
         train_test_val_ratio = list(map(int, args.train_test_val.split('-')))
         assert len(train_test_val_ratio) == 3 and sum(train_test_val_ratio) == 100
         

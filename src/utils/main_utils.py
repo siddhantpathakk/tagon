@@ -42,11 +42,11 @@ def parse_opt():
     # training based arguments
     parser.add_argument('--bs', type=int, default=128, help='batch_size')
     parser.add_argument('--n_epoch', type=int, default=200, help='number of epochs')
-    parser.add_argument('--lr', type=float, default=1e-3, help='learning rate') # [1e-2, 1e-3, 1e-4]
+    parser.add_argument('--lr', type=float, default=1e-4, help='learning rate') # [1e-2, 1e-3, 1e-4]
     parser.add_argument('--prefix', type=str, default='ml100k', help='prefix to name the checkpoints')
     parser.add_argument('--gpu', type=int, default=0, help='idx for the gpu to use')
     parser.add_argument('--seed', type=int, default=42, help='random seed')
-    parser.add_argument('--l2', type=float, default=1e-2, help='l2 regularization') # [5e-1, 1e-1, 1e-2, 1e-3]
+    parser.add_argument('--l2', type=float, default=1e-1, help='l2 regularization') # [5e-1, 1e-1, 1e-2, 1e-3]
     parser.add_argument('--ckpt_epoch', type=int, default=10, help='save model per k epochs')
     parser.add_argument('--pretrain', type=str, default=None, help='pretrained model path')
     
@@ -55,7 +55,7 @@ def parse_opt():
         return args
     except:
         parser.print_help()
-        sys.exit(0)
+        # sys.exit(0)
 
 
 def set_up_logger():

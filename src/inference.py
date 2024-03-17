@@ -1,13 +1,14 @@
-from datetime import datetime
 import multiprocessing
+from matplotlib import pyplot as plt
 import torch
 import logging
+import time, datetime
 import numpy as np
-from utils.data_utils import Data
-from utils.main_utils import parse_opt
-from utils.trainer_utils import  build_model, get_new_history
+from src.utils.data_utils import Data
+from src.utils.main_utils import parse_opt
 import json
 import pandas as pd
+import networkx as nx
 
 def eval_user(tgrec, src, dst, ts, train_src, train_dst, args):
     cores = multiprocessing.cpu_count() // 2
@@ -138,35 +139,52 @@ class InferenceEngine:
         
         self.args = args
         self.data = data
-        self.model, _, _, _, self.device = build_model(self.args, self.data, self.logger)
+        # self.model, _, _, _, self.device = build_model(self.args, self.data, self.logger)
         self.NUM_NEIGHBORS = self.args.n_degree
         
-        self.history = get_new_history()
+        # self.history = get_new_history()
         
-        self.i_map = json.load(open('/home/FYP/siddhant005/fyp/processed/ml-100k/ml-100k_i_map.json'))
-        self.u_map = json.load(open('/home/FYP/siddhant005/fyp/processed/ml-100k/ml-100k_u_map.json'))
-        self.u_i_csv = pd.read_csv('/home/FYP/siddhant005/fyp/processed/ml-100k/ml_ml-100k.csv')
+        self.i_map = json.load(open('/home/FYP/siddhant005/fyp/processed/ml-100k_i_map.json'))
+        self.u_map = json.load(open('/home/FYP/siddhant005/fyp/processed/ml-100k_u_map.json'))
+        self.u_i_csv = pd.read_csv('/home/FYP/siddhant005/fyp/processed/ml_ml-100k.csv')
     
     def get_mapped_user_id(self, user_id):
         return self.u_map[str(user_id)]
      
     def run(self, user_id):
-        self.model.ngh_finder = self.data.full_ngh_finder
-        src, dst, ts = self.data.get_user_data(user_id)
+        # self.model.ngh_finder = self.data.full_ngh_finder
         
-        print(f'User id (real) : {user_id} mapped to {self.get_mapped_user_id(user_id)}')
+        real_uid = user_id
+        mapped_uid = self.get_key_by_value(real_uid, self.u_map)
         
-        return eval_user(self.model, src, dst, ts, 
-                         self.data.train_src_l, self.data.train_dst_l, self.args)
+        print(f'The mapped user id {mapped_uid} is for {real_uid} real user id')
+        
+        return self.data.get_user_data(mapped_uid)
+        # print(f'User {real_uid} has {len(src)} interactions')
+
+        # print(src)
+        # print(dst)
+        # for it, ts_ in zip(dst, ts):
+        #     print(f'\t({self.i_map[str(it)]["item_id"]})\t{self.i_map[str(it)]["title"]} at {datetime.datetime.fromtimestamp(ts_)}')
+        # self.get_graph(src, dst, ts)
+        # return eval_user(self.model, src, dst, ts, 
+        #                  self.data.train_src_l, self.data.train_dst_l, self.args)
     
+    def get_key_by_value(self, real_userid, dict_map):
+        for key, value in dict_map.items():
+            if value == real_userid:
+                return key
+            
     
+
+        
 if __name__ == "__main__":
     
     args = parse_opt()
     
-    data = Data(args.data, args, split=True)
+    data = Data(args.data, args, split=False)
     inference = InferenceEngine(args, data)
     
-    user_id = 850
+    user_id = 259
     print(f'Running inference for user {user_id}...')
     print(inference.run(user_id))

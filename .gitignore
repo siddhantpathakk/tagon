@@ -18,16 +18,9 @@ ipython_config.py
 
 .pytype/
 cython_debug/
+
+
 sh_scripts
-slurm_logs
-saved_models
-saved_checkpoints
-rank_results
-repo
-history
-ablation_study
-
-
+processed
 log
-amazon
-ml-1m
+datasets
