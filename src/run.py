@@ -6,21 +6,21 @@ import sys
 import argparse
 import os
 import json
-
 import torch
 import numpy as np
+
 from sklearn.metrics import average_precision_score
 from sklearn.metrics import f1_score
 from sklearn.metrics import roc_auc_score
 
-from model import TGRec
-from data import Data
+from src.model.TAGON import TAGON
+from src.data.data import Data
 from evaluation import *
-from utils import EarlyStopMonitor
+from src.utils.utils import EarlyStopMonitor
 
 
 ### Argument and global variables
-parser = argparse.ArgumentParser('Interface for TGSRec experiments on link predictions')
+parser = argparse.ArgumentParser('Interface for TAGON experiments on link predictions')
 parser.add_argument('-d', '--data', type=str, help='data sources to use, try wikipedia or reddit', default='wikipedia')
 parser.add_argument('--bs', type=int, default=200, help='batch_size')
 parser.add_argument('--prefix', type=str, default='', help='prefix to name the checkpoints')
@@ -121,17 +121,17 @@ print(n_nodes, "n nodes")
 n_edges = data.num_total_edges
 print(n_edges, "n edges")
 
-tgan = TGRec(data.train_ngh_finder, n_nodes+1, args,
+tgan = TAGON(data.train_ngh_finder, n_nodes+1, args,
             num_layers=NUM_LAYER, use_time=USE_TIME, agg_method=AGG_METHOD, attn_mode=ATTN_MODE,
             seq_len=SEQ_LEN, n_head=NUM_HEADS, drop_out=DROP_OUT, node_dim=NODE_DIM, time_dim=TIME_DIM)
 
 
 checkpoint = torch.load("./saved_models/ml-100k/ml-100k.pt")
 tgan.load_state_dict(checkpoint['model_state_dict'])
+tgan = tgan.to(device)
 logger.info('loaded pretrain model from ./saved_models/ml-100k/ml-100k.pt')
 
 # logger.info('using TGSRec')
-tgan = tgan.to(device)
 
 optimizer = torch.optim.Adam(tgan.parameters(), lr=LEARNING_RATE, weight_decay=0.001)
 optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
