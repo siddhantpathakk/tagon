@@ -1,0 +1,1291 @@
+/var/spool/slurm/d/job03161/slurm_script: 11: source: not found
+/var/spool/slurm/d/job03161/slurm_script: 12: source: not found
+INFO:root:Namespace(data='Digital_Music', bs=150, prefix='', n_degree=20, n_head=2, n_epoch=120, n_layer=2, lr=0.01, drop_out=0.3, reg=0.3, gpu=0, node_dim=16, time_dim=16, agg_method='attn', attn_mode='map', time='time', uniform=True, new_node=False, samplerate=1, popnegsample=False, timepopnegsample=True, negsampleeval=1000, disencomponents=1)
+INFO:root:#interactions in train: 51765
+INFO:root:#interactions in valid:2183 
+INFO:root:#interaction in test: 984
+INFO:root:number of nodes: 9109
+INFO:root:number of nodes: 9109
+INFO:model:Aggregation uses attention model
+INFO:model:Using map based attention
+INFO:model:Using map based attention
+INFO:model:Using map based attention
+INFO:model:Using map based attention
+INFO:model:Using time encoding
+INFO:root:num of training instances: 51765
+INFO:root:num of batches per epoch: 346
+INFO:result:Epoch, Train Loss, Train AP, Train F1, Val AP, Val F1, Test AP, Test F1, Test AUC
+INFO:root:Running epoch 1
+INFO:root:	Batch: 1/346 done
+INFO:root:	Batch: 70/346 done
+INFO:root:	Batch: 139/346 done
+INFO:root:	Batch: 208/346 done
+INFO:root:	Batch: 277/346 done
+INFO:root:	Batch: 346/346 done
+INFO:result:1, 1.2327, 0.7070, 0.6613, 0.5966, 0.4520, 0.5816, 0.6667, 0.5496
+INFO:root:Running epoch 2
+INFO:root:	Batch: 1/346 done
+INFO:root:	Batch: 70/346 done
+INFO:root:	Batch: 139/346 done
+INFO:root:	Batch: 208/346 done
+INFO:root:	Batch: 277/346 done
+INFO:root:	Batch: 346/346 done
+INFO:result:2, 1.2293, 0.7110, 0.6496, 0.6237, 0.5103, 0.5965, 0.4472, 0.5738
+INFO:root:Running epoch 3
+INFO:root:	Batch: 1/346 done
+INFO:root:	Batch: 70/346 done
+INFO:root:	Batch: 139/346 done
+INFO:root:	Batch: 208/346 done
+INFO:root:	Batch: 277/346 done
+INFO:root:	Batch: 346/346 done
+INFO:result:3, 1.2280, 0.6861, 0.5802, 0.6421, 0.5646, 0.5867, 0.4124, 0.5633
+INFO:root:Running epoch 4
+INFO:root:	Batch: 1/346 done
+INFO:root:	Batch: 70/346 done
+INFO:root:	Batch: 139/346 done
+INFO:root:	Batch: 208/346 done
+INFO:root:	Batch: 277/346 done
+INFO:root:	Batch: 346/346 done
+INFO:result:4, 1.2063, 0.7518, 0.6859, 0.6358, 0.5113, 0.5938, 0.4123, 0.5700
+INFO:root:Running epoch 5
+INFO:root:	Batch: 1/346 done
+INFO:root:	Batch: 70/346 done
+INFO:root:	Batch: 139/346 done
+INFO:root:	Batch: 208/346 done
+INFO:root:	Batch: 277/346 done
+INFO:root:	Batch: 346/346 done
+INFO:result:5, 1.1859, 0.7788, 0.7053, 0.6318, 0.4566, 0.5908, 0.3674, 0.5620
+INFO:root:Running epoch 6
+INFO:root:	Batch: 1/346 done
+INFO:root:	Batch: 70/346 done
+INFO:root:	Batch: 139/346 done
+INFO:root:	Batch: 208/346 done
+INFO:root:	Batch: 277/346 done
+INFO:root:	Batch: 346/346 done
+INFO:result:6, 1.1685, 0.7811, 0.7201, 0.6412, 0.4358, 0.5888, 0.3462, 0.5549
+INFO:root:Running epoch 7
+INFO:root:	Batch: 1/346 done
+INFO:root:	Batch: 70/346 done
+INFO:root:	Batch: 139/346 done
+INFO:root:	Batch: 208/346 done
+INFO:root:	Batch: 277/346 done
+INFO:root:	Batch: 346/346 done
+INFO:result:7, 1.1621, 0.7454, 0.7082, 0.6273, 0.5313, 0.5802, 0.4716, 0.5404
+INFO:root:Running epoch 8
+INFO:root:	Batch: 1/346 done
+INFO:root:	Batch: 70/346 done
+INFO:root:	Batch: 139/346 done
+INFO:root:	Batch: 208/346 done
+INFO:root:	Batch: 277/346 done
+INFO:root:	Batch: 346/346 done
+INFO:result:8, 1.1556, 0.7463, 0.7180, 0.6376, 0.3628, 0.5942, 0.3284, 0.5565
+INFO:root:Running epoch 9
+INFO:root:	Batch: 1/346 done
+INFO:root:	Batch: 70/346 done
+INFO:root:	Batch: 139/346 done
+INFO:root:	Batch: 208/346 done
+INFO:root:	Batch: 277/346 done
+INFO:root:	Batch: 346/346 done
+INFO:result:9, 1.1467, 0.7706, 0.7274, 0.6208, 0.5182, 0.5818, 0.4593, 0.5460
+INFO:root:Running epoch 10
+INFO:root:	Batch: 1/346 done
+INFO:root:	Batch: 70/346 done
+INFO:root:	Batch: 139/346 done
+INFO:root:	Batch: 208/346 done
+INFO:root:	Batch: 277/346 done
+INFO:root:	Batch: 346/346 done
+INFO:result:10, 1.1464, 0.7024, 0.7060, 0.6312, 0.5294, 0.5890, 0.4782, 0.5503
+INFO:root:Running epoch 11
+INFO:root:	Batch: 1/346 done
+INFO:root:	Batch: 70/346 done
+INFO:root:	Batch: 139/346 done
+INFO:root:	Batch: 208/346 done
+INFO:root:	Batch: 277/346 done
+INFO:root:	Batch: 346/346 done
+INFO:result:11, 1.1542, 0.6391, 0.6854, 0.6453, 0.5918, 0.6123, 0.5435, 0.5756
+INFO:root:Running epoch 12
+INFO:root:	Batch: 1/346 done
+INFO:root:	Batch: 70/346 done
+INFO:root:	Batch: 139/346 done
+INFO:root:	Batch: 208/346 done
+INFO:root:	Batch: 277/346 done
+INFO:root:	Batch: 346/346 done
+INFO:result:12, 1.1562, 0.7160, 0.6947, 0.6549, 0.5690, 0.6110, 0.5071, 0.5597
+INFO:root:Running epoch 13
+INFO:root:	Batch: 1/346 done
+INFO:root:	Batch: 70/346 done
+INFO:root:	Batch: 139/346 done
+INFO:root:	Batch: 208/346 done
+INFO:root:	Batch: 277/346 done
+INFO:root:	Batch: 346/346 done
+INFO:result:13, 1.1551, 0.7501, 0.6961, 0.6630, 0.5621, 0.6016, 0.4296, 0.5599
+INFO:root:Running epoch 14
+INFO:root:	Batch: 1/346 done
+INFO:root:	Batch: 70/346 done
+INFO:root:	Batch: 139/346 done
+INFO:root:	Batch: 208/346 done
+INFO:root:	Batch: 277/346 done
+INFO:root:	Batch: 346/346 done
+INFO:result:14, 1.1521, 0.7669, 0.7009, 0.6427, 0.5298, 0.5963, 0.4143, 0.5530
+INFO:root:Running epoch 15
+INFO:root:	Batch: 1/346 done
+INFO:root:	Batch: 70/346 done
+INFO:root:	Batch: 139/346 done
+INFO:root:	Batch: 208/346 done
+INFO:root:	Batch: 277/346 done
+INFO:root:	Batch: 346/346 done
+INFO:result:15, 1.1488, 0.7755, 0.6961, 0.6498, 0.5439, 0.5981, 0.4197, 0.5490
+INFO:root:Running epoch 16
+INFO:root:	Batch: 1/346 done
+INFO:root:	Batch: 70/346 done
+INFO:root:	Batch: 139/346 done
+INFO:root:	Batch: 208/346 done
+INFO:root:	Batch: 277/346 done
+INFO:root:	Batch: 346/346 done
+INFO:result:16, 1.1453, 0.7824, 0.7077, 0.6456, 0.5311, 0.5965, 0.4111, 0.5515
+INFO:root:Running epoch 17
+INFO:root:	Batch: 1/346 done
+INFO:root:	Batch: 70/346 done
+INFO:root:	Batch: 139/346 done
+INFO:root:	Batch: 208/346 done
+INFO:root:	Batch: 277/346 done
+INFO:root:	Batch: 346/346 done
+INFO:result:17, 1.1417, 0.7867, 0.7099, 0.6508, 0.5480, 0.5893, 0.4036, 0.5347
+INFO:root:Running epoch 18
+INFO:root:	Batch: 1/346 done
+INFO:root:	Batch: 70/346 done
+INFO:root:	Batch: 139/346 done
+INFO:root:	Batch: 208/346 done
+INFO:root:	Batch: 277/346 done
+INFO:root:	Batch: 346/346 done
+INFO:result:18, 1.1383, 0.7897, 0.7103, 0.6509, 0.5469, 0.5832, 0.3951, 0.5335
+INFO:root:Running epoch 19
+INFO:root:	Batch: 1/346 done
+INFO:root:	Batch: 70/346 done
+INFO:root:	Batch: 139/346 done
+INFO:root:	Batch: 208/346 done
+INFO:root:	Batch: 277/346 done
+INFO:root:	Batch: 346/346 done
+INFO:result:19, 1.1348, 0.7920, 0.7152, 0.6604, 0.5429, 0.5716, 0.3911, 0.5325
+INFO:root:Running epoch 20
+INFO:root:	Batch: 1/346 done
+INFO:root:	Batch: 70/346 done
+INFO:root:	Batch: 139/346 done
+INFO:root:	Batch: 208/346 done
+INFO:root:	Batch: 277/346 done
+INFO:root:	Batch: 346/346 done
+INFO:result:20, 1.1311, 0.7970, 0.7182, 0.6576, 0.5503, 0.5839, 0.3889, 0.5380
+INFO:root:Running epoch 21
+INFO:root:	Batch: 1/346 done
+INFO:root:	Batch: 70/346 done
+INFO:root:	Batch: 139/346 done
+INFO:root:	Batch: 208/346 done
+INFO:root:	Batch: 277/346 done
+INFO:root:	Batch: 346/346 done
+INFO:result:21, 1.1300, 0.7776, 0.7121, 0.6592, 0.5754, 0.5742, 0.4167, 0.5172
+INFO:root:Running epoch 22
+INFO:root:	Batch: 1/346 done
+INFO:root:	Batch: 70/346 done
+INFO:root:	Batch: 139/346 done
+INFO:root:	Batch: 208/346 done
+INFO:root:	Batch: 277/346 done
+INFO:root:	Batch: 346/346 done
+INFO:result:22, 1.1276, 0.7930, 0.7188, 0.6589, 0.5620, 0.6029, 0.3770, 0.5586
+INFO:root:Running epoch 23
+INFO:root:	Batch: 1/346 done
+INFO:root:	Batch: 70/346 done
+INFO:root:	Batch: 139/346 done
+INFO:root:	Batch: 208/346 done
+INFO:root:	Batch: 277/346 done
+INFO:root:	Batch: 346/346 done
+INFO:result:23, 1.1250, 0.7972, 0.7167, 0.6621, 0.5593, 0.6076, 0.3516, 0.5592
+INFO:root:Running epoch 24
+INFO:root:	Batch: 1/346 done
+INFO:root:	Batch: 70/346 done
+INFO:root:	Batch: 139/346 done
+INFO:root:	Batch: 208/346 done
+INFO:root:	Batch: 277/346 done
+INFO:root:	Batch: 346/346 done
+INFO:result:24, 1.1226, 0.7988, 0.7183, 0.6716, 0.5616, 0.5999, 0.3457, 0.5451
+INFO:root:Running epoch 25
+INFO:root:	Batch: 1/346 done
+INFO:root:	Batch: 70/346 done
+INFO:root:	Batch: 139/346 done
+INFO:root:	Batch: 208/346 done
+INFO:root:	Batch: 277/346 done
+INFO:root:	Batch: 346/346 done
+INFO:result:25, 1.1202, 0.7991, 0.7178, 0.6623, 0.5611, 0.5909, 0.3458, 0.5446
+INFO:root:Running epoch 26
+INFO:root:	Batch: 1/346 done
+INFO:root:	Batch: 70/346 done
+INFO:root:	Batch: 139/346 done
+INFO:root:	Batch: 208/346 done
+INFO:root:	Batch: 277/346 done
+INFO:root:	Batch: 346/346 done
+INFO:result:26, 1.1179, 0.7993, 0.7178, 0.6738, 0.5643, 0.5838, 0.3402, 0.5466
+INFO:root:Running epoch 27
+INFO:root:	Batch: 1/346 done
+INFO:root:	Batch: 70/346 done
+INFO:root:	Batch: 139/346 done
+INFO:root:	Batch: 208/346 done
+INFO:root:	Batch: 277/346 done
+INFO:root:	Batch: 346/346 done
+INFO:result:27, 1.1156, 0.8024, 0.7201, 0.6697, 0.5702, 0.5906, 0.3463, 0.5402
+INFO:root:Running epoch 28
+INFO:root:	Batch: 1/346 done
+INFO:root:	Batch: 70/346 done
+INFO:root:	Batch: 139/346 done
+INFO:root:	Batch: 208/346 done
+INFO:root:	Batch: 277/346 done
+INFO:root:	Batch: 346/346 done
+INFO:result:28, 1.1135, 0.8023, 0.7221, 0.6678, 0.5737, 0.6010, 0.3479, 0.5510
+INFO:root:Running epoch 29
+INFO:root:	Batch: 1/346 done
+INFO:root:	Batch: 70/346 done
+INFO:root:	Batch: 139/346 done
+INFO:root:	Batch: 208/346 done
+INFO:root:	Batch: 277/346 done
+INFO:root:	Batch: 346/346 done
+INFO:result:29, 1.1115, 0.8040, 0.7225, 0.6641, 0.5696, 0.5795, 0.3350, 0.5297
+INFO:root:Running epoch 30
+INFO:root:	Batch: 1/346 done
+INFO:root:	Batch: 70/346 done
+INFO:root:	Batch: 139/346 done
+INFO:root:	Batch: 208/346 done
+INFO:root:	Batch: 277/346 done
+INFO:root:	Batch: 346/346 done
+INFO:result:30, 1.1096, 0.8042, 0.7228, 0.6798, 0.5783, 0.5784, 0.3457, 0.5331
+INFO:root:Running epoch 31
+INFO:root:	Batch: 1/346 done
+INFO:root:	Batch: 70/346 done
+INFO:root:	Batch: 139/346 done
+INFO:root:	Batch: 208/346 done
+INFO:root:	Batch: 277/346 done
+INFO:root:	Batch: 346/346 done
+INFO:result:31, 1.1077, 0.8035, 0.7164, 0.6758, 0.5885, 0.6043, 0.3770, 0.5542
+INFO:root:Running epoch 32
+INFO:root:	Batch: 1/346 done
+INFO:root:	Batch: 70/346 done
+INFO:root:	Batch: 139/346 done
+INFO:root:	Batch: 208/346 done
+INFO:root:	Batch: 277/346 done
+INFO:root:	Batch: 346/346 done
+INFO:result:32, 1.1060, 0.8035, 0.7205, 0.6649, 0.5944, 0.5811, 0.3853, 0.5361
+INFO:root:Running epoch 33
+INFO:root:	Batch: 1/346 done
+INFO:root:	Batch: 70/346 done
+INFO:root:	Batch: 139/346 done
+INFO:root:	Batch: 208/346 done
+INFO:root:	Batch: 277/346 done
+INFO:root:	Batch: 346/346 done
+INFO:result:33, 1.1043, 0.8062, 0.7236, 0.6699, 0.5978, 0.5870, 0.3871, 0.5448
+INFO:root:Running epoch 34
+INFO:root:	Batch: 1/346 done
+INFO:root:	Batch: 70/346 done
+INFO:root:	Batch: 139/346 done
+INFO:root:	Batch: 208/346 done
+INFO:root:	Batch: 277/346 done
+INFO:root:	Batch: 346/346 done
+INFO:result:34, 1.1028, 0.8041, 0.7234, 0.6689, 0.5988, 0.5991, 0.3918, 0.5449
+INFO:root:Running epoch 35
+INFO:root:	Batch: 1/346 done
+INFO:root:	Batch: 70/346 done
+INFO:root:	Batch: 139/346 done
+INFO:root:	Batch: 208/346 done
+INFO:root:	Batch: 277/346 done
+INFO:root:	Batch: 346/346 done
+INFO:result:35, 1.1013, 0.8048, 0.7244, 0.6789, 0.6042, 0.6073, 0.3940, 0.5527
+INFO:root:early stop triggered, break
+INFO:root:best epoch: 1, best test ap: 0.6123
+INFO:root:saving the last model
+INFO:root:model saved
+INFO:root:commencing final evaluation and test
+INFO:root:evaluating user 264
+INFO:root:evaluating user 74
+INFO:root:evaluating user 216
+INFO:root:evaluating user 2072
+INFO:root:evaluating user 3860
+INFO:root:evaluating user 1169
+INFO:root:evaluating user 1993
+INFO:root:evaluating user 2370
+INFO:root:evaluating user 1370
+INFO:root:evaluating user 1852
+INFO:root:evaluating user 4742
+INFO:root:evaluating user 3016
+INFO:root:evaluating user 1979
+INFO:root:evaluating user 1938
+INFO:root:evaluating user 3211
+INFO:root:evaluating user 885
+INFO:root:evaluating user 1059
+INFO:root:evaluating user 885
+INFO:root:evaluating user 2633
+INFO:root:evaluating user 703
+INFO:root:evaluating user 199
+INFO:root:evaluating user 1861
+INFO:root:evaluating user 1948
+INFO:root:evaluating user 1948
+INFO:root:evaluating user 63
+INFO:root:evaluating user 1948
+INFO:root:evaluating user 951
+INFO:root:evaluating user 1948
+INFO:root:evaluating user 2110
+INFO:root:evaluating user 1886
+INFO:root:evaluating user 1886
+INFO:root:evaluating user 773
+INFO:root:evaluating user 992
+INFO:root:evaluating user 1512
+INFO:root:evaluating user 1395
+INFO:root:evaluating user 1712
+INFO:root:evaluating user 1979
+INFO:root:evaluating user 950
+INFO:root:evaluating user 1795
+INFO:root:evaluating user 87
+INFO:root:evaluating user 1072
+INFO:root:evaluating user 594
+INFO:root:evaluating user 78
+INFO:root:evaluating user 216
+INFO:root:evaluating user 1059
+INFO:root:evaluating user 216
+INFO:root:evaluating user 2856
+INFO:root:evaluating user 1488
+INFO:root:evaluating user 2192
+INFO:root:evaluating user 1999
+INFO:root:evaluating user 2052
+INFO:root:evaluating user 67
+INFO:root:evaluating user 2052
+INFO:root:evaluating user 2126
+INFO:root:evaluating user 1169
+INFO:root:evaluating user 1570
+INFO:root:evaluating user 1568
+INFO:root:evaluating user 3942
+INFO:root:evaluating user 502
+INFO:root:evaluating user 87
+INFO:root:evaluating user 216
+INFO:root:evaluating user 1110
+INFO:root:evaluating user 1529
+INFO:root:evaluating user 12
+INFO:root:evaluating user 1721
+INFO:root:evaluating user 92
+INFO:root:evaluating user 951
+INFO:root:evaluating user 951
+INFO:root:evaluating user 221
+INFO:root:evaluating user 3943
+INFO:root:evaluating user 812
+INFO:root:evaluating user 951
+INFO:root:evaluating user 3060
+INFO:root:evaluating user 1999
+INFO:root:evaluating user 2054
+INFO:root:evaluating user 695
+INFO:root:evaluating user 2230
+INFO:root:evaluating user 864
+INFO:root:evaluating user 864
+INFO:root:evaluating user 78
+INFO:root:evaluating user 864
+INFO:root:evaluating user 1076
+INFO:root:evaluating user 864
+INFO:root:evaluating user 1072
+INFO:root:evaluating user 1117
+INFO:root:evaluating user 3060
+INFO:root:evaluating user 1572
+INFO:root:evaluating user 2006
+INFO:root:evaluating user 221
+INFO:root:evaluating user 87
+INFO:root:evaluating user 1619
+INFO:root:evaluating user 1619
+INFO:root:evaluating user 1619
+INFO:root:evaluating user 1619
+INFO:root:evaluating user 1619
+INFO:root:evaluating user 3249
+INFO:root:evaluating user 951
+INFO:root:evaluating user 2110
+INFO:root:evaluating user 53
+INFO:root:evaluating user 767
+INFO:root:evaluating user 864
+INFO:root:evaluating user 864
+INFO:root:evaluating user 954
+INFO:root:evaluating user 1395
+INFO:root:evaluating user 951
+INFO:root:evaluating user 951
+INFO:root:evaluating user 2175
+INFO:root:evaluating user 2175
+INFO:root:evaluating user 3057
+INFO:root:evaluating user 3057
+INFO:root:evaluating user 3057
+INFO:root:evaluating user 3057
+INFO:root:evaluating user 4289
+INFO:root:evaluating user 1059
+INFO:root:evaluating user 87
+INFO:root:evaluating user 87
+INFO:root:evaluating user 53
+INFO:root:evaluating user 53
+INFO:root:evaluating user 913
+INFO:root:evaluating user 2192
+INFO:root:evaluating user 1483
+INFO:root:evaluating user 737
+INFO:root:evaluating user 3218
+INFO:root:evaluating user 951
+INFO:root:evaluating user 67
+INFO:root:evaluating user 864
+INFO:root:evaluating user 874
+INFO:root:evaluating user 3234
+INFO:root:evaluating user 3234
+INFO:root:evaluating user 2158
+INFO:root:evaluating user 1987
+INFO:root:evaluating user 2072
+INFO:root:evaluating user 1987
+INFO:root:evaluating user 2356
+INFO:root:evaluating user 463
+INFO:root:evaluating user 1999
+INFO:root:evaluating user 951
+INFO:root:evaluating user 4142
+INFO:root:evaluating user 1331
+INFO:root:evaluating user 1483
+INFO:root:evaluating user 972
+INFO:root:evaluating user 87
+INFO:root:evaluating user 862
+INFO:root:evaluating user 5141
+INFO:root:evaluating user 874
+INFO:root:evaluating user 87
+INFO:root:evaluating user 615
+INFO:root:evaluating user 1795
+INFO:root:evaluating user 1795
+INFO:root:evaluating user 3232
+INFO:root:evaluating user 874
+INFO:root:evaluating user 74
+INFO:root:evaluating user 491
+INFO:root:evaluating user 203
+INFO:root:evaluating user 2181
+INFO:root:evaluating user 261
+INFO:root:evaluating user 615
+INFO:root:evaluating user 2356
+INFO:root:evaluating user 216
+INFO:root:evaluating user 78
+INFO:root:evaluating user 2250
+INFO:root:evaluating user 1703
+INFO:root:evaluating user 216
+INFO:root:evaluating user 199
+INFO:root:evaluating user 53
+INFO:root:evaluating user 78
+INFO:root:evaluating user 87
+INFO:root:evaluating user 67
+INFO:root:evaluating user 1353
+INFO:root:evaluating user 193
+INFO:root:evaluating user 2691
+INFO:root:evaluating user 1072
+INFO:root:evaluating user 333
+INFO:root:evaluating user 87
+INFO:root:evaluating user 2629
+INFO:root:evaluating user 882
+INFO:root:evaluating user 78
+INFO:root:evaluating user 491
+INFO:root:evaluating user 87
+INFO:root:evaluating user 840
+INFO:root:evaluating user 87
+INFO:root:evaluating user 232
+INFO:root:evaluating user 216
+INFO:root:evaluating user 1852
+INFO:root:evaluating user 1059
+INFO:root:evaluating user 78
+INFO:root:evaluating user 1076
+INFO:root:evaluating user 261
+INFO:root:evaluating user 1263
+INFO:root:evaluating user 265
+INFO:root:evaluating user 3232
+INFO:root:evaluating user 1072
+INFO:root:evaluating user 2550
+INFO:root:evaluating user 1483
+INFO:root:evaluating user 862
+INFO:root:evaluating user 67
+INFO:root:evaluating user 4847
+INFO:root:evaluating user 67
+INFO:root:evaluating user 3939
+INFO:root:evaluating user 98
+INFO:root:evaluating user 723
+INFO:root:evaluating user 1999
+INFO:root:evaluating user 78
+INFO:root:evaluating user 98
+INFO:root:evaluating user 723
+INFO:root:evaluating user 1347
+INFO:root:evaluating user 491
+INFO:root:evaluating user 1711
+INFO:root:evaluating user 3484
+INFO:root:evaluating user 2382
+INFO:root:evaluating user 3939
+INFO:root:evaluating user 180
+INFO:root:evaluating user 98
+INFO:root:evaluating user 1059
+INFO:root:evaluating user 2251
+INFO:root:evaluating user 4345
+INFO:root:evaluating user 87
+INFO:root:evaluating user 2790
+INFO:root:evaluating user 3901
+INFO:root:evaluating user 265
+INFO:root:evaluating user 98
+INFO:root:evaluating user 98
+INFO:root:evaluating user 1733
+INFO:root:evaluating user 45
+INFO:root:evaluating user 45
+INFO:root:evaluating user 87
+INFO:root:evaluating user 98
+INFO:root:evaluating user 98
+INFO:root:evaluating user 1938
+INFO:root:evaluating user 218
+INFO:root:evaluating user 216
+INFO:root:evaluating user 737
+INFO:root:evaluating user 3280
+INFO:root:evaluating user 3430
+INFO:root:evaluating user 98
+INFO:root:evaluating user 885
+INFO:root:evaluating user 4103
+INFO:root:evaluating user 4664
+INFO:root:evaluating user 2070
+INFO:root:evaluating user 2012
+INFO:root:evaluating user 98
+INFO:root:evaluating user 929
+INFO:root:evaluating user 419
+INFO:root:evaluating user 73
+INFO:root:evaluating user 1072
+INFO:root:evaluating user 1072
+INFO:root:evaluating user 830
+INFO:root:evaluating user 71
+INFO:root:evaluating user 1059
+INFO:root:evaluating user 1311
+INFO:root:evaluating user 1886
+INFO:root:evaluating user 216
+INFO:root:evaluating user 245
+INFO:root:evaluating user 74
+INFO:root:evaluating user 71
+INFO:root:evaluating user 71
+INFO:root:evaluating user 71
+INFO:root:evaluating user 2072
+INFO:root:evaluating user 2469
+INFO:root:evaluating user 87
+INFO:root:evaluating user 3657
+INFO:root:evaluating user 937
+INFO:root:evaluating user 221
+INFO:root:evaluating user 86
+INFO:root:evaluating user 862
+INFO:root:evaluating user 2543
+INFO:root:evaluating user 76
+INFO:root:evaluating user 75
+INFO:root:evaluating user 115
+INFO:root:evaluating user 216
+INFO:root:evaluating user 885
+INFO:root:evaluating user 2773
+INFO:root:evaluating user 74
+INFO:root:evaluating user 216
+INFO:root:evaluating user 216
+INFO:root:evaluating user 67
+INFO:root:evaluating user 947
+INFO:root:evaluating user 233
+INFO:root:evaluating user 1322
+INFO:root:evaluating user 1322
+INFO:root:evaluating user 2262
+INFO:root:evaluating user 705
+INFO:root:evaluating user 954
+INFO:root:evaluating user 937
+INFO:root:evaluating user 1110
+INFO:root:evaluating user 1072
+INFO:root:evaluating user 2096
+INFO:root:evaluating user 937
+INFO:root:evaluating user 1774
+INFO:root:evaluating user 2175
+INFO:root:evaluating user 216
+INFO:root:evaluating user 3624
+INFO:root:evaluating user 2175
+INFO:root:evaluating user 833
+INFO:root:evaluating user 633
+INFO:root:evaluating user 82
+INFO:root:evaluating user 209
+INFO:root:evaluating user 2001
+INFO:root:evaluating user 615
+INFO:root:evaluating user 78
+INFO:root:evaluating user 2583
+INFO:root:evaluating user 1596
+INFO:root:evaluating user 3208
+INFO:root:evaluating user 3197
+INFO:root:evaluating user 74
+INFO:root:evaluating user 1649
+INFO:root:evaluating user 913
+INFO:root:evaluating user 1072
+INFO:root:evaluating user 221
+INFO:root:evaluating user 4345
+INFO:root:evaluating user 4345
+INFO:root:evaluating user 87
+INFO:root:evaluating user 1627
+INFO:root:evaluating user 1938
+INFO:root:evaluating user 2250
+INFO:root:evaluating user 1464
+INFO:root:evaluating user 1483
+INFO:root:evaluating user 2079
+INFO:root:evaluating user 87
+INFO:root:evaluating user 1695
+INFO:root:evaluating user 2462
+INFO:root:evaluating user 988
+INFO:root:evaluating user 913
+INFO:root:evaluating user 3507
+INFO:root:evaluating user 2194
+INFO:root:evaluating user 87
+INFO:root:evaluating user 2079
+INFO:root:evaluating user 1730
+INFO:root:evaluating user 1886
+INFO:root:evaluating user 2346
+INFO:root:evaluating user 3487
+INFO:root:evaluating user 87
+INFO:root:evaluating user 3487
+INFO:root:evaluating user 71
+INFO:root:evaluating user 3487
+INFO:root:evaluating user 3487
+INFO:root:evaluating user 895
+INFO:root:evaluating user 1072
+INFO:root:evaluating user 71
+INFO:root:evaluating user 947
+INFO:root:evaluating user 1999
+INFO:root:evaluating user 1483
+INFO:root:evaluating user 232
+INFO:root:evaluating user 183
+INFO:root:evaluating user 2509
+INFO:root:evaluating user 791
+INFO:root:evaluating user 3833
+INFO:root:evaluating user 1698
+INFO:root:evaluating user 1839
+INFO:root:evaluating user 1072
+INFO:root:evaluating user 2462
+INFO:root:evaluating user 2262
+INFO:root:evaluating user 769
+INFO:root:evaluating user 2462
+INFO:root:evaluating user 2462
+INFO:root:evaluating user 626
+INFO:root:evaluating user 1395
+INFO:root:evaluating user 2128
+INFO:root:evaluating user 2262
+INFO:root:evaluating user 841
+INFO:root:evaluating user 1395
+INFO:root:evaluating user 3106
+INFO:root:evaluating user 951
+INFO:root:evaluating user 38
+INFO:root:evaluating user 1110
+INFO:root:evaluating user 841
+INFO:root:evaluating user 841
+INFO:root:evaluating user 1703
+INFO:root:evaluating user 841
+INFO:root:evaluating user 769
+INFO:root:evaluating user 2617
+INFO:root:evaluating user 841
+INFO:root:evaluating user 75
+INFO:root:evaluating user 841
+INFO:root:evaluating user 1633
+INFO:root:evaluating user 1414
+INFO:root:evaluating user 71
+INFO:root:evaluating user 71
+INFO:root:evaluating user 71
+INFO:root:evaluating user 2262
+INFO:root:evaluating user 3197
+INFO:root:evaluating user 2998
+INFO:root:evaluating user 71
+INFO:root:evaluating user 3060
+INFO:root:evaluating user 78
+INFO:root:evaluating user 1999
+INFO:root:evaluating user 2036
+INFO:root:evaluating user 1059
+INFO:root:evaluating user 166
+INFO:root:evaluating user 1059
+INFO:root:evaluating user 505
+INFO:root:evaluating user 3141
+INFO:root:evaluating user 275
+INFO:root:evaluating user 841
+INFO:root:evaluating user 38
+INFO:root:evaluating user 2120
+INFO:root:evaluating user 1613
+INFO:root:evaluating user 2296
+INFO:root:evaluating user 1613
+INFO:root:evaluating user 166
+INFO:root:evaluating user 1613
+INFO:root:evaluating user 1613
+INFO:root:evaluating user 1613
+INFO:root:evaluating user 1613
+INFO:root:evaluating user 1613
+INFO:root:evaluating user 1613
+INFO:root:evaluating user 1613
+INFO:root:evaluating user 1613
+INFO:root:evaluating user 1613
+INFO:root:evaluating user 1613
+INFO:root:evaluating user 1613
+INFO:root:evaluating user 1613
+INFO:root:evaluating user 738
+INFO:root:evaluating user 1613
+INFO:root:evaluating user 53
+INFO:root:evaluating user 1613
+INFO:root:evaluating user 1613
+INFO:root:evaluating user 1613
+INFO:root:evaluating user 1839
+INFO:root:evaluating user 1999
+INFO:root:evaluating user 78
+INFO:root:evaluating user 951
+INFO:root:evaluating user 1613
+INFO:root:evaluating user 221
+INFO:root:evaluating user 1999
+INFO:root:evaluating user 261
+INFO:root:evaluating user 67
+INFO:root:evaluating user 2550
+INFO:root:evaluating user 2848
+INFO:root:evaluating user 2550
+INFO:root:evaluating user 1999
+INFO:root:evaluating user 2576
+INFO:root:evaluating user 824
+INFO:root:evaluating user 1613
+INFO:root:evaluating user 1613
+INFO:root:evaluating user 1613
+INFO:root:evaluating user 143
+INFO:root:evaluating user 1072
+INFO:root:evaluating user 261
+INFO:root:evaluating user 1072
+INFO:root:evaluating user 1613
+INFO:root:evaluating user 2258
+INFO:root:evaluating user 1613
+INFO:root:evaluating user 1613
+INFO:root:evaluating user 1072
+INFO:root:evaluating user 347
+INFO:root:evaluating user 216
+INFO:root:evaluating user 1613
+INFO:root:evaluating user 1613
+INFO:root:evaluating user 1613
+INFO:root:evaluating user 1613
+INFO:root:evaluating user 1613
+INFO:root:evaluating user 1613
+INFO:root:evaluating user 216
+INFO:root:evaluating user 1955
+INFO:root:evaluating user 42
+INFO:root:evaluating user 203
+INFO:root:evaluating user 1795
+INFO:root:evaluating user 3901
+INFO:root:evaluating user 2258
+INFO:root:evaluating user 2258
+INFO:root:evaluating user 4937
+INFO:root:evaluating user 824
+INFO:root:evaluating user 78
+INFO:root:evaluating user 1929
+INFO:root:evaluating user 2509
+INFO:root:evaluating user 723
+INFO:root:evaluating user 199
+INFO:root:evaluating user 4090
+INFO:root:evaluating user 63
+INFO:root:evaluating user 2126
+INFO:root:evaluating user 63
+INFO:root:evaluating user 63
+INFO:root:evaluating user 63
+INFO:root:evaluating user 63
+INFO:root:evaluating user 2875
+INFO:root:evaluating user 2550
+INFO:root:evaluating user 321
+INFO:root:evaluating user 1999
+INFO:root:evaluating user 87
+INFO:root:evaluating user 78
+INFO:root:evaluating user 2790
+INFO:root:evaluating user 4090
+INFO:root:evaluating user 190
+INFO:root:evaluating user 190
+INFO:root:evaluating user 190
+INFO:root:evaluating user 871
+INFO:root:evaluating user 265
+INFO:root:evaluating user 87
+INFO:root:evaluating user 87
+INFO:root:evaluating user 2075
+INFO:root:evaluating user 204
+INFO:root:evaluating user 1488
+INFO:root:evaluating user 954
+INFO:root:evaluating user 951
+INFO:root:evaluating user 2546
+INFO:root:evaluating user 2126
+INFO:root:evaluating user 1169
+INFO:root:evaluating user 1001
+INFO:root:evaluating user 1001
+INFO:root:evaluating user 2126
+INFO:root:evaluating user 2126
+INFO:root:evaluating user 1087
+INFO:root:evaluating user 175
+INFO:root:evaluating user 3539
+INFO:root:evaluating user 1653
+INFO:root:evaluating user 325
+INFO:root:evaluating user 1999
+INFO:root:evaluating user 1372
+INFO:root:evaluating user 3057
+INFO:root:evaluating user 92
+INFO:root:evaluating user 3611
+INFO:root:evaluating user 391
+INFO:root:evaluating user 391
+INFO:root:evaluating user 2115
+INFO:root:evaluating user 391
+INFO:root:evaluating user 281
+INFO:root:evaluating user 2244
+INFO:root:evaluating user 1311
+INFO:root:evaluating user 2213
+INFO:root:evaluating user 1849
+INFO:root:evaluating user 1979
+INFO:root:evaluating user 502
+INFO:root:evaluating user 281
+INFO:root:evaluating user 2930
+INFO:root:evaluating user 2137
+INFO:root:evaluating user 78
+INFO:root:evaluating user 230
+INFO:root:evaluating user 3817
+INFO:root:evaluating user 1370
+INFO:root:evaluating user 1072
+INFO:root:evaluating user 2590
+INFO:root:evaluating user 78
+INFO:root:evaluating user 1414
+INFO:root:evaluating user 78
+INFO:root:evaluating user 1414
+INFO:root:evaluating user 1414
+INFO:root:evaluating user 1628
+INFO:root:evaluating user 1322
+INFO:root:evaluating user 1322
+INFO:root:evaluating user 3539
+INFO:root:evaluating user 216
+INFO:root:evaluating user 1374
+INFO:root:evaluating user 261
+INFO:root:evaluating user 2374
+INFO:root:evaluating user 4598
+INFO:root:evaluating user 1072
+INFO:root:evaluating user 841
+INFO:root:evaluating user 2126
+INFO:root:evaluating user 1613
+INFO:root:evaluating user 1613
+INFO:root:evaluating user 1613
+INFO:root:evaluating user 1613
+INFO:root:evaluating user 1613
+INFO:root:evaluating user 1613
+INFO:root:evaluating user 1613
+INFO:root:evaluating user 5334
+INFO:root:evaluating user 782
+INFO:root:evaluating user 295
+INFO:root:evaluating user 723
+INFO:root:evaluating user 1483
+INFO:root:evaluating user 1613
+INFO:root:evaluating user 1820
+INFO:root:evaluating user 1565
+INFO:root:evaluating user 1703
+INFO:root:evaluating user 92
+INFO:root:evaluating user 226
+INFO:root:evaluating user 1613
+INFO:root:evaluating user 1613
+INFO:root:evaluating user 1613
+INFO:root:evaluating user 3068
+INFO:root:evaluating user 1613
+INFO:root:evaluating user 92
+INFO:root:evaluating user 1617
+INFO:root:evaluating user 1483
+INFO:root:evaluating user 1979
+INFO:root:evaluating user 1072
+INFO:root:evaluating user 1613
+INFO:root:evaluating user 1613
+INFO:root:evaluating user 92
+INFO:root:evaluating user 216
+INFO:root:evaluating user 87
+INFO:root:evaluating user 1999
+INFO:root:evaluating user 87
+INFO:root:evaluating user 319
+INFO:root:evaluating user 216
+INFO:root:evaluating user 1613
+INFO:root:evaluating user 216
+INFO:root:evaluating user 1568
+INFO:root:evaluating user 3930
+INFO:root:evaluating user 262
+INFO:root:evaluating user 1613
+INFO:root:evaluating user 3555
+INFO:root:evaluating user 1613
+INFO:root:evaluating user 1999
+INFO:root:evaluating user 1771
+INFO:root:evaluating user 1613
+INFO:root:evaluating user 871
+INFO:root:evaluating user 601
+INFO:root:evaluating user 1771
+INFO:root:evaluating user 951
+INFO:root:evaluating user 1322
+INFO:root:evaluating user 1771
+INFO:root:evaluating user 1613
+INFO:root:evaluating user 1322
+INFO:root:evaluating user 1322
+INFO:root:evaluating user 1613
+INFO:root:evaluating user 2045
+INFO:root:evaluating user 1565
+INFO:root:evaluating user 262
+INFO:root:evaluating user 1893
+INFO:root:evaluating user 940
+INFO:root:evaluating user 1613
+INFO:root:evaluating user 1613
+INFO:root:evaluating user 824
+INFO:root:evaluating user 63
+INFO:root:evaluating user 2897
+INFO:root:evaluating user 63
+INFO:root:evaluating user 2691
+INFO:root:evaluating user 1999
+INFO:root:evaluating user 824
+INFO:root:evaluating user 87
+INFO:root:evaluating user 1568
+INFO:root:evaluating user 824
+INFO:root:evaluating user 115
+INFO:root:evaluating user 261
+INFO:root:evaluating user 2115
+INFO:root:evaluating user 1955
+INFO:root:evaluating user 1001
+INFO:root:evaluating user 1585
+INFO:root:evaluating user 262
+INFO:root:evaluating user 2994
+INFO:root:evaluating user 2629
+INFO:root:evaluating user 3142
+INFO:root:evaluating user 78
+INFO:root:evaluating user 78
+INFO:root:evaluating user 1954
+INFO:root:evaluating user 1125
+INFO:root:evaluating user 1613
+INFO:root:evaluating user 1613
+INFO:root:evaluating user 3055
+INFO:root:evaluating user 3827
+INFO:root:evaluating user 3827
+INFO:root:evaluating user 3827
+INFO:root:evaluating user 3827
+INFO:root:evaluating user 882
+INFO:root:evaluating user 936
+INFO:root:evaluating user 1483
+INFO:root:evaluating user 2994
+INFO:root:evaluating user 1795
+INFO:root:evaluating user 673
+INFO:root:evaluating user 2382
+INFO:root:evaluating user 1889
+INFO:root:evaluating user 2570
+INFO:root:evaluating user 2570
+INFO:root:evaluating user 192
+INFO:root:evaluating user 319
+INFO:root:evaluating user 143
+INFO:root:evaluating user 1322
+INFO:root:evaluating user 2550
+INFO:root:evaluating user 261
+INFO:root:evaluating user 3219
+INFO:root:evaluating user 3271
+INFO:root:evaluating user 3271
+INFO:root:evaluating user 2617
+INFO:root:evaluating user 1370
+INFO:root:evaluating user 1696
+INFO:root:evaluating user 19
+INFO:root:evaluating user 1895
+INFO:root:evaluating user 1895
+INFO:root:evaluating user 990
+INFO:root:evaluating user 1775
+INFO:root:evaluating user 2115
+INFO:root:evaluating user 40
+INFO:root:evaluating user 1414
+INFO:root:evaluating user 53
+INFO:root:evaluating user 261
+INFO:root:evaluating user 1696
+INFO:root:evaluating user 19
+INFO:root:evaluating user 5180
+INFO:root:evaluating user 1076
+INFO:root:evaluating user 2483
+INFO:root:evaluating user 261
+INFO:root:evaluating user 2045
+INFO:root:evaluating user 74
+INFO:root:evaluating user 1337
+INFO:root:evaluating user 261
+INFO:root:evaluating user 3236
+INFO:root:evaluating user 2128
+INFO:root:evaluating user 74
+INFO:root:evaluating user 2128
+INFO:root:evaluating user 261
+INFO:root:evaluating user 1420
+INFO:root:evaluating user 615
+INFO:root:evaluating user 1585
+INFO:root:evaluating user 951
+INFO:root:evaluating user 78
+INFO:root:evaluating user 281
+INFO:root:evaluating user 897
+INFO:root:evaluating user 4103
+INFO:root:evaluating user 951
+INFO:root:evaluating user 78
+INFO:root:evaluating user 2052
+INFO:root:evaluating user 281
+INFO:root:evaluating user 773
+INFO:root:evaluating user 595
+INFO:root:evaluating user 295
+INFO:root:evaluating user 261
+INFO:root:evaluating user 840
+INFO:root:evaluating user 192
+INFO:root:evaluating user 216
+INFO:root:evaluating user 2075
+INFO:root:evaluating user 1711
+INFO:root:evaluating user 2723
+INFO:root:evaluating user 3055
+INFO:root:evaluating user 491
+INFO:root:evaluating user 1337
+INFO:root:evaluating user 1072
+INFO:root:evaluating user 673
+INFO:root:evaluating user 2382
+INFO:root:evaluating user 915
+INFO:root:evaluating user 1703
+INFO:root:evaluating user 1929
+INFO:root:evaluating user 262
+INFO:root:evaluating user 1999
+INFO:root:evaluating user 1470
+INFO:root:evaluating user 992
+INFO:root:evaluating user 166
+INFO:root:evaluating user 74
+INFO:root:evaluating user 87
+INFO:root:evaluating user 2580
+INFO:root:evaluating user 582
+INFO:root:evaluating user 507
+INFO:root:evaluating user 385
+INFO:root:evaluating user 1263
+INFO:root:evaluating user 1619
+INFO:root:evaluating user 262
+INFO:root:evaluating user 3208
+INFO:root:evaluating user 192
+INFO:root:evaluating user 262
+INFO:root:evaluating user 1999
+INFO:root:evaluating user 1999
+INFO:root:evaluating user 1353
+INFO:root:evaluating user 1999
+INFO:root:evaluating user 1353
+INFO:root:evaluating user 81
+INFO:root:evaluating user 3044
+INFO:root:evaluating user 833
+INFO:root:evaluating user 1585
+INFO:root:evaluating user 488
+INFO:root:evaluating user 2193
+INFO:root:evaluating user 4742
+INFO:root:evaluating user 738
+INFO:root:evaluating user 1072
+INFO:root:evaluating user 216
+INFO:root:evaluating user 2556
+INFO:root:evaluating user 2062
+INFO:root:evaluating user 2262
+INFO:root:evaluating user 261
+INFO:root:evaluating user 2370
+INFO:root:evaluating user 738
+INFO:root:evaluating user 2110
+INFO:root:evaluating user 507
+INFO:root:evaluating user 221
+INFO:root:evaluating user 882
+INFO:root:evaluating user 92
+INFO:root:evaluating user 1264
+INFO:root:evaluating user 87
+INFO:root:evaluating user 87
+INFO:root:evaluating user 262
+INFO:root:evaluating user 63
+INFO:root:evaluating user 862
+INFO:root:evaluating user 1264
+INFO:root:evaluating user 1264
+INFO:root:evaluating user 2052
+INFO:root:evaluating user 319
+INFO:root:evaluating user 3197
+INFO:root:evaluating user 74
+INFO:root:evaluating user 950
+INFO:root:evaluating user 261
+INFO:root:evaluating user 818
+INFO:root:evaluating user 871
+INFO:root:evaluating user 131
+INFO:root:evaluating user 261
+INFO:root:evaluating user 78
+INFO:root:evaluating user 3133
+INFO:root:evaluating user 1954
+INFO:root:evaluating user 194
+INFO:root:evaluating user 194
+INFO:root:evaluating user 885
+INFO:root:evaluating user 194
+INFO:root:evaluating user 194
+INFO:root:evaluating user 1308
+INFO:root:evaluating user 261
+INFO:root:evaluating user 864
+INFO:root:evaluating user 1072
+INFO:root:evaluating user 194
+INFO:root:evaluating user 3833
+INFO:root:evaluating user 3765
+INFO:root:evaluating user 4667
+INFO:root:evaluating user 3141
+INFO:root:evaluating user 1110
+INFO:root:evaluating user 1223
+INFO:root:evaluating user 1820
+INFO:root:evaluating user 951
+INFO:root:evaluating user 1072
+INFO:root:evaluating user 275
+INFO:root:evaluating user 1929
+INFO:root:evaluating user 940
+INFO:root:evaluating user 38
+INFO:root:evaluating user 987
+INFO:root:evaluating user 1337
+INFO:root:evaluating user 1327
+INFO:root:evaluating user 1999
+INFO:root:evaluating user 1054
+INFO:root:evaluating user 1752
+INFO:root:evaluating user 1987
+INFO:root:evaluating user 1963
+INFO:root:evaluating user 3269
+INFO:root:evaluating user 3572
+INFO:root:evaluating user 3572
+INFO:root:evaluating user 1752
+INFO:root:evaluating user 3572
+INFO:root:evaluating user 2550
+INFO:root:evaluating user 1954
+INFO:root:evaluating user 491
+INFO:root:evaluating user 3574
+INFO:root:evaluating user 53
+INFO:root:evaluating user 78
+INFO:root:evaluating user 2903
+INFO:root:evaluating user 1114
+INFO:root:evaluating user 1795
+INFO:root:evaluating user 2759
+INFO:root:evaluating user 507
+INFO:root:evaluating user 194
+INFO:root:evaluating user 945
+INFO:root:evaluating user 1323
+INFO:root:evaluating user 874
+INFO:root:evaluating user 1906
+INFO:root:evaluating user 1906
+INFO:root:evaluating user 1906
+INFO:root:evaluating user 1906
+INFO:root:evaluating user 2682
+INFO:root:evaluating user 2682
+INFO:root:evaluating user 2682
+INFO:root:evaluating user 96
+INFO:root:evaluating user 871
+INFO:root:evaluating user 864
+INFO:root:evaluating user 3498
+INFO:root:evaluating user 2001
+INFO:root:evaluating user 925
+INFO:root:evaluating user 925
+INFO:root:evaluating user 87
+INFO:root:evaluating user 87
+INFO:root:evaluating user 74
+INFO:root:evaluating user 1263
+INFO:root:evaluating user 1263
+INFO:root:evaluating user 3930
+INFO:root:evaluating user 87
+INFO:root:evaluating user 3555
+INFO:root:evaluating user 3572
+INFO:root:evaluating user 1483
+INFO:root:evaluating user 3097
+INFO:root:evaluating user 3097
+INFO:root:evaluating user 3097
+INFO:root:evaluating user 2621
+INFO:root:evaluating user 115
+INFO:root:evaluating user 2126
+INFO:root:evaluating user 261
+INFO:root:evaluating user 2094
+INFO:root:evaluating user 3555
+INFO:root:evaluating user 62
+INFO:root:evaluating user 925
+INFO:root:evaluating user 216
+INFO:root:evaluating user 882
+INFO:root:evaluating user 848
+INFO:root:evaluating user 3555
+INFO:root:evaluating user 954
+INFO:root:evaluating user 2903
+INFO:root:evaluating user 723
+INFO:root:evaluating user 4169
+INFO:root:evaluating user 692
+INFO:root:evaluating user 610
+INFO:root:evaluating user 1310
+INFO:root:evaluating user 216
+INFO:root:evaluating user 1775
+INFO:root:evaluating user 216
+INFO:root:evaluating user 945
+INFO:root:evaluating user 3395
+INFO:root:evaluating user 3395
+INFO:root:evaluating user 2994
+INFO:root:evaluating user 1311
+INFO:root:evaluating user 4194
+INFO:root:evaluating user 2250
+INFO:root:evaluating user 1855
+INFO:root:evaluating user 1076
+INFO:root:evaluating user 265
+INFO:root:evaluating user 1169
+INFO:root:evaluating user 951
+INFO:root:evaluating user 951
+INFO:root:evaluating user 945
+INFO:root:evaluating user 192
+INFO:root:evaluating user 2993
+INFO:root:evaluating user 240
+INFO:root:evaluating user 1619
+INFO:root:evaluating user 1337
+INFO:root:evaluating user 1310
+INFO:root:evaluating user 1347
+INFO:root:evaluating user 109
+INFO:root:evaluating user 1572
+INFO:root:evaluating user 87
+INFO:root:evaluating user 3612
+INFO:root:evaluating user 950
+INFO:root:evaluating user 1929
+INFO:root:evaluating user 833
+INFO:root:evaluating user 582
+INFO:root:evaluating user 4194
+INFO:root:evaluating user 818
+INFO:root:evaluating user 897
+INFO:root:evaluating user 3611
+INFO:root:evaluating user 1886
+INFO:root:evaluating user 951
+INFO:root:evaluating user 1886
+INFO:root:evaluating user 1795
+INFO:root:evaluating user 1795
+INFO:root:evaluating user 1353
+INFO:root:evaluating user 2617
+INFO:root:evaluating user 2617
+INFO:root:evaluating user 3799
+INFO:root:evaluating user 295
+INFO:root:evaluating user 1698
+INFO:root:evaluating user 897
+INFO:root:evaluating user 3109
+INFO:root:evaluating user 3219
+INFO:root:evaluating user 3245
+INFO:root:evaluating user 240
+INFO:root:evaluating user 3234
+INFO:root:evaluating user 4696
+INFO:root:evaluating user 53
+INFO:root:evaluating user 2739
+INFO:root:evaluating user 2629
+INFO:root:evaluating user 87
+INFO:root:evaluating user 1938
+INFO:root:evaluating user 1311
+INFO:root:evaluating user 897
+INFO:root:evaluating user 3339
+INFO:root:evaluating user 3339
+INFO:root:evaluating user 2911
+INFO:root:evaluating user 1698
+INFO:root:evaluating user 2790
+INFO:root:evaluating user 1223
+INFO:root:evaluating user 87
+INFO:root:evaluating user 87
+INFO:root:evaluating user 265
+INFO:root:evaluating user 87
+INFO:root:evaluating user 216
+INFO:root:evaluating user 2903
+INFO:root:evaluating user 1963
+INFO:root:evaluating user 3536
+INFO:root:evaluating user 5124
+INFO:root:evaluating user 87
+INFO:root:evaluating user 2993
+INFO:root:evaluating user 240
+INFO:root:evaluating user 87
+INFO:root:evaluating user 818
+INFO:root:evaluating user 4024
+INFO:root:evaluating user 265
+INFO:root:evaluating user 74
+INFO:root:evaluating user 610
+INFO:root:evaluating user 1311
+INFO:root:evaluating user 594
+INFO:root:evaluating user 2089
+INFO:root:evaluating user 63
+INFO:root:evaluating user 1323
+INFO:root:evaluating user 3507
+INFO:root:evaluating user 1965
+INFO:root:evaluating user 216
+INFO:root:evaluating user 198
+INFO:root:evaluating user 3611
+INFO:root:evaluating user 3611
+INFO:root:evaluating user 2261
+INFO:root:evaluating user 1668
+INFO:root:evaluating user 1668
+INFO:root:evaluating user 3000
+INFO:root:test: {'precision': array([0.00060976, 0.00035569]), 'recall': array([0.00609756, 0.00711382]), 'ndcg': array([0.00253007, 0.00276521]), 'hit_ratio': array([0.00609756, 0.00711382]), 'auc': 0.5548810975609763, 'mrr': 0.001621431627850113}
+Traceback (most recent call last):
+  File "/mnt/slurm_home/rahul/FYP_siddhant/TGSRec/run_TGREC.py", line 313, in <module>
+    with open(test_pred_output_file, 'w') as f:
+FileNotFoundError: [Errno 2] No such file or directory: './rank_results/Digital_Music/Digital_Music_TARGON_20240322-084421_test.json'
