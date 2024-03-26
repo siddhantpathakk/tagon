@@ -2,6 +2,10 @@ import numpy as np
 import pandas as pd
 
 class RandEdgeSampler(object):
+    """
+    Class for sampling edges from the graph.
+    Will be used for train, validation and test set.
+    """
     def __init__(self, src_list, dst_list, ts_list):
         self.edges = {}
         for u, i in zip(src_list, dst_list):
@@ -82,6 +86,9 @@ class RandEdgeSampler(object):
 
 
 class NeighborFinder:
+    """
+    Class for finding the neighbors of a node in the graph.
+    """
     def __init__(self, adj_list, uniform=False):
         """
         Params
@@ -232,4 +239,3 @@ class NeighborFinder:
             eidx_records.append(out_ngh_eidx_batch)
             t_records.append(out_ngh_t_batch)
         return node_records, eidx_records, t_records
-

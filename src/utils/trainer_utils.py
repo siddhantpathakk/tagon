@@ -15,6 +15,12 @@ def get_new_history():
             'train_f1':[],
             'train_auc':[],
             
+            'val_loss': [],
+            'val_acc':[],
+            'val_ap':[],
+            'val_f1':[],
+            'val_auc':[],
+            
             'val_recall10': [],
             'val_recall20': [],
             'val_mrr': [],
@@ -31,7 +37,6 @@ def bpr_loss(pos_score, neg_score):
 
 
 def build_model(args, data, logger):
-    # seed_everything(self.args.seed)
     device = torch.device('cuda:{}'.format(args.gpu))
     
     n_nodes = data.max_idx
@@ -44,6 +49,11 @@ def build_model(args, data, logger):
                     drop_out=args.drop_out, 
                     node_dim=args.node_dim, time_dim=args.time_dim)
     
+    if args.pretrain:
+        checkpoint = torch.load(args.pretrain)
+        model.load_state_dict(checkpoint['model_state_dict'], strict=False)
+        logger.info(f"Pretrained model loaded from {args.pretrain}")
+    
     optimizer = torch.optim.Adam(model.parameters(), 
                                         lr=args.lr,
                                         weight_decay=args.l2,)
@@ -55,48 +65,39 @@ def build_model(args, data, logger):
     warmup_period = 15
     warmup_scheduler = warmup.LinearWarmup(optimizer, warmup_period=warmup_period)
     
-    # logger.info("Model built successfully")
-    # logger.info(model)
-    # logger.info(f'Optimizer: {optimizer.__class__.__name__} with lr: {args.lr} and l2: {args.l2}')
-    # logger.info(f'Learning rate scheduler: {lr_scheduler.__class__.__name__}')
-    # logger.info(f'Warmup scheduler: {warmup_scheduler.__class__.__name__}')
-    # logger.info(f'Device: {device}')
-    # logger.info(f'Number of nodes: {n_nodes}')
-    # logger.info(f'Number of edges: {n_edges}')
+    logger.info("Model built successfully")
+    logger.info(model)
+    logger.info(f'Number of parameters: {sum(p.numel() for p in model.parameters())}'
+                f' (trainable: {sum(p.numel() for p in model.parameters() if p.requires_grad)})')
+    logger.info(f'Loss function: BPR + L2 regularization')
+    logger.info(f'Optimizer: {optimizer.__class__.__name__} with lr: {args.lr} and l2: {args.l2}')
+    logger.info(f'Learning rate scheduler: {lr_scheduler.__class__.__name__}')
+    logger.info(f'Warmup scheduler: {warmup_scheduler.__class__.__name__} with warmup period: {warmup_period}')
+    logger.info(f'Device: {device}')
+    logger.info(f'Number of nodes: {n_nodes}')
+    logger.info(f'Number of edges: {n_edges}')
     
     return model, optimizer, lr_scheduler, warmup_scheduler, device
     
 
-class EarlyStopMonitor(object):
-    def __init__(self, max_round=10, higher_better=True, tolerance=1e-3):
-        self.max_round = max_round
-        self.num_round = 0
-
-        self.epoch_count = 0
-        self.best_epoch = 0
-
-        self.last_best = None
-        self.higher_better = higher_better
-        self.tolerance = tolerance
+class EarlyStopper:
+    def __init__(self, patience=1, min_delta=0):
+        logger = logging.getLogger()
+        self.patience = patience
+        self.min_delta = min_delta
+        self.counter = 0
+        self.min_validation_loss = float('inf')
         
-        self.logger = logging.getLogger(__name__)
-        
-        # self.logger.info(f"Early stopping monitor: max_round={max_round}, higher_better={higher_better}, tolerance={tolerance}")
+        logger.info(f'Early stopping callback initialized with patience: {patience} and min_delta: {min_delta}')
 
-
-    def early_stop_check(self, curr_val):
-        self.epoch_count += 1
-        
-        if not self.higher_better:
-            curr_val *= -1
-        if self.last_best is None:
-            self.last_best = curr_val
-        elif (curr_val - self.last_best) / np.abs(self.last_best) > self.tolerance:
-            self.last_best = curr_val
-            self.num_round = 0
-            self.best_epoch = self.epoch_count
-        else:
-            self.num_round += 1
-        return self.num_round >= self.max_round
+    def early_stop(self, validation_loss):
+        if validation_loss < self.min_validation_loss:
+            self.min_validation_loss = validation_loss
+            self.counter = 0
+        elif validation_loss > (self.min_validation_loss + self.min_delta):
+            self.counter += 1
+            if self.counter >= self.patience:
+                return True
+        return False
     
     

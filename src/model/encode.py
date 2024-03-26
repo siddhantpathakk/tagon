@@ -3,9 +3,12 @@ import torch
 import torch.nn as nn
 
 class TimeEncode(torch.nn.Module):
+    """
+    TimeEncode is a class for time encoding the input sequence.
+    Based on claims from Bochner's theorem, the time encoding is a linear combination of sinusoids.
+    """
     def __init__(self, expand_dim, factor=5):
         super(TimeEncode, self).__init__()
-        
         time_dim = expand_dim
         self.factor = factor
         self.basis_freq = torch.nn.Parameter((torch.from_numpy(1 / 10 ** np.linspace(0, 9, time_dim))).float())
@@ -25,7 +28,13 @@ class TimeEncode(torch.nn.Module):
 
         return harmonic 
 
+
 class DisentangleTimeEncode(torch.nn.Module):
+    """
+    An improved version of TimeEncode, DisentangleTimeEncode is a class for time encoding the input sequence.
+    Based on claims from Bochner's theorem, the time encoding is a linear combination of sinusoids.
+    The difference is that DisentangleTimeEncode is able to disentangle the time encoding into multiple components.
+    """
     def __init__(self, components, expand_dim, factor=5):
         super(DisentangleTimeEncode, self).__init__()
         
@@ -55,8 +64,10 @@ class DisentangleTimeEncode(torch.nn.Module):
         return harmonic
     
     
-    
 class PosEncode(torch.nn.Module):
+    """
+    Standard positional encoding using sinusoids, as proposed in "Attention is All You Need".
+    """
     def __init__(self, expand_dim, seq_len):
         super().__init__()
         
@@ -71,6 +82,9 @@ class PosEncode(torch.nn.Module):
     
 
 class EmptyEncode(torch.nn.Module):
+    """
+    Dummy encoding for the input sequence.
+    """
     def __init__(self, expand_dim):
         super().__init__()
         self.expand_dim = expand_dim

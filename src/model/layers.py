@@ -4,6 +4,10 @@ import numpy as np
 
 
 class MergeLayer(torch.nn.Module):
+    """
+    MergeLayer is a class for merging and concatenating the input features.
+    LayerNorm is currently not used.
+    """
     def __init__(self, dim1, dim2, dim3, dim4):
         super().__init__()
         # self.layer_norm = torch.nn.LayerNorm(dim1 + dim2)
@@ -22,6 +26,10 @@ class MergeLayer(torch.nn.Module):
     
 
 class MergeSelfAttnLayer(nn.Module):
+    """
+    MergeSelfAttnLayer is a class for merging and concatenating the input features.
+    Meant for self-attention module.
+    """
     def __init__(self, feat_dim, time_dim, batch_size, n):
         super(MergeSelfAttnLayer, self).__init__()
         self.fc1 = nn.Linear(feat_dim+time_dim+feat_dim, batch_size * n)
@@ -39,6 +47,9 @@ class MergeSelfAttnLayer(nn.Module):
     
 
 class LSTMPool(torch.nn.Module):
+    """
+    LSTMPool is a class for LSTM pooling for aggregating the input features.
+    """
     def __init__(self, feat_dim, time_dim):
         super(LSTMPool, self).__init__()
         self.feat_dim = feat_dim
@@ -68,6 +79,9 @@ class LSTMPool(torch.nn.Module):
     
 
 class MeanPool(torch.nn.Module):
+    """
+    MeanPool is a class for mean pooling for aggregating the input features.
+    """
     def __init__(self, feat_dim):
         super(MeanPool, self).__init__()
         self.feat_dim = feat_dim
@@ -85,8 +99,9 @@ class MeanPool(torch.nn.Module):
         
 
 class ScaledDotProductAttention(torch.nn.Module):
-    ''' Scaled Dot-Product Attention '''
-
+    """
+    ScaledDotProductAttention is a class for scaled dot-product attention.
+    """
     def __init__(self, temperature, attn_dropout=0.1):
         super().__init__()
         self.temperature = temperature
@@ -94,7 +109,6 @@ class ScaledDotProductAttention(torch.nn.Module):
         self.softmax = torch.nn.Softmax(dim=2)
 
     def forward(self, q, k, v, mask=None):
-
         attn = torch.bmm(q, k.transpose(1, 2))
         attn = attn / self.temperature
 
@@ -110,8 +124,9 @@ class ScaledDotProductAttention(torch.nn.Module):
 
 
 class MultiHeadAttention(nn.Module):
-    ''' Multi-Head Attention module '''
-
+    """
+    MultiHeadAttention is a class for multi-head attention.
+    """
     def __init__(self, n_head, d_model, d_k, d_v, dropout=0.1):
         super().__init__()
 
@@ -137,7 +152,6 @@ class MultiHeadAttention(nn.Module):
 
 
     def forward(self, q, k, v, mask=None):
-
         d_k, d_v, n_head = self.d_k, self.d_v, self.n_head
 
         sz_b, len_q, _ = q.size()
@@ -169,7 +183,10 @@ class MultiHeadAttention(nn.Module):
     
 
 class MapBasedMultiHeadAttention(nn.Module):
-    ''' Multi-Head Attention module '''
+    """
+    MapBasedMultiHeadAttention is a class for map-based multi-head attention.
+    It is different from MHA in that it uses a map to calculate the attention weights.
+    """
 
     def __init__(self, n_head, d_model, d_k, d_v, dropout=0.1):
         super().__init__()
@@ -209,9 +226,7 @@ class MapBasedMultiHeadAttention(nn.Module):
         residual = q
 
         q = self.wq_node_transform(q).view(sz_b, len_q, n_head, d_k)
-        
         k = self.wk_node_transform(k).view(sz_b, len_k, n_head, d_k)
-        
         v = self.wv_node_transform(v).view(sz_b, len_v, n_head, d_v)
 
         q = q.permute(2, 0, 1, 3).contiguous().view(-1, len_q, d_k) # (n*b) x lq x dk
@@ -227,7 +242,6 @@ class MapBasedMultiHeadAttention(nn.Module):
         mask = mask.repeat(n_head, 1, 1) # (n*b) x lq x lk
         
         ## Map based Attention
-        #output, attn = self.attention(q, k, v, mask=mask)
         q_k = torch.cat([q, k], dim=3) # [(n*b), lq, lk, dk * 2]
         attn = self.weight_map(q_k).squeeze(dim=3) # [(n*b), lq, lk]
         

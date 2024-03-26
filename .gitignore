@@ -18,12 +18,9 @@ ipython_config.py
 
 .pytype/
 cython_debug/
-train_sh_scripts
-slurm_logs
-# saved_models
-saved_checkpoints
-rank_results
 
 
-datasets
+sh_scripts
 processed
+log
+datasets
