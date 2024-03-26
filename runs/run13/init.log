@@ -1,0 +1,23 @@
+INFO:	main:	2024-03-11 13:23:17,289:	Outputs will be saved in: runs/run13
+INFO:	main:	2024-03-11 13:23:17,289:	Using seed: 42
+INFO:	main:	2024-03-11 13:23:17,290:	Using device: cuda
+INFO:	main:	2024-03-11 13:23:17,290:	Commencing data collection for ml-1m
+INFO:	dataloader:	2024-03-11 13:23:19,295:	Data preprocessing completed
+INFO:	dataloader:	2024-03-11 13:23:19,295:	uid2locid_time: 4297 
+INFO:	dataloader:	2024-03-11 13:23:19,295:	locid2detail: 3112 
+INFO:	dataloader:	2024-03-11 13:23:19,295:	node_num: 7414 
+INFO:	dataloader:	2024-03-11 13:23:19,295:	relation_num: 4 
+INFO:	dataloader:	2024-03-11 13:23:19,295:	user_num: 4297 
+INFO:	dataloader:	2024-03-11 13:23:19,295:	train_num: 34376 
+INFO:	dataloader:	2024-03-11 13:23:19,295:	test_num: 4297 
+INFO:	dataloader:	2024-03-11 13:23:19,295:	train_set: (34376, 13) 
+INFO:	dataloader:	2024-03-11 13:23:19,295:	test_set: (4297, 10) 
+INFO:	dataloader:	2024-03-11 13:23:19,295:	uid_list_: 4297 
+INFO:	dataloader:	2024-03-11 13:23:19,296:	u2v: 4297 
+INFO:	dataloader:	2024-03-11 13:23:19,296:	u2vc: 4297 
+INFO:	dataloader:	2024-03-11 13:23:19,296:	v2u: 3112 
+INFO:	dataloader:	2024-03-11 13:23:19,296:	v2vc: 3112 
+INFO:	main:	2024-03-11 13:23:19,440:	Commencing training for 500 epochs.
+INFO:	main:	2024-03-11 15:11:53,754:	Completed training for 500 epochs
+INFO:	main:	2024-03-11 15:11:53,794:	Model saved at runs/run13/model.pth
+INFO:	main:	2024-03-11 15:11:53,794:	Completed run 13

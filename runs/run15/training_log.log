@@ -1,0 +1,43 @@
+2024-03-11 17:08:10,577:	Model:	CAGSRec with 3 variant
+2024-03-11 17:08:10,577:	CAGSRec(
+  (long_term_gnn): LongTermGNN(
+    (conv_modulelist): ModuleList(
+      (0-2): 3 x ImprovedGNNunit(32, 32, num_relations=4)
+    )
+  )
+  (short_term_gnn): ShortTermGNN(
+    (conv_modulelist): ModuleList(
+      (0-2): 3 x ImprovedGNNunit(32, 32, num_relations=4)
+    )
+  )
+  (temporal_seq_attn_layer): TemporalSequentialAttentionLayer_v2(
+    (drop_layer): Dropout(p=0.1, inplace=False)
+    (feedforward): Sequential(
+      (0): PointWiseFeedForward(
+        (conv1): Conv1d(192, 192, kernel_size=(1,), stride=(1,))
+        (dropout1): Dropout(p=0.1, inplace=False)
+        (relu): ReLU()
+        (conv2): Conv1d(192, 192, kernel_size=(1,), stride=(1,))
+        (dropout2): Dropout(p=0.1, inplace=False)
+      )
+      (1): LayerNorm((192,), eps=1e-08, elementwise_affine=True)
+    )
+  )
+  (predict_emb_w): Embedding(3112, 192, padding_idx=0)
+  (predict_emb_b): Embedding(3112, 1, padding_idx=0)
+  (node_embeddings): Embedding(7414, 32, padding_idx=0)
+)
+2024-03-11 17:08:10,578:	Optimizer:	Adam with initial lr = 0.001, l2 = 0.0001
+2024-03-11 17:08:10,578:	LR Scheduler:	LinearLR
+2024-03-11 17:09:09,667:	Epoch 1/500:	Loss: 1.2486	P@10: 0.0512	R@10: 0.0256	MAP@10: 0.0160	NDCG@10: 0.0461	HR@10: 0.3244
+2024-03-11 17:10:08,010:	Epoch 2/500:	Loss: 1.4584	P@10: 0.0208	R@10: 0.0104	MAP@10: 0.0061	NDCG@10: 0.0199	HR@10: 0.1727
+2024-03-11 17:11:06,257:	Epoch 3/500:	Loss: 1.7463	P@10: 0.0351	R@10: 0.0176	MAP@10: 0.0124	NDCG@10: 0.0361	HR@10: 0.2586
+2024-03-11 17:12:04,681:	Epoch 4/500:	Loss: 1.5218	P@10: 0.0259	R@10: 0.0130	MAP@10: 0.0088	NDCG@10: 0.0267	HR@10: 0.2136
+2024-03-11 17:13:03,172:	Epoch 5/500:	Loss: 1.7754	P@10: 0.0510	R@10: 0.0255	MAP@10: 0.0140	NDCG@10: 0.0434	HR@10: 0.3181
+2024-03-11 17:14:02,127:	Epoch 6/500:	Loss: 1.6873	P@10: 0.0465	R@10: 0.0232	MAP@10: 0.0164	NDCG@10: 0.0472	HR@10: 0.3291
+2024-03-11 17:15:50,331:	Epoch 7/500:	Loss: 1.6206	P@10: 0.0321	R@10: 0.0160	MAP@10: 0.0128	NDCG@10: 0.0347	HR@10: 0.2181
+2024-03-11 17:16:48,273:	Epoch 8/500:	Loss: 1.5844	P@10: 0.0409	R@10: 0.0205	MAP@10: 0.0156	NDCG@10: 0.0408	HR@10: 0.2299
+2024-03-11 17:17:46,404:	Epoch 9/500:	Loss: 1.5117	P@10: 0.0516	R@10: 0.0258	MAP@10: 0.0177	NDCG@10: 0.0475	HR@10: 0.2886
+2024-03-11 17:18:44,535:	Epoch 10/500:	Loss: 1.4732	P@10: 0.0475	R@10: 0.0238	MAP@10: 0.0140	NDCG@10: 0.0426	HR@10: 0.3202
+2024-03-11 17:19:42,517:	Epoch 11/500:	Loss: 1.3824	P@10: 0.0187	R@10: 0.0093	MAP@10: 0.0056	NDCG@10: 0.0177	HR@10: 0.1482
+2024-03-11 17:19:42,517:	Early stopping at epoch 11
