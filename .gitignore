@@ -28,3 +28,8 @@ err
 jupyter
 tmp
 ml-1m
+src
+*.out
+*.err
+*.txt
+# runs
