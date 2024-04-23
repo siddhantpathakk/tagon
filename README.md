@@ -71,5 +71,5 @@ Start the training (modify the parameters in the shell script accordingly)
 
 ## Feedback
 
-If you have any feedback, please reach out to us at fake@fake.com
+If you have any feedback, please reach out to us at siddhant005@e.ntu.edu.sg
 
