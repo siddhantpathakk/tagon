@@ -1,15 +1,13 @@
 import logging
 import torch
 torch.cuda.empty_cache()
-
-import pandas as pd
 import numpy as np
 
 from sklearn.metrics import average_precision_score, f1_score, roc_auc_score
 from sklearn.preprocessing import MinMaxScaler
 
 import multiprocessing
-import metrics
+import evaluation.metrics as metrics
 import math
 
 Ks = [10, 20]
@@ -199,44 +197,6 @@ def eval_users(tgrec, src, dst, ts, train_src, train_dst, args):
                 batch_src_l = []
                 batch_test_items = []
                 batch_ts = []
-                #batch_len = []
-            #pred_prob = pred_scores.sigmoid()
-
-            #neg_label = np.zeros(len(neg_items))
-
-            #preds = pred_scores.cpu().numpy()
-            #preds_list.append(preds)
-            #preds_len_preditems.append(len(neg_items)+1)
-            #scaler = MinMaxScaler()
-            #posterior = np.transpose(scaler.fit_transform(np.transpose([preds])))[0]
-            #posterior = -np.sort(-posterior)
-            ##posterior = pred_prob.cpu().numpy()
-            #labels = np.concatenate([pos_label, neg_label])
-
-            #r = []
-            #rankeditems = list((-preds).argsort())
-            #for i in rankeditems:
-            #    if i == 0:
-            #        r.append(1)
-            #    else:
-            #        r.append(0)
-
-            #precision, recall, ndcg, hit_ratio = [], [], [], []
-            #for K in Ks:
-            #    precision.append(metrics.precision_at_k(r, K))
-            #    recall.append(metrics.recall_at_k(r, K, len(pos_items)))
-            #    ndcg.append(metrics.ndcg_at_k(r, K))
-            #    hit_ratio.append(metrics.hit_at_k(r, K))
-            #auc = metrics.auc(ground_truth=r, prediction=posterior)
-            #mrr = metrics.mrr(r)
-
-            #result['precision'] += precision
-            #result['recall'] += recall
-            #result['ndcg'] += ndcg
-            #result['hit_ratio'] += hit_ratio
-            #result['auc'] += auc
-            #result['mrr'] += mrr
-
 
     result['precision'] /= num_interactions
     result['recall'] /= num_interactions

@@ -118,8 +118,8 @@ def run(data_name):
     
 
 
-# run('Tools_and_Home_Improvement')
-#run('Office_Products')
+run('Tools_and_Home_Improvement')
+run('Office_Products')
 run('Toys_and_Games')
-# run('Digital_Music')
-# run('Baby')
+run('Digital_Music')
+run('Baby')

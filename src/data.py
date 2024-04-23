@@ -2,10 +2,16 @@ import pandas as pd
 import numpy as np
 import logging
 from graph import NeighborFinder
-from utils import RandEdgeSampler
+from utils.utils import RandEdgeSampler
 
 class Data():
+    """
+    Data class for loading and splitting the dataset.
 
+    Parameters:
+        DATASET: str, the dataset name.
+        args: argparse.ArgumentParser, the argument parser.        
+    """
     def __init__(self, DATASET, args):
         ### Load data and train val test split
         g_df = pd.read_csv('./processed/ml_{}.csv'.format(DATASET))
@@ -13,6 +19,13 @@ class Data():
 
 
     def split_data(self, g_df, args):
+        """
+        Split the data into training, validation, and test sets.
+
+        Parameters:
+            g_df: pd.DataFrame, the data frame of the dataset.
+            args: argparse.ArgumentParser, the argument parser.
+        """
         logger = logging.getLogger()
                 
         val_time, test_time = list(np.quantile(g_df.ts, [0.80, 0.90]))

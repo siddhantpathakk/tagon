@@ -3,15 +3,14 @@ torch.cuda.empty_cache()
 import numpy as np
 
 class NeighborFinder:
+    """
+    NeighborFinder is a class for finding the temporal neighbors of a node.
+
+    Parameters:
+        adj_list: List[List[int]], the adjacency list of the graph.
+        uniform: bool, whether to sample the neighbors uniformly.
+    """
     def __init__(self, adj_list, uniform=False):
-        """
-        Params
-        ------
-        node_idx_l: List[int]
-        node_ts_l: List[int]
-        off_set_l: List[int], such that node_idx_l[off_set_l[i]:off_set_l[i + 1]] = adjacent_list[i]
-        """ 
-       
         node_idx_l, node_ts_l, edge_idx_l, off_set_l = self.init_off_set(adj_list)
         self.node_idx_l = node_idx_l
         self.node_ts_l = node_ts_l
@@ -23,10 +22,8 @@ class NeighborFinder:
         
     def init_off_set(self, adj_list):
         """
-        Params
-        ------
-        adj_list: List[List[int]]
-        
+        Parameters:
+            adj_list: List[List[int]]
         """
         n_idx_l = []
         n_ts_l = []
@@ -89,11 +86,12 @@ class NeighborFinder:
 
     def get_temporal_neighbor(self, src_idx_l, cut_time_l, num_neighbors=20):
         """
-        Params
-        ------
-        src_idx_l: List[int]
-        cut_time_l: List[float],
-        num_neighbors: int
+        Get the temporal neighbors of the source nodes.
+
+        Parameters:
+            src_idx_l: List[int], the source node list.
+            cut_time_l: List[float], the cut time list.
+            num_neighbors: int, the number of neighbors to sample.
         """
         assert(len(src_idx_l) == len(cut_time_l))
         
@@ -133,8 +131,7 @@ class NeighborFinder:
         return out_ngh_node_batch, out_ngh_eidx_batch, out_ngh_t_batch
 
     def find_k_hop(self, k, src_idx_l, cut_time_l, num_neighbors=20):
-        """Sampling the k-hop sub graph
-        """
+        """Sampling the k-hop sub graph"""
         x, y, z = self.get_temporal_neighbor(src_idx_l, cut_time_l, num_neighbors)
         node_records = [x]
         eidx_records = [y]
@@ -153,6 +150,3 @@ class NeighborFinder:
             eidx_records.append(out_ngh_eidx_batch)
             t_records.append(out_ngh_t_batch)
         return node_records, eidx_records, t_records
-
-            
-
