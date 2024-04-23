@@ -3,6 +3,14 @@ import pandas as pd
 
 ### Utility function and class
 class EarlyStopMonitor(object):
+    """
+    Early stopping monitor.
+
+    Parameters:
+        max_round: int, the maximum round to wait before early stop.
+        higher_better: bool, whether the larger metric value is better.
+        tolerance: float, the threshold that the metric should be larger than the best to reset the round.
+    """
     def __init__(self, max_round=3, higher_better=True, tolerance=1e-3):
         self.max_round = max_round
         self.num_round = 0
@@ -29,7 +37,15 @@ class EarlyStopMonitor(object):
             self.num_round += 1
         return self.num_round >= self.max_round
 
-class RandEdgeSampler(object):
+class RandEdgeSampler(object):  
+    """
+    Random edge sampling mechanism.
+
+    Parameters:
+        src_list: np.array, the source node list.
+        dst_list: np.array, the destination node list.
+        ts_list: np.array, the timestamp list.
+    """
     def __init__(self, src_list, dst_list, ts_list):
         self.edges = {}
         for u, i in zip(src_list, dst_list):
