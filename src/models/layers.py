@@ -1,5 +1,5 @@
 import torch
-torch.cuda.empty_cache()
+# torch.cuda.empty_cache()
 import torch.nn as nn
 
 class MergeLayer(torch.nn.Module):
