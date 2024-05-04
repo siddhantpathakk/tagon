@@ -1,4 +1,5 @@
 import logging
+import random
 import torch
 # torch.cuda.empty_cache()
 import numpy as np
@@ -80,8 +81,10 @@ def eval_users(tgrec, src, dst, ts, train_src, train_dst, args, user_id=None):
     
     cores = multiprocessing.cpu_count()
     userset = set(src)
-   
-   
+    print('num users: ', len(userset))
+    print(userset)
+    user_id = list(userset)[0]
+    print('evaluating user %d' % user_id)
     train_itemset = set(train_dst)
     pos_edges = {}
     for u, i, t in zip(src, dst, ts):
@@ -109,7 +112,6 @@ def eval_users(tgrec, src, dst, ts, train_src, train_dst, args, user_id=None):
     preds_num_candidates = []
 
     test_outputs = []
-    logger = logging.getLogger()
     num_interactions = 0
     num_test_instances = 0
     with torch.no_grad():
@@ -120,7 +122,9 @@ def eval_users(tgrec, src, dst, ts, train_src, train_dst, args, user_id=None):
         #batch_len = []
         batch_i = 0
         for u, i, t in zip(src, dst, ts):
-            logger.info('evaluating user %d' % u)
+            if user_id is not None and u != user_id:
+                continue
+            print('evaluating user %d' % u)
             num_test_instances += 1
             if u not in train_src or i not in train_itemset or u not in pos_edges:
                 continue
@@ -202,13 +206,13 @@ def eval_users(tgrec, src, dst, ts, train_src, train_dst, args, user_id=None):
                 batch_test_items = []
                 batch_ts = []
 
+    print('num_interactions: ', num_interactions)
     result['precision'] /= num_interactions
     result['recall'] /= num_interactions
     result['ndcg'] /= num_interactions
     result['hit_ratio'] /= num_interactions
     result['auc'] /= num_interactions
     result['mrr'] /= num_interactions
-    print('num_interactions: ', num_interactions)
 
     return result, test_outputs
 

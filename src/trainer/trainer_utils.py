@@ -10,7 +10,7 @@ def setup_model(data, args, n_nodes, GPU, NUM_LAYER, USE_TIME, AGG_METHOD, ATTN_
             seq_len=SEQ_LEN, n_head=NUM_HEADS, drop_out=DROP_OUT, node_dim=NODE_DIM, time_dim=TIME_DIM)
 
     if load_pretrain:
-        checkpoint = torch.load(load_pretrain)
+        checkpoint = torch.load(load_pretrain, map_location=device)
         model.load_state_dict(checkpoint['model_state_dict'])
 
     model = model.to(device)
@@ -18,9 +18,10 @@ def setup_model(data, args, n_nodes, GPU, NUM_LAYER, USE_TIME, AGG_METHOD, ATTN_
 
 def setup_optimizer(model, LEARNING_RATE, load_pretrain=None):
     optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE, weight_decay=0.001)
-
+    device = torch.device('cuda:0') if torch.cuda.is_available() else torch.device('cpu')
+    
     if load_pretrain:
-        checkpoint = torch.load(load_pretrain)
+        checkpoint = torch.load(load_pretrain, map_location=device)
         optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
         
     return optimizer

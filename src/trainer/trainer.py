@@ -1,4 +1,5 @@
 import math
+import random
 import numpy as np
 from sklearn.metrics import average_precision_score, f1_score, roc_auc_score
 from sklearn.preprocessing import MinMaxScaler
@@ -116,12 +117,13 @@ class Trainer:
             
         print('Training completed')
     
-    def test(self):
+    def test(self, user_id=None):
         self.model.ngh_finder = self.data.test_train_ngh_finder
         print('Commence final test phase')
-        valid_result, valid_pred_output = eval_users(self.model, self.data.val_src_l, self.data.val_dst_l, self.data.val_ts_l, self.data.train_src_l, self.data.train_dst_l, self.args)
+        valid_result, valid_pred_output = eval_users(self.model, self.data.test_src_l, self.data.test_dst_l, self.data.test_ts_l, self.data.train_src_l, self.data.train_dst_l, self.args, user_id=user_id)
         print("Final test phase completed")
         return valid_result, valid_pred_output
+
     
     def save_model(self, save_model_path, ckpt=None):
         model_name = self.args.data + '_TAGON.pt' if not ckpt else self.args.data + '-' + str(ckpt) + '_TAGON.pt'

@@ -32,8 +32,11 @@ if __name__ == '__main__':
     NODE_DIM = args.node_dim
     TIME_DIM = args.time_dim
     test_mode = True if args.test_mode else False
+    infer_mode = True if args.infer_mode else False
+    
     print('Please note that the test mode is set to True. This means that the model will not be trained, but only tested on the test set/user.') if test_mode else print('Testing mode is set to False. The model will be trained only.')
-
+    print('Please note that the inference mode is set to True. This means that the model will not be trained, but only used to infer the results.') if infer_mode else None
+    
     os.mkdir(RANK_RESULTS_DIR) if not os.path.isdir(RANK_RESULTS_DIR) else None
     os.mkdir(SAVE_MODEL_DIR(args)) if not os.path.isdir(SAVE_MODEL_DIR(args)) else None
 
@@ -51,12 +54,17 @@ if __name__ == '__main__':
     early_stopper = EarlyStopMonitor(max_round=5, higher_better=True)
     trainer = Trainer(data, model, optimizer, early_stopper, NUM_EPOCH, BATCH_SIZE, args)
     
-    if not test_mode:
-        trainer.train()
+    
+    trainer.train() if not test_mode and not infer_mode else None
     
     if test_mode:
         result, output = trainer.test()
         print(result)
         print(output)
+    
+    if infer_mode:
+        result, output = trainer.test(user_id=134)
+        print(result)
+        print(output)
         
-    trainer.save_model(SAVE_MODEL_DIR(args))
+    trainer.save_model(SAVE_MODEL_DIR(args)) if not test_mode and not infer_mode else None

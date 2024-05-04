@@ -15,6 +15,8 @@ class Data():
     def __init__(self, DATASET, args, user_id=None):
         ### Load data and train val test split
         g_df = pd.read_csv('/home/FYP/siddhant005/tagon/processed/ml_{}.csv'.format(DATASET))
+        self.g_df = g_df
+        self.args = args
         self.split_data(g_df, args, user_id)
 
 
@@ -31,8 +33,11 @@ class Data():
         
         if user_id is not None:
             g_df = g_df[g_df.u == user_id]
-               
-        val_time, test_time = list(np.quantile(g_df.ts, [0.80, 0.90]))
+            print(len(g_df), 'interactions for user', user_id)
+            val_time, test_time = list(np.quantile(g_df.ts, [0.00, 0.01]))
+            print(val_time, test_time)
+        else:  
+            val_time, test_time = list(np.quantile(g_df.ts, [0.80, 0.90]))
         
         src_l = g_df.u.values
         dst_l = g_df.i.values
@@ -118,20 +123,3 @@ class Data():
         self.train_rand_sampler = RandEdgeSampler(self.train_src_l, self.train_dst_l, self.train_ts_l)
         self.val_rand_sampler = RandEdgeSampler(src_l, dst_l, ts_l)
         self.test_rand_sampler = RandEdgeSampler(src_l, dst_l, ts_l)
-
-
-    def set_test_data_for_one_user(self, user_id):
-        """
-        Set the test data for one user.
-
-        Parameters:
-            user_id: int, the user ID.
-        """
-        self.test_src_l = self.test_src_l[self.test_src_l == user_id]
-        self.test_dst_l = self.test_dst_l[self.test_src_l == user_id]
-        self.test_ts_l = self.test_ts_l[self.test_src_l == user_id]
-        self.test_e_idx_l = self.test_e_idx_l[self.test_src_l == user_id]
-        self.test_label_l = self.test_label_l[self.test_src_l == user_id]
-
-        self.test_rand_sampler = RandEdgeSampler(self.test_src_l, self.test_dst_l, self.test_ts_l)
-        
