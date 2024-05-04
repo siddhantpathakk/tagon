@@ -9,6 +9,9 @@ from utils.parse import parse_training_args
 from utils.utils import EarlyStopMonitor, set_seed
 from utils.consts import *
 
+import warnings
+warnings.filterwarnings("ignore")
+
 if __name__ == '__main__':
 
     args = parse_training_args()

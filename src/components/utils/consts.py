@@ -6,4 +6,4 @@ RANK_RESULTS_DIR = f"./tmp/rank_results"
 # RANK_RESULTS_FILE = lambda args: f"{RANK_RESULTS_DIR}/{args.data}_TAGON_{datetime_str}"
 SAVE_MODEL_DIR = lambda args: f"./tmp/{args.data}/"
 
-pretrain_path = lambda args: f"./tmp/{args.data}/{args.data}_TAGON.pt"
+pretrain_path = lambda args: f"./ckpts/slab/saved_models/{args.data}/{args.data}_TARGON.pt"

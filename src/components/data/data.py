@@ -14,7 +14,7 @@ class Data():
     """
     def __init__(self, DATASET, args, user_id=None):
         ### Load data and train val test split
-        g_df = pd.read_csv('/home/FYP/siddhant005/tagon/processed/ml_{}.csv'.format(DATASET))
+        g_df = pd.read_csv('./processed/ml_{}.csv'.format(DATASET))
         self.g_df = g_df
         self.args = args
         self.split_data(g_df, args, user_id)

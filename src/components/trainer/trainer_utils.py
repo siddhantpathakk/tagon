@@ -5,6 +5,13 @@ from models.TAGON import TAGON
 def setup_model(data, args, n_nodes, GPU, NUM_LAYER, USE_TIME, AGG_METHOD, ATTN_MODE, SEQ_LEN, NUM_HEADS, DROP_OUT, NODE_DIM, TIME_DIM, load_pretrain=None):
     device = torch.device('cuda:{}'.format(GPU)) if torch.cuda.is_available() else torch.device('cpu')
     
+    # if macbook, use mps
+    # try:
+    #     device = torch.device('mps')
+    #     print('Using mps acceleration from Apple for model')
+    # except:
+    #     pass
+    
     model = TAGON(data.train_ngh_finder, n_nodes+1, args,
             num_layers=NUM_LAYER, use_time=USE_TIME, agg_method=AGG_METHOD, attn_mode=ATTN_MODE,
             seq_len=SEQ_LEN, n_head=NUM_HEADS, drop_out=DROP_OUT, node_dim=NODE_DIM, time_dim=TIME_DIM)
@@ -19,6 +26,12 @@ def setup_model(data, args, n_nodes, GPU, NUM_LAYER, USE_TIME, AGG_METHOD, ATTN_
 def setup_optimizer(model, LEARNING_RATE, load_pretrain=None):
     optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE, weight_decay=0.001)
     device = torch.device('cuda:0') if torch.cuda.is_available() else torch.device('cpu')
+    
+    # if macbook, use mps
+    # try:
+    #     device = torch.device('mps')
+    # except:
+    #     pass
     
     if load_pretrain:
         checkpoint = torch.load(load_pretrain, map_location=device)

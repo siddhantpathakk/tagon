@@ -199,6 +199,12 @@ class TAGON(torch.nn.Module):
         assert(curr_layers >= 0)
         
         device = torch.device('cuda:{}'.format(0)) if torch.cuda.is_available() else torch.device('cpu')
+        
+        #if macbook, use mps
+        # try:
+        #     device = torch.device('mps')
+        # except:
+        #     pass
     
         batch_size = len(src_idx_l)
         
