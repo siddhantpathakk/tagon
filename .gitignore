@@ -2,3 +2,13 @@
 raw
 log
 saved_models
+processed
+__pycache__
+slab
+*.sh
+*.err
+*.out
+new
+rank_results
+ckpts/
+tmp
