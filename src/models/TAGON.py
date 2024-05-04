@@ -198,7 +198,7 @@ class TAGON(torch.nn.Module):
         """
         assert(curr_layers >= 0)
         
-        device = torch.device('cuda:{}'.format(0))
+        device = torch.device('cuda:{}'.format(0)) if torch.cuda.is_available() else torch.device('cpu')
     
         batch_size = len(src_idx_l)
         
