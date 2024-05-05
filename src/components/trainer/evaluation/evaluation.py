@@ -82,9 +82,6 @@ def eval_users(tgrec, src, dst, ts, train_src, train_dst, args, user_id=None):
     cores = multiprocessing.cpu_count()
     userset = set(src)
     print('num users: ', len(userset))
-    print(userset)
-    user_id = list(userset)[0]
-    print('evaluating user %d' % user_id)
     train_itemset = set(train_dst)
     pos_edges = {}
     for u, i, t in zip(src, dst, ts):
