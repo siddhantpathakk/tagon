@@ -1,9 +1,7 @@
-import time
+SAVE_MODEL_DIR = lambda args, cwd: cwd + f"/tmp/{args.data}/"
 
-datetime_str = time.strftime("%Y%m%d-%H%M%S")
+pretrain_path = lambda args, cwd: cwd + f"/tmp/ckpts/slab/{args.data}/{args.data}_TARGON.pt"
+# pretrain_path = lambda args: f"./tmp/ckpts/scse_gpu/{args.data}/{args.data}_TAGON.pt"
 
-RANK_RESULTS_DIR = f"./tmp/rank_results"
-# RANK_RESULTS_FILE = lambda args: f"{RANK_RESULTS_DIR}/{args.data}_TAGON_{datetime_str}"
-SAVE_MODEL_DIR = lambda args: f"./tmp/{args.data}/"
-
-pretrain_path = lambda args: f"./ckpts/slab/saved_models/{args.data}/{args.data}_TARGON.pt"
+user_history_path = lambda args, cwd, userID: cwd + f"/tmp/{args.data}_UID{userID}_history.csv"
+infer_output_path = lambda args, cwd, userID: cwd + f"/tmp/{args.data}_UID{userID}_output.csv"
