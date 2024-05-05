@@ -11,6 +11,19 @@ def set_seed(seed):
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
 
+def make_pred_df(output):
+    """
+    Make prediction dataframe.
+
+    Parameters:
+        output: list[dict], the prediction output.
+
+    Returns:
+        df: pd.DataFrame, the prediction dataframe.
+    """
+    df = pd.DataFrame(output)
+    return df
+    
 class EarlyStopMonitor(object):
     """
     Early stopping monitor.
