@@ -123,3 +123,14 @@ class Data():
         self.train_rand_sampler = RandEdgeSampler(self.train_src_l, self.train_dst_l, self.train_ts_l)
         self.val_rand_sampler = RandEdgeSampler(src_l, dst_l, ts_l)
         self.test_rand_sampler = RandEdgeSampler(src_l, dst_l, ts_l)
+
+
+    def get_user_history(self, user_id):
+        """
+        Get the user history.
+
+        Parameters:
+            user_id: int, the user id.
+        """
+        user_history = self.g_df[self.g_df.u == user_id]
+        return user_history
