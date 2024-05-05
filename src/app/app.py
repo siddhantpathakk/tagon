@@ -21,7 +21,13 @@ def predict(uid):
 
 
 if __name__ == '__main__':
-    st.title('Demonstration for TAGON: Temporal Attention Graph Neural Networks for Sequential Recommendation')
+    st.set_page_config(page_title='TAGON', 
+                       page_icon='random', 
+                       layout='wide',
+                       menu_items={"Get Help": "https://www.github.com/siddhantpathakk/tagon"}
+                       )
+    
+    st.title('FYP Demonstration for TAGON: Temporal Attention Graph Neural Networks for Sequential Recommendation')
     
     user_id = st.text_input('User ID', '0')
     
@@ -37,7 +43,6 @@ if __name__ == '__main__':
     user_item_matrix = create_user_item_matrix(data)
     ctbg_graph = create_user_item_graph(user_item_matrix)
     # st.plotly_chart(ctbg_graph)
-
 
     # Add histogram data
     x1 = np.random.randn(200) - 2
@@ -59,6 +64,7 @@ if __name__ == '__main__':
     
     
     st.subheader('Predictions')
+    predictions = None
     
     if st.button('Predict'):
         predictions = predict(user_id)
