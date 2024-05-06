@@ -48,16 +48,16 @@ def eval_one_user(x):
         recall.append(recall_at_k(r, K, 1))
         ndcg.append(ndcg_at_k(r, K))
         hit_ratio.append(hit_at_k(r, K))
-    auc = auc(ground_truth=labels, prediction=posterior)
-    mrr = mrr(r)
+    auc_ = auc(ground_truth=labels, prediction=posterior)
+    mrr_ = mrr(r)
 
 
     result['precision'] += precision
     result['recall'] += recall
     result['ndcg'] += ndcg
     result['hit_ratio'] += hit_ratio
-    result['auc'] += auc
-    result['mrr'] += mrr
+    result['auc'] += auc_
+    result['mrr'] += mrr_
 
     return (result, rankeditems[:max(Ks)], uit, rec_items)
 
