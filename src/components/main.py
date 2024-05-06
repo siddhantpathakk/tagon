@@ -54,7 +54,7 @@ if __name__ == '__main__':
     print('User history','\n', user_history)
     user_history.to_csv(user_history_path(args, cwd, USER_ID), index=False)
     
-    pretrain = pretrain_path(args, cwd) if not test_mode else None
+    pretrain = pretrain_path_slab(args, cwd) if not test_mode else None
     
     model = setup_model(data, args, data.max_idx, GPU, NUM_LAYER, USE_TIME, AGG_METHOD, ATTN_MODE, SEQ_LEN, NUM_HEADS, DROP_OUT, NODE_DIM, TIME_DIM, 
                         load_pretrain=pretrain)
