@@ -4,7 +4,7 @@ import torch.nn as nn
 import logging
 import numpy as np
 
-from models.layers import MergeLayer, MergeSelfAttnLayer
+from src.components.models.layers import MergeLayer, MergeSelfAttnLayer
 
 class ScaledDotProductAttention(torch.nn.Module):
     ''' Scaled Dot-Product Attention module 

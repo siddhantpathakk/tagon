@@ -1,8 +1,8 @@
 import pandas as pd
 import numpy as np
 import logging
-from graph.graph import NeighborFinder
-from utils.utils import RandEdgeSampler
+from src.components.graph.graph import NeighborFinder
+from src.components.utils.utils import RandEdgeSampler
 
 class Data():
     """

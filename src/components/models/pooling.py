@@ -1,6 +1,6 @@
 import torch
 # torch.cuda.empty_cache()
-from models.layers import MergeLayer
+from src.components.models.layers import MergeLayer
 
 
 class LSTMPool(torch.nn.Module):

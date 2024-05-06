@@ -4,10 +4,10 @@ import torch.nn.functional as F
 import logging
 import numpy as np
 
-from models.encoders import DisentangleTimeEncode, EmptyEncode, PosEncode, TimeEncode
-from models.attention import AttnModel
-from models.layers import MergeLayer
-from models.pooling import LSTMPool, MeanPool
+from src.components.models.encoders import DisentangleTimeEncode, EmptyEncode, PosEncode, TimeEncode
+from src.components.models.attention import AttnModel
+from src.components.models.layers import MergeLayer
+from src.components.models.pooling import LSTMPool, MeanPool
 
 
 

@@ -1,5 +1,5 @@
 import torch
-from models.TAGON import TAGON
+from src.components.models.TAGON import TAGON
 
 
 def setup_model(data, args, n_nodes, GPU, NUM_LAYER, USE_TIME, AGG_METHOD, ATTN_MODE, SEQ_LEN, NUM_HEADS, DROP_OUT, NODE_DIM, TIME_DIM, load_pretrain=None):

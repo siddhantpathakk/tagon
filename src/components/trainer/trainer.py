@@ -1,11 +1,11 @@
 import math
-import random
 import numpy as np
 from sklearn.metrics import average_precision_score, f1_score, roc_auc_score
 from sklearn.preprocessing import MinMaxScaler
 import torch
-from trainer.evaluation.evaluation import eval_one_epoch, eval_users
-from trainer.trainer_utils import bpr_loss
+
+from src.components.trainer.trainer_utils import bpr_loss
+from src.components.trainer.evaluation.evaluate import eval_one_epoch, eval_users
 
 class Trainer:
     def __init__(self, data, model, optimizer, early_stopper, NUM_EPOCH, BATCH_SIZE, args):

@@ -2,12 +2,12 @@ import os
 
 from data.data import Data
 
-from trainer.trainer_utils import setup_model, setup_optimizer
-from trainer.trainer import Trainer
+from src.components.trainer.trainer_utils import setup_model, setup_optimizer
+from src.components.trainer.trainer import Trainer
 
-from utils.parse import parse_training_args
-from utils.utils import EarlyStopMonitor, make_pred_df, set_seed
-from utils.consts import *
+from src.components.utils.parse import parse_training_args
+from src.components.utils.utils import EarlyStopMonitor, make_pred_df, set_seed
+from src.components.utils.consts import *
 
 import warnings
 warnings.filterwarnings("ignore")

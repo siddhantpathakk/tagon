@@ -8,7 +8,7 @@ from sklearn.metrics import average_precision_score, f1_score, roc_auc_score
 from sklearn.preprocessing import MinMaxScaler
 
 import multiprocessing
-import trainer.evaluation.metrics as metrics
+from src.components.trainer.evaluation.metrics import *
 import math
 
 Ks = [10, 20]
@@ -44,12 +44,12 @@ def eval_one_user(x):
 
     precision, recall, ndcg, hit_ratio = [], [], [], []
     for K in Ks:
-        precision.append(metrics.precision_at_k(r, K))
-        recall.append(metrics.recall_at_k(r, K, 1))
-        ndcg.append(metrics.ndcg_at_k(r, K))
-        hit_ratio.append(metrics.hit_at_k(r, K))
-    auc = metrics.auc(ground_truth=labels, prediction=posterior)
-    mrr = metrics.mrr(r)
+        precision.append(precision_at_k(r, K))
+        recall.append(recall_at_k(r, K, 1))
+        ndcg.append(ndcg_at_k(r, K))
+        hit_ratio.append(hit_at_k(r, K))
+    auc = auc(ground_truth=labels, prediction=posterior)
+    mrr = mrr(r)
 
 
     result['precision'] += precision
