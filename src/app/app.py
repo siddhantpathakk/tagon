@@ -4,26 +4,14 @@ import pandas as pd
 import plotly.express as px
 
 from src.components.trainer.trainer import Trainer
-from src.components.utils.parse import parse_app_args
-from src.components.trainer.trainer_utils import setup_model
-from src.components.utils.utils import set_seed
+from src.components.utils.parse import parse_training_args
+from src.components.trainer.trainer_utils import setup_model, setup_optimizer
+from src.components.utils.utils import EarlyStopMonitor, set_seed
 from src.components.data.data import Data
-
-
-def get_user_hist(dataset, user_id):
-    configfile_path = f"src/config/{dataset}.json"
-    args = parse_app_args(configfile_path)
-    DATASET = args.data
-    USER_ID = user_id
-    set_seed(args.seed)
-    data = Data(DATASET, args)
-    user_history = data.get_user_history(USER_ID)
-    return user_history
-
+from src.components.utils.consts import *
 
 def get_output(dataset, user_id):
-    configfile_path = f"src/config/{dataset}.json"
-    args = parse_app_args(configfile_path)
+    args = parse_training_args(dataset=dataset)
 
     BATCH_SIZE = args.bs
     NUM_NEIGHBORS = args.n_degree
@@ -31,32 +19,50 @@ def get_output(dataset, user_id):
     NUM_HEADS = args.n_head
     DROP_OUT = args.drop_out
     GPU = args.gpu
+    NEW_NODE = args.new_node
     USE_TIME = args.time
     AGG_METHOD = args.agg_method
     ATTN_MODE = args.attn_mode
     SEQ_LEN = NUM_NEIGHBORS
     DATASET = args.data
     NUM_LAYER = args.n_layer
+    LEARNING_RATE = args.lr
     NODE_DIM = args.node_dim
     TIME_DIM = args.time_dim
+    test_mode = False
+    infer_mode = True 
     USER_ID = user_id
+
+    cwd = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 
     set_seed(args.seed)
 
     data = Data(DATASET, args)
+    n_nodes = data.max_idx
+    n_edges = data.num_total_edges
+    print('Number of nodes:', n_nodes)
+    print('Number of edges:', n_edges)
 
-    pretrain = f'src/components/tmp/ckpts/slab/{DATASET}/{DATASET}_TARGON.pt'
+    user_history = data.get_user_history(USER_ID)
+    print('User history', '\n', user_history)
 
-    model = setup_model(data, args, data.max_idx, GPU, NUM_LAYER, USE_TIME, AGG_METHOD,
-                        ATTN_MODE, SEQ_LEN, NUM_HEADS, DROP_OUT, NODE_DIM, TIME_DIM,
+    pretrain = pretrain_app_path_slab(args, cwd)
+
+    model = setup_model(data, args, data.max_idx, GPU, NUM_LAYER, USE_TIME, AGG_METHOD, ATTN_MODE, SEQ_LEN, NUM_HEADS, DROP_OUT, NODE_DIM, TIME_DIM,
                         load_pretrain=pretrain)
+    optimizer = setup_optimizer(model, LEARNING_RATE, load_pretrain=pretrain)
+    early_stopper = EarlyStopMonitor(max_round=5, higher_better=True)
+    trainer = Trainer(data, model, optimizer, early_stopper,
+                      NUM_EPOCH, BATCH_SIZE, args)
 
-    trainer = Trainer(data, model,
-                      optimizer=None, early_stopper=None,
-                      NUM_EPOCH=NUM_EPOCH, BATCH_SIZE=BATCH_SIZE, args=args)
+    if infer_mode:
+        result, output = trainer.test(user_id=USER_ID)
+        print(result)
+        print(output)   
+    
+    return user_history, output
 
-    _, output = trainer.test(user_id=USER_ID)
-    return output
+
 
 # Streamlit UI
 st.set_page_config(page_title='TAGON',
@@ -78,21 +84,21 @@ if st.sidebar.button('Load Dataset'):
     st.toast("Dataset loaded!",  icon="✅")
 
 user_id = st.sidebar.text_input("Enter User ID", "0")
-if st.sidebar.button('Load user data'):
+
+if st.sidebar.button('Predict'):
     user_id = int(user_id) 
     print(f'User ID: {user_id}')
     st.toast("User data loaded!",  icon="✅")
-
-if st.sidebar.button('Predict'):
     st.toast("Predictions completed!",  icon="✅")
+    user_hist, output = get_output(selected_dataset, user_id)
 
 st.header("Continuous Time Bipartite Graph (CTBG)")
 # # fig = px.line(load_dataset('example'), x='time', y='value')
 # # st.plotly_chart(fig)
-
+    
 if st.checkbox('View in CSV format', key='user_data'):
     st.header("CSV Data")
-    dataframe = pd.DataFrame(get_user_hist(selected_dataset, user_id))
+    dataframe = pd.DataFrame(user_hist)
     st.dataframe(dataframe)
 
 st.header("Recommendations")
@@ -101,5 +107,5 @@ st.header("Recommendations")
 
 if st.checkbox('View in CSV format', key='recs'):
     st.header("CSV Data")
-    dataframe = pd.DataFrame(get_output(selected_dataset, user_id))
+    dataframe = pd.DataFrame(output)
     st.dataframe(dataframe)
