@@ -1,0 +1,14 @@
+[theme]
+primaryColor="#e50914"
+backgroundColor="#292f33"
+secondaryBackgroundColor="#221f2f"
+textColor="#f5f5f1"
+font="sans serif"
+
+
+[logger]
+
+# Level of logging: 'error', 'warning', 'info', or 'debug'.
+level = "info"
+
+messageFormat = "%(asctime)s %(message)s"
