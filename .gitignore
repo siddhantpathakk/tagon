@@ -13,3 +13,4 @@ rank_results
 ckpts/
 tmp
 *.ipynb
+src/app/userset.json
