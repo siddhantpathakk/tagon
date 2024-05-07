@@ -8,6 +8,11 @@ from src.components.trainer.trainer_utils import bpr_loss
 from src.components.trainer.evaluation.evaluate import eval_one_epoch, eval_users
 
 class Trainer:
+    """
+    Trainer class for training the TAGON model
+    
+    Also contains methods for validation and testing
+    """
     def __init__(self, data, model, optimizer, early_stopper, NUM_EPOCH, BATCH_SIZE, args):
         self.model = model
         self.optimizer = optimizer
