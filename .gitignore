@@ -12,3 +12,4 @@ new
 rank_results
 ckpts/
 tmp
+*.ipynb
