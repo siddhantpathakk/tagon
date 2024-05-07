@@ -1,8 +1,8 @@
 import os
 import streamlit as st
 import pandas as pd
-import plotly.express as px
 
+from plot import make_ctbg
 from src.components.trainer.trainer import Trainer
 from src.components.utils.parse import parse_training_args
 from src.components.trainer.trainer_utils import setup_model, setup_optimizer
@@ -10,6 +10,7 @@ from src.components.utils.utils import EarlyStopMonitor, set_seed
 from src.components.data.data import Data
 from src.components.utils.consts import *
 
+@st.cache_data
 def get_output(dataset, user_id):
     args = parse_training_args(dataset=dataset)
 
@@ -66,8 +67,9 @@ def get_output(dataset, user_id):
 
 # Streamlit UI
 st.set_page_config(page_title='TAGON',
-                    page_icon='random',
+                   page_icon=":material/sdk:",
                     layout='wide',
+                    initial_sidebar_state='expanded',
                     menu_items={
                         "Get Help": "https://www.github.com/siddhantpathakk/tagon",
                         'About': "This is a final year project demonstration for TAGON."
@@ -79,33 +81,29 @@ st.title(f'FYP Demonstration for TAGON')
 dataset_names = ['ml-100k', 'Baby', 'Digital_Music', 'Toys_and_Games', 'Tools_and_Home_Improvement']
 
 selected_dataset = st.sidebar.selectbox("Select dataset", dataset_names, placeholder="Select a dataset")
-if st.sidebar.button('Load Dataset'):
-    print(f'Selected dataset: {selected_dataset}')
-    st.toast("Dataset loaded!",  icon="✅")
-
 user_id = st.sidebar.text_input("Enter User ID", "0")
+trim = st.sidebar.slider("Trim (for CTBG)", 1, 10, 9)
 
-if st.sidebar.button('Predict'):
+session_state = False
+if st.button('Predict'):
     user_id = int(user_id) 
-    print(f'User ID: {user_id}')
-    st.toast("User data loaded!",  icon="✅")
-    st.toast("Predictions completed!",  icon="✅")
+
+    print(f"Selected dataset: {selected_dataset}")
+    print(f"User ID: {user_id}")
     user_hist, output = get_output(selected_dataset, user_id)
-
-st.header("Continuous Time Bipartite Graph (CTBG)")
-# # fig = px.line(load_dataset('example'), x='time', y='value')
-# # st.plotly_chart(fig)
+    st.toast("Predictions completed!",  icon="✅")
+    session_state = True
     
-if st.checkbox('View in CSV format', key='user_data'):
-    st.header("CSV Data")
-    dataframe = pd.DataFrame(user_hist)
-    st.dataframe(dataframe)
+if session_state:
+    st.header("Continuous Time Bipartite Graph (CTBG)")
+    fig = make_ctbg(user_hist, selected_dataset, trim=trim)
+    st.plotly_chart(fig)
+        
+    # if st.checkbox("CSV Data"):
+    # dataframe = pd.DataFrame(user_hist)
+    # st.dataframe(dataframe)
 
-st.header("Recommendations")
-# # recs_figure = px.bar(load_user_data('example_user'), x='event', y='timestamp')
-# # st.plotly_chart(recs_figure)
-
-if st.checkbox('View in CSV format', key='recs'):
-    st.header("CSV Data")
+    st.header("Recommendations")
+    st.subheader("CSV Data")
     dataframe = pd.DataFrame(output)
     st.dataframe(dataframe)
