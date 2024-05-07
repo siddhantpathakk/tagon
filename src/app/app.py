@@ -2,7 +2,7 @@ import os
 import streamlit as st
 import pandas as pd
 
-from plot import make_ctbg
+from plot import make_ctbg, make_recgraph
 from src.components.trainer.trainer import Trainer
 from src.components.utils.parse import parse_training_args
 from src.components.trainer.trainer_utils import setup_model, setup_optimizer
@@ -88,7 +88,7 @@ user_id = int(user_id)
 
 
 st.sidebar.subheader("CTBG Settings")
-trim = st.sidebar.slider("Trim (for CTBG)", 1, 6, 4)
+trim = st.sidebar.slider("Trim (for CTBG)", 1, 20, 4)
 show_csv = st.sidebar.checkbox("Show CSV Data")
 
 session_state = False
@@ -106,16 +106,20 @@ if session_state:
     fig = make_ctbg(user_hist, selected_dataset, trim=trim)
     st.plotly_chart(fig)
         
-        
     if show_csv:
         dataframe = pd.DataFrame(user_hist)
+        dataframe = dataframe.sort_values(by='ts', ascending=False)
+        dataframe['ts'] = pd.to_datetime(dataframe['ts'], unit='s')
+        dataframe = dataframe[['u', 'i', 'ts']]
         st.dataframe(dataframe)
 
     st.header("Recommendations")
+    fig2 = make_recgraph(fig, output)
+    st.plotly_chart(fig2)
     if show_csv:
         st.subheader("CSV Data")
         dataframe = pd.DataFrame(output)
-        dataframe = dataframe.sort_values(by='timestamp', ascending=False)
+        dataframe = dataframe.sort_values(by='timestamp', ascending=True)
         dataframe['timestamp'] = pd.to_datetime(dataframe['timestamp'], unit='s')
         dataframe = dataframe[['u_pos_gd', 'timestamp', 'predicted']][::-1].reset_index(drop=True)
         st.dataframe(dataframe)
