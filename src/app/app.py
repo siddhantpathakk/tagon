@@ -1,3 +1,4 @@
+import json
 import os
 import streamlit as st
 import pandas as pd
@@ -9,6 +10,10 @@ from src.components.trainer.trainer_utils import setup_model, setup_optimizer
 from src.components.utils.utils import EarlyStopMonitor, set_seed
 from src.components.data.data import Data
 from src.components.utils.consts import *
+
+import warnings
+warnings.filterwarnings("ignore")
+
 
 @st.cache_data
 def get_output(dataset, user_id):
@@ -43,7 +48,7 @@ def get_output(dataset, user_id):
     print('Number of edges:', n_edges)
 
     user_history = data.get_user_history(USER_ID)
-    print('User history', '\n', user_history)
+    print('User history', '\n', user_history.head())    
 
     pretrain = pretrain_app_path_slab(args, cwd)
 
@@ -55,8 +60,7 @@ def get_output(dataset, user_id):
                       NUM_EPOCH, BATCH_SIZE, args)
 
     if infer_mode:
-        result, output = trainer.test(user_id=USER_ID)
-        print(result)
+        _, output = trainer.test(user_id=USER_ID)
         print(output)   
     
     return user_history, output
@@ -86,6 +90,13 @@ selected_dataset = st.sidebar.selectbox("Select dataset", dataset_names, placeho
 user_id = st.sidebar.text_input("Enter User ID", "2")
 user_id = int(user_id)
 
+userset_path = 'src/app/userset.json'
+userset_map = json.load(open(userset_path, 'r'))
+valid_user_id_flag = True
+if user_id not in userset_map[selected_dataset]:
+    st.error(f"User ID {user_id} not found in the dataset")
+    st.toast("Please enter a valid User ID", icon="🚫")
+    valid_user_id_flag = False
 
 st.sidebar.subheader("CTBG Settings")
 trim = st.sidebar.slider("Trim (for CTBG)", 1, 20, 4)
@@ -93,15 +104,16 @@ show_csv = st.sidebar.checkbox("Show CSV Data")
 
 session_state = False
 st.sidebar.subheader("Make Predictions")
-if st.sidebar.button('Predict', type='primary'):
+predict_button = st.sidebar.button('Predict', type='primary',
+                                   disabled=not valid_user_id_flag)
+if predict_button and valid_user_id_flag:
     print(f"Selected dataset: {selected_dataset}")
     print(f"User ID: {user_id}")
     user_hist, output = get_output(selected_dataset, user_id)
     session_state = True
     st.toast("Predictions completed!",  icon="✅")
     
-if session_state:
-    
+if session_state and valid_user_id_flag:
     st.header("Continuous Time Bipartite Graph (CTBG)")
     fig = make_ctbg(user_hist, selected_dataset, trim=trim)
     st.plotly_chart(fig)
@@ -119,7 +131,6 @@ if session_state:
     if show_csv:
         st.subheader("CSV Data")
         dataframe = pd.DataFrame(output)
-        dataframe = dataframe.sort_values(by='timestamp', ascending=True)
+        dataframe = dataframe.sort_values(by='timestamp', ascending=False)
         dataframe['timestamp'] = pd.to_datetime(dataframe['timestamp'], unit='s')
-        dataframe = dataframe[['u_pos_gd', 'timestamp', 'predicted']][::-1].reset_index(drop=True)
         st.dataframe(dataframe)

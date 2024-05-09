@@ -7,8 +7,12 @@ font="sans serif"
 
 
 [logger]
-
-# Level of logging: 'error', 'warning', 'info', or 'debug'.
 level = "info"
-
 messageFormat = "%(asctime)s %(message)s"
+
+
+[global]
+showWarningOnDirectExecution = false
+
+[client]
+showErrorDetails = false
