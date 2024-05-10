@@ -28,7 +28,7 @@ def parse_training_args(dataset=None):
     parser.add_argument('--gpu', type=int, default=0, help='idx for the gpu to use')
     
     parser.add_argument('--node_dim', type=int, default=8, help='Dimentions of the node embedding')
-    parser.add_argument('--time_dim', type=int, default=8, help='Dimentions of the time embedding')
+    parser.add_argument('--time_dim', type=int, default=16, help='Dimentions of the time embedding')
     
     parser.add_argument('--agg_method', type=str, choices=['attn', 'lstm', 'mean'], help='local aggregation method', default='attn')
     parser.add_argument('--attn_mode', type=str, choices=['prod', 'map'], default='map', help='use dot product attention or mapping based')
