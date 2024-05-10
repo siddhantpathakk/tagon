@@ -102,19 +102,19 @@ def run(data_name):
     print("#u", len(u_ind_id_map))
     print("#i", len(i_ind_id_map))
 
-    new_df = reindex(df)
+    # new_df = reindex(df)
     
-    print(feat.shape)
-    empty = np.zeros(feat.shape[1])[np.newaxis, :]
-    feat = np.vstack([empty, feat])
+    # print(feat.shape)
+    # empty = np.zeros(feat.shape[1])[np.newaxis, :]
+    # feat = np.vstack([empty, feat])
     
-    max_idx = max(new_df.u.max(), new_df.i.max())
-    rand_feat = np.zeros((max_idx + 1, feat.shape[1]))
+    # max_idx = max(new_df.u.max(), new_df.i.max())
+    # rand_feat = np.zeros((max_idx + 1, feat.shape[1]))
     
-    print(feat.shape)
-    new_df.to_csv(OUT_DF, index=False)
-    np.save(OUT_FEAT, feat)
-    np.save(OUT_NODE_FEAT, rand_feat)
+    # print(feat.shape)
+    # new_df.to_csv(OUT_DF, index=False)
+    # np.save(OUT_FEAT, feat)
+    # np.save(OUT_NODE_FEAT, rand_feat)
     
 
 
