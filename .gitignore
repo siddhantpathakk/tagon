@@ -13,4 +13,4 @@ rank_results
 ckpts/
 tmp
 *.ipynb
-src/app/userset.json
+app_stateless.py
