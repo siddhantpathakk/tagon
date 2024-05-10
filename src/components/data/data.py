@@ -30,14 +30,7 @@ class Data():
         """
         logger = logging.getLogger()
         
-        
-        if user_id is not None:
-            g_df = g_df[g_df.u == user_id]
-            print(len(g_df), 'interactions for user', user_id)
-            val_time, test_time = list(np.quantile(g_df.ts, [0.00, 0.01]))
-            print(val_time, test_time)
-        else:  
-            val_time, test_time = list(np.quantile(g_df.ts, [0.80, 0.90]))
+        val_time, test_time = list(np.quantile(g_df.ts, [0.80, 0.90]))
         
         src_l = g_df.u.values
         dst_l = g_df.i.values
