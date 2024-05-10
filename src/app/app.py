@@ -68,8 +68,7 @@ st.set_page_config(page_title='TAGON',
                    menu_items={
                        "Get Help": "https://www.github.com/siddhantpathakk/tagon",
                        'About': "This is a final year project demonstration for TAGON."
-                   }
-                   )
+                   })
 
 st.title('FYP Demonstration for TAGON')
 
@@ -122,19 +121,26 @@ if 'output' in st.session_state and valid_user_id_flag:
         dataframe['ts'] = pd.to_datetime(dataframe['ts'], unit='s')
         dataframe = dataframe.sort_values(by='ts', ascending=False)
         dataframe = dataframe[['u', 'i', 'ts']].head(trim)
+        user_hist = dataframe.copy()
         st.plotly_chart(make_plotly_table(dataframe, 'User History'))
 
     st.header("Recommendations")
     out_dataframe = pd.DataFrame(st.session_state['output']).rename(
         columns={'u_pos_gd': 'i', 'u_ind': 'u', 'timestamp': 'ts'})
     out_dataframe['ts'] = pd.to_datetime(out_dataframe['ts'], unit='s')
+    
+    ts_list_historical = user_hist['i'].values
+    ts_list_new = out_dataframe['i'].values
+    common_items = list(set(ts_list_historical) & set(ts_list_new))
     reference_point = st.selectbox(
-        "Choose reference point for next-item prediction", out_dataframe['i'].unique())
+        "Choose reference point for next-item prediction", common_items, index=0)
+    out_df2 = out_dataframe.copy()
     n_recs = st.slider("Number of recommendations", 1, 20, 5)
     st.write(f"Top {n_recs} recommendations:")
-    recs = out_dataframe[out_dataframe['i'] ==
-                         reference_point]['predicted'].iloc[0][:n_recs]
+    recs = out_dataframe[out_dataframe['i'] == reference_point]['predicted'].iloc[0][:n_recs]
     st.write(' - '.join(str(x) for x in recs))
+    fig_rec = make_recgraph(user_hist, out_df2, reference_point, n_recs)
+    st.plotly_chart(fig_rec)
 
     if show_csv:
         rec_df = pd.merge(dataframe, out_dataframe, on=[

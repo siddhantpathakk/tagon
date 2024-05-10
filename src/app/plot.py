@@ -3,8 +3,9 @@ import networkx as nx
 import json
 import pandas as pd
 import datetime
+from retrieval import get_item_name, get_asin, get_review, get_categories, get_username, prepare_recs_for_graph
 
-def make_ctbg(user_hist, dataset, trim=10, theme='light'):
+def make_ctbg(user_hist, dataset, trim=10, theme='light', recs=False, n_recs=5):
     user_hist = user_hist.sort_values(by='ts', ascending=False)
     user_hist['ts'] = pd.to_datetime(user_hist['ts'], unit='s')
     user_hist = user_hist[:trim]
@@ -47,8 +48,15 @@ def make_ctbg(user_hist, dataset, trim=10, theme='light'):
     node_colors = ['#A4D4B4' if node in user_hist['u'].unique()  # else '#E4D9FF' for node in B.nodes ()]
                    else '#FFFF00' for node in B.nodes()]
     
-    for i in range(2, len(node_colors)):
-        node_colors[i] = generate_lighter_shade_of_color(node_colors[i - 1], factor=0.35)
+    # if recs true, change all from 2nd to n_recs+1 to 'red'
+    if recs:
+        for i in range(2, n_recs + 2):
+            node_colors[i-1] = "#e50914"
+    
+    elif not recs:
+        for i in range(2, len(node_colors)):
+            node_colors[i] = generate_lighter_shade_of_color(node_colors[i - 1], factor=0.35)
+
 
     node_texts = [user_labels.get(node, item_labels.get(node, ""))
                   for node in B.nodes()]
@@ -95,53 +103,18 @@ def generate_lighter_shade_of_color(color, factor=0.5):
     new_rgb = tuple(int((255 - val) * factor + val) for val in rgb)
     return f"#{''.join([hex(val)[2:].zfill(2) for val in new_rgb])}"
 
-def get_item_name(item_id, dataset='amzn'):
-    if dataset == 'ml-100k':
-        item_df = pd.read_json(f'/Users/siddhantpathak/Desktop/Projects/tagon/processed/ml-100k_i_map.json').T
-        name = item_df[item_df['item_id'] == item_id]['title'].iloc[0] if item_id in item_df['item_id'].values else 'UNKNOWN ITEM'
-    else:
-        asin = get_asin(item_id, dataset)
-        name = get_name_from_asin(asin, dataset)
-    return name
-
-def get_name_from_asin(asin, dataset_name):
-    item_df = pd.read_csv(f'/Users/siddhantpathak/Desktop/Projects/tagon/datasets/item_meta/meta_{dataset_name}.csv')
-    name = item_df[item_df['asin'] == asin]['title'].iloc[0]
-    return name if name else ''
-
-def get_asin(item_id, dataset_name):
-    df = pd.read_csv(f'/Users/siddhantpathak/Desktop/Projects/tagon/processed/merged_ml_{dataset_name}.csv')
-    return df[df['i'] == item_id]['asin'].iloc[0]
-
-def get_review(item_id, user_id, dataset_name):
-    df = pd.read_csv(f'/Users/siddhantpathak/Desktop/Projects/tagon/datasets/review_meta/review_{dataset_name}.csv')
-    asin = get_asin(item_id, dataset_name)
-    revID = get_reviewerID(user_id, dataset_name)
-    return df[(df['asin'] == asin) & (df['reviewerID'] == revID)]['summary'].values[0]
-
-
-def get_categories(node_id, dataset_name):
-    import ast
-    asin = get_asin(node_id, dataset_name)
-    df = pd.read_csv(f'/Users/siddhantpathak/Desktop/Projects/tagon/datasets/item_meta/meta_{dataset_name}.csv')
-    cats = ast.literal_eval(df[(df['asin'] == asin)]['categories'].values[0])
-    return cats[:1] if len(cats) > 1 else cats
-
-def get_reviewerID(user_id, dataset_name):
-    df = pd.read_csv(
-        f'/Users/siddhantpathak/Desktop/Projects/tagon/processed/merged_ml_{dataset_name}.csv')
-    return df[df['u'] == user_id]['reviewerID'].iloc[0]
-
-def get_username(user_id, dataset_name):
-    reviewer_id = get_reviewerID(user_id, dataset_name)
-    df = pd.read_csv(f'/Users/siddhantpathak/Desktop/Projects/tagon/datasets/user_meta/user_{dataset_name}.csv')
-    return df[df['reviewerID'] == reviewer_id]['reviewerName'].iloc[0], reviewer_id
     
-    
-    
-def make_recgraph(ctbg, rec_output):
-    return ctbg
+def make_rec_hist(user_history, rec_output, reference_point, n_recs=5):
+    rec = prepare_recs_for_graph(rec_output, reference_point, n_recs)
+    new_user_hist = user_history.copy()
+    new_user_hist = pd.concat([new_user_hist, rec])
+    new_user_hist = new_user_hist.sort_values(by='ts', ascending=False)
+    return new_user_hist
 
+def make_recgraph(user_history, rec_output, reference_point, n_recs=5, theme='light'):
+    user_history = make_rec_hist(user_history, rec_output, reference_point, n_recs)
+    fig = make_ctbg(user_history, 'ml-100k', trim=len(user_history), theme=theme, recs=True, n_recs=n_recs)
+    return fig
 
 def make_plotly_table(df, title_):
     # Enhanced Plotly table with readability improvements
