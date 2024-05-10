@@ -13,6 +13,3 @@ messageFormat = "%(asctime)s %(message)s"
 
 [global]
 showWarningOnDirectExecution = false
-
-[client]
-showErrorDetails = false
