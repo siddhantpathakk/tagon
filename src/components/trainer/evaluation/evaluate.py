@@ -81,8 +81,6 @@ def eval_users(tgrec, src, dst, ts, train_src, train_dst, args, user_id=None):
     
     cores = multiprocessing.cpu_count()
     userset = set(src)
-    print('num users: ', len(userset))
-    print(list(userset)[:20])
     train_itemset = set(train_dst)
     pos_edges = {}
     for u, i, t in zip(src, dst, ts):
@@ -110,7 +108,7 @@ def eval_users(tgrec, src, dst, ts, train_src, train_dst, args, user_id=None):
     preds_num_candidates = []
 
     test_outputs = []
-    num_interactions = 0
+    num_interactions = 1
     num_test_instances = 0
     with torch.no_grad():
         tgrec = tgrec.eval()
@@ -204,13 +202,13 @@ def eval_users(tgrec, src, dst, ts, train_src, train_dst, args, user_id=None):
                 batch_test_items = []
                 batch_ts = []
 
-    print('num_interactions: ', num_interactions)
-    result['precision'] /= num_interactions
-    result['recall'] /= num_interactions
-    result['ndcg'] /= num_interactions
-    result['hit_ratio'] /= num_interactions
-    result['auc'] /= num_interactions
-    result['mrr'] /= num_interactions
+    # print('num_interactions: ', num_interactions)
+    # result['precision'] /= num_interactions
+    # result['recall'] /= num_interactions
+    # result['ndcg'] /= num_interactions
+    # result['hit_ratio'] /= num_interactions
+    # result['auc'] /= num_interactions
+    # result['mrr'] /= num_interactions
 
     return result, test_outputs
 
