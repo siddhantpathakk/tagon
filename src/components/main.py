@@ -36,7 +36,7 @@ if __name__ == '__main__':
     TIME_DIM = args.time_dim
     test_mode = True if args.test_mode else False
     infer_mode = True if args.infer_mode else False
-    USER_ID = 2
+    USER_ID = 16414
     
     print('Please note that the test mode is set to True. This means that the model will not be trained, but only tested on the test set/user.') if test_mode else print('Testing mode is set to False. The model will be trained only.')
     print('Please note that the inference mode is set to True. This means that the model will not be trained, but only used to infer the results.') if infer_mode else None
@@ -73,6 +73,7 @@ if __name__ == '__main__':
         result, output = trainer.test(user_id=USER_ID)
         print(result)
         output_df = make_pred_df(output)
+        print(output_df)
         output_df.to_csv(infer_output_path(args, cwd, USER_ID), index=False)
         
     trainer.save_model(SAVE_MODEL_DIR(args)) if not test_mode and not infer_mode else None
