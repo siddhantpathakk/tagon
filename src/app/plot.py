@@ -108,8 +108,9 @@ def make_rec_hist(user_history, rec_output, reference_point, n_recs=5):
 
 def make_ctbg_with_recommendations(user_hist, dataset, trim=10, theme='light', reference_id=None, recommendations=None):
     # Preparing the historical and recommendation data
-    user_hist = user_hist.sort_values(by='ts', ascending=False).head(trim)
+    user_hist = user_hist.sort_values(by='ts', ascending=False)
     user_hist['ts'] = pd.to_datetime(user_hist['ts'], unit='s')
+    user_hist = user_hist[:trim]
 
     # Graph construction
     B = nx.DiGraph()
@@ -159,24 +160,34 @@ def make_ctbg_with_recommendations(user_hist, dataset, trim=10, theme='light', r
     node_x = [pos[node][0] for node in B.nodes()]
     node_y = [pos[node][1] for node in B.nodes()]
 
-    # node colors: user nodes are green, historical items are blue, recommendations are red
-    node_colors = [
-        '#A4D4B4' if node in user_nodes else '#FFFF00' if node in item_nodes else '#FF0000' for node in B.nodes()]
+    # node_counter = 0
+    # node_colors = []
+    # for node in B.nodes():
+    #     if node in user_nodes:
+    #         node_colors.append('#A4D4B4')
+    #     if node in item_nodes:
+    #         base_color = '#FFD700' if node_counter == 0 else node_colors[node_counter - 1]
+    #         new_node_color = generate_lighter_shade_of_color(base_color, factor=0.05)
+    #         node_colors.append(new_node_color)
+    #         node_counter += 1
+    #     if node in recommendations:
+    #         node_colors.append('#FF0000')
 
-    # # Generate lighter shades of colors for the historical items
-    # for i in range(2, len(node_colors)):
-    #     node_colors[i] = generate_lighter_shade_of_color(node_colors[i - 1], factor=0.35)
+    node_colors = ['#A4D4B4' if node in user_nodes else '#FFFF00' if node in item_nodes else '#FF0000' for node in B.nodes()]
+
+    print(node_colors)
+
 
     node_texts = []
     for index, node in enumerate(B.nodes()):
         if node in user_nodes:
-            node_texts.append(f"u<sub>{index + 1}</sub>")
+            node_texts.append(f"user")
         elif node in recommendations:
             ref_index = list(B.nodes()).index(reference_id) + 1
             order = recommendations.index(node) + 1
             node_texts.append(f"i<sub>{ref_index},{order}</sub>")
         else:
-            node_texts.append(f"i<sub>{index + 1}</sub>")
+            node_texts.append(f"item")
 
 
     # More informative hover texts
@@ -207,21 +218,47 @@ def make_ctbg_with_recommendations(user_hist, dataset, trim=10, theme='light', r
                 hover_texts.append(
                     f"""<b>Graph Node ID:</b> {node}<br><b>ASIN:</b> {get_asin(node, dataset)}<br><b>Item Name:</b> {get_item_name(node, dataset)}<br><b>Interacted on:</b> {user_hist[user_hist['i'] == node]['ts'].iloc[0].strftime('%d-%B-%Y %I:%M%p')}<br><b>Review given:</b> "{get_review(node, user_id, dataset)}"<br><b>Categories:</b> {get_categories(node, dataset)}""")
 
-
-    fig = go.Figure()
+    fig = go.Figure(layout=dict(
+        xaxis=dict(showgrid=False, zeroline=False,
+                   showticklabels=False),
+        yaxis=dict(showgrid=False, zeroline=False,
+                   showticklabels=False),
+        autosize=True,
+        hovermode='closest'
+    ))
+    
     fig.add_trace(go.Scatter(x=edge_x, y=edge_y, mode='lines',
                   line=dict(width=0.5, color='#e50914'), hoverinfo='none'))
+    
     fig.add_trace(go.Scatter(x=node_x, y=node_y, mode='markers+text', text=node_texts,
                              marker=dict(size=30, color=node_colors),
                              hoverinfo='text', hovertext=hover_texts, textposition='middle center',
                                 hoverlabel=dict(bgcolor='white',
                                                 bordercolor=node_colors,
                                                 font=dict(
-                                                    color='black', family='Times New Roman', size=14),
-                                                align="left"),
-                                textfont=dict(size=16, family='Open Sans, sans-serif', color='black')))
+                                                    color='black', family='Times New Roman', size=14), align="left"),
+                                textfont=dict(size=10, family='Open Sans, sans-serif', color='black')))
 
     fig.update_layout(showlegend=False, xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
-                      yaxis=dict(showgrid=False, zeroline=False, showticklabels=False), margin=dict(l=0, r=0, t=0, b=0))
+                      yaxis=dict(showgrid=False, zeroline=False, showticklabels=False), margin=dict(l=0, r=0, t=10, b=10))
+    
+    annotation_text = f'<b>Reference Point:</b> i<sub>{list(B.nodes()).index(reference_id) + 1}</sub><br>'
+    annotation_text += "Recommendations are ranked in order of preference, from bottom to top, with the bottom being the most preferred."
+
+    # fig.add_annotation(
+    #     text=annotation_text,
+    #     align='left',
+    #     showarrow=False,
+    #     xref='paper',
+    #     yref='paper',
+    #     borderpad=6,
+    #     bgcolor='black',
+    #     bordercolor='mediumseagreen',
+    #     borderwidth=1,
+    #     font_size=13,
+    #     font=dict(color='white', family='Arial, sans-serif', size=19),
+    #     xanchor='left',
+    #     yanchor='bottom'
+    # )
     
     return fig
