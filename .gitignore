@@ -14,3 +14,7 @@ ckpts/
 tmp
 *.ipynb
 app_stateless.py
+*.csv
+*.npy
+# *.json m 
+datasets/
