@@ -1,7 +1,6 @@
 import json
 import numpy as np
 import pandas as pd
-import gzip
 
 def preprocess(data_name, meta_path):
     u_list, i_list, ts_list, label_list = [], [], [], []
