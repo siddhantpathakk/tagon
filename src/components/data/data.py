@@ -13,8 +13,8 @@ class Data():
         args: argparse.ArgumentParser, the argument parser.        
     """
     def __init__(self, DATASET, args, user_id=None):
-        ### Load data and train val test split
-        g_df = pd.read_csv('./processed/ml_{}.csv'.format(DATASET))
+        root = f'/Users/siddhantpathak/Desktop/Projects/tagon/'
+        g_df = pd.read_csv(root + 'datasets/{}/data/ml_{}.csv'.format(DATASET, DATASET))
         self.g_df = g_df
         self.args = args
         self.split_data(g_df, args, user_id)
