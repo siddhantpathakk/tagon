@@ -1,5 +1,8 @@
 import pandas as pd
 
+import warnings
+warnings.filterwarnings("ignore")
+
 def get_item_name(item_id, dataset='amzn'):
     if dataset == 'ml-100k':
         item_df = pd.read_json(
@@ -56,6 +59,8 @@ def get_username(user_id, dataset_name):
 
 
 def prepare_recs_for_graph(recs, reference_point, n_recs):
+    n_recs = int(n_recs)
+    reference_point = int(reference_point)
     rec = recs[recs['i'] == reference_point]['predicted'].iloc[0][:n_recs]
     timestamp = recs[recs['i'] == reference_point]['ts'].iloc[0]
     user = recs[recs['i'] == reference_point]['u'].iloc[0]
@@ -64,4 +69,6 @@ def prepare_recs_for_graph(recs, reference_point, n_recs):
         'i': rec,
         'ts': [timestamp] * n_recs
     }
-    return pd.DataFrame(rec_dict)
+    rec_df = pd.DataFrame(rec_dict)
+    print(rec_df)
+    return rec_df

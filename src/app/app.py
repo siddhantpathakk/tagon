@@ -3,7 +3,7 @@ import os
 import streamlit as st
 import pandas as pd
 
-from plot import make_ctbg, make_plotly_table, make_recgraph
+from plot import make_ctbg, make_plotly_table, make_ctbg_with_recommendations
 from src.components.trainer.trainer import Trainer
 from src.components.utils.parse import parse_training_args
 from src.components.trainer.trainer_utils import setup_model, setup_optimizer
@@ -139,9 +139,13 @@ if 'output' in st.session_state and valid_user_id_flag:
     st.write(f"Top {n_recs} recommendations:")
     recs = out_dataframe[out_dataframe['i'] == reference_point]['predicted'].iloc[0][:n_recs]
     st.write(' - '.join(str(x) for x in recs))
-    fig_rec = make_recgraph(user_hist, out_df2, reference_point, n_recs)
+    
+    st.write(f'reference_point: {reference_point, type(reference_point)}')
+    fig_rec = make_ctbg_with_recommendations(user_hist, selected_dataset, trim=trim, 
+                                             reference_id=reference_point, 
+                                             recommendations=recs)
     st.plotly_chart(fig_rec)
-
+    
     if show_csv:
         rec_df = pd.merge(dataframe, out_dataframe, on=[
                           'u', 'ts', 'i'], how='outer').dropna()
