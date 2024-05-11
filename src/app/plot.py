@@ -1,8 +1,6 @@
 import plotly.graph_objects as go
 import networkx as nx
-import json
 import pandas as pd
-import datetime
 from retrieval import get_item_name, get_asin, get_review, get_categories, get_username, prepare_recs_for_graph
 
 def make_ctbg(user_hist, dataset, trim=10, theme='light'):
@@ -107,31 +105,6 @@ def make_rec_hist(user_history, rec_output, reference_point, n_recs=5):
     return new_user_hist
 
 
-def make_plotly_table(df, title_):
-    # Enhanced Plotly table with readability improvements
-    fig = go.Figure(data=[go.Table(
-        header=dict(
-            values=list(df.columns),
-            fill_color='navy',  # Darker color for header
-            align='left',
-            # White text on navy background, larger font
-            font=dict(color='white', size=12)
-        ),
-        cells=dict(
-            values=[df[col] for col in df.columns],
-            fill_color='lavender',
-            align='left',
-            # Slightly larger font for cells
-            font=dict(color='black', size=11),
-            height=30  # Taller cells for better readability
-        )
-    )],
-        layout=go.Layout(
-        title=go.layout.Title(text=title_),
-        title_font=dict(size=16)  # Larger title font
-    ))
-    return fig
-
 
 def make_ctbg_with_recommendations(user_hist, dataset, trim=10, theme='light', reference_id=None, recommendations=None):
     # Preparing the historical and recommendation data
@@ -185,18 +158,15 @@ def make_ctbg_with_recommendations(user_hist, dataset, trim=10, theme='light', r
     # Node colors and labels
     node_x = [pos[node][0] for node in B.nodes()]
     node_y = [pos[node][1] for node in B.nodes()]
-    # node_colors = [
-    #     '#A4D4B4' if node in user_nodes else '#ADD8E6' for node in B.nodes()]
 
-    # # Make all recommendation node
- 
     # node colors: user nodes are green, historical items are blue, recommendations are red
     node_colors = [
         '#A4D4B4' if node in user_nodes else '#FFFF00' if node in item_nodes else '#FF0000' for node in B.nodes()]
 
-    # Node labels and hover texts
-    # node_texts = [f"u<sub>{index + 1}</sub>" if node in user_nodes else f"i<sub>{index + 1}</sub>"
-    #                 for index, node in enumerate(B.nodes())]
+    # # Generate lighter shades of colors for the historical items
+    # for i in range(2, len(node_colors)):
+    #     node_colors[i] = generate_lighter_shade_of_color(node_colors[i - 1], factor=0.35)
+
     node_texts = []
     for index, node in enumerate(B.nodes()):
         if node in user_nodes:
@@ -208,8 +178,6 @@ def make_ctbg_with_recommendations(user_hist, dataset, trim=10, theme='light', r
         else:
             node_texts.append(f"i<sub>{index + 1}</sub>")
 
-
-    # Position the user node centered wrt historical items
 
     # More informative hover texts
     hover_texts = []
@@ -223,10 +191,13 @@ def make_ctbg_with_recommendations(user_hist, dataset, trim=10, theme='light', r
                 hover_texts.append(
                     f"""<b>Graph Node ID:</b> {node}<br><b>Username:</b> {get_username(node, dataset)[0]}<br><b>User ID:</b> {get_username(node, dataset)[1]}""")
             user_id = node
-        elif node in recommendations:
+        elif node in recommendations and dataset != 'ml-100k':
+            # Recommendation node hover text
+            hover_texts.append(f"<b>Item ID:</b> {node}<br><b>Item Name:</b> {get_item_name(node, dataset)}<br><b>Categories:</b> {get_categories(node, dataset)}")
+        elif node in recommendations and dataset == 'ml-100k':
             # Recommendation node hover text
             hover_texts.append(
-                f"<b>Item ID:</b> {node}<br><b>Item Name:</b> {get_item_name(node, dataset)}<br><b>Categories:</b> {get_categories(node, dataset)}")
+                f"<b>Item ID:</b> {node}<br><b>Item Name:</b> {get_item_name(node, dataset)}")
         else:
             # Historical item node hover text
             if dataset == 'ml-100k':
