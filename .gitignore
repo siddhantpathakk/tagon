@@ -16,5 +16,5 @@ tmp
 app_stateless.py
 *.csv
 *.npy
-# *.json m 
-datasets/
+*.json 
+# datasets/
