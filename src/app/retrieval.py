@@ -3,7 +3,8 @@ import pandas as pd
 import warnings
 warnings.filterwarnings("ignore")
 
-root = '/Users/siddhantpathak/Desktop/Projects/tagon/'
+# root = '/Users/siddhantpathak/Desktop/Projects/tagon/'
+root = '/home/FYP/siddhant005/tagon/'
 
 def get_item_name(item_id, dataset):
     if dataset == 'ml-100k':

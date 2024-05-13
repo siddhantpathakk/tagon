@@ -10,7 +10,7 @@ datasets = [
 ]
 
 root = f'/Users/siddhantpathak/Desktop/Projects/tagon/datasets/'
-
+# root = f'/home/FYP/siddhant005/tagon/datasets/'
 for dataset_name in datasets:
     print(f"Processing {dataset_name} dataset")
     data_ml_csv = pd.read_csv(root + f'{dataset_name}/data/ml_{dataset_name}.csv')

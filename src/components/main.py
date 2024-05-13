@@ -1,13 +1,14 @@
 import os
+import random
 
 from data.data import Data
 
-from src.components.trainer.trainer_utils import setup_model, setup_optimizer
-from src.components.trainer.trainer import Trainer
+from trainer.trainer_utils import setup_model, setup_optimizer
+from trainer.trainer import Trainer
 
-from src.components.utils.parse import parse_training_args
-from src.components.utils.utils import EarlyStopMonitor, make_pred_df, set_seed
-from src.components.utils.consts import *
+from utils.parse import parse_training_args
+from utils.utils import EarlyStopMonitor, make_pred_df, set_seed
+from utils.consts import *
 
 import warnings
 warnings.filterwarnings("ignore")
@@ -36,44 +37,52 @@ if __name__ == '__main__':
     TIME_DIM = args.time_dim
     test_mode = True if args.test_mode else False
     infer_mode = True if args.infer_mode else False
-    USER_ID = 16414
-    
-    print('Please note that the test mode is set to True. This means that the model will not be trained, but only tested on the test set/user.') if test_mode else print('Testing mode is set to False. The model will be trained only.')
-    print('Please note that the inference mode is set to True. This means that the model will not be trained, but only used to infer the results.') if infer_mode else None
-    
-    cwd = os.path.dirname(os.path.realpath(__file__))
-    os.mkdir(SAVE_MODEL_DIR(args, cwd)) if not os.path.isdir(SAVE_MODEL_DIR(args, cwd)) else None
+    userset = [4102, 2062, 19, 2070, 2072, 2079, 38, 40, 2089, 42, 45, 4142, 2094, 2096, 53, 2110]
 
-    set_seed(args.seed)
-    
-    data = Data(DATASET, args)
-    n_nodes = data.max_idx
-    n_edges = data.num_total_edges
 
-    user_history = data.get_user_history(USER_ID)
-    print('User history','\n', user_history)
-    user_history.to_csv(user_history_path(args, cwd, USER_ID), index=False)
     
-    pretrain = pretrain_path_slab(args, cwd) if not test_mode else None
-    
-    model = setup_model(data, args, data.max_idx, GPU, NUM_LAYER, USE_TIME, AGG_METHOD, ATTN_MODE, SEQ_LEN, NUM_HEADS, DROP_OUT, NODE_DIM, TIME_DIM, 
-                        load_pretrain=pretrain)
-    optimizer = setup_optimizer(model, LEARNING_RATE, load_pretrain=pretrain)
-    early_stopper = EarlyStopMonitor(max_round=5, higher_better=True)
-    trainer = Trainer(data, model, optimizer, early_stopper, NUM_EPOCH, BATCH_SIZE, args)
-    
-    trainer.train() if not test_mode and not infer_mode else None
-    
-    if test_mode:
-        result, output = trainer.test()
-        print(result)
-        print(output)
-    
-    if infer_mode:
-        result, output = trainer.test(user_id=USER_ID)
-        print(result)
-        output_df = make_pred_df(output)
-        print(output_df)
-        output_df.to_csv(infer_output_path(args, cwd, USER_ID), index=False)
+    for user in userset:
+        USER_ID = user
+        print('User ID:', user)
+            
+        print('Please note that the test mode is set to True. This means that the model will not be trained, but only tested on the test set/user.') if test_mode else print('Testing mode is set to False. The model will be trained only.')
+        print('Please note that the inference mode is set to True. This means that the model will not be trained, but only used to infer the results.') if infer_mode else None
         
-    trainer.save_model(SAVE_MODEL_DIR(args)) if not test_mode and not infer_mode else None
+        cwd = os.path.dirname(os.path.realpath(__file__))
+        os.mkdir(SAVE_MODEL_DIR(args, cwd)) if not os.path.isdir(SAVE_MODEL_DIR(args, cwd)) else None
+
+        set_seed(args.seed)
+        
+        data = Data(DATASET, args)
+        n_nodes = data.max_idx
+        n_edges = data.num_total_edges
+
+        user_history = data.get_user_history(USER_ID)
+        print('User history','\n', user_history)
+        user_history.to_csv(user_history_path(args, cwd, USER_ID), index=False)
+        
+        # pretrain = pretrain_path_slab(args, cwd) if not test_mode else None
+        pretrain = '/home/FYP/siddhant005/tagon/src/components/tmp/LATEST/Digital_Music-5_TAGON.pt'
+
+        
+        model = setup_model(data, args, data.max_idx, GPU, NUM_LAYER, USE_TIME, AGG_METHOD, ATTN_MODE, SEQ_LEN, NUM_HEADS, DROP_OUT, NODE_DIM, TIME_DIM, 
+                            load_pretrain=pretrain)
+        optimizer = setup_optimizer(model, LEARNING_RATE, load_pretrain=pretrain)
+        early_stopper = EarlyStopMonitor(max_round=5, higher_better=True)
+        trainer = Trainer(data, model, optimizer, early_stopper, NUM_EPOCH, BATCH_SIZE, args)
+        
+        trainer.train() if not test_mode and not infer_mode else None
+        
+        if test_mode:
+            result, output = trainer.test()
+            print(result)
+            print(output)
+        
+        if infer_mode:
+            result, output = trainer.test(user_id=USER_ID)
+            print(result)
+            output_df = make_pred_df(output)
+            print(output_df)
+            output_df.to_csv(infer_output_path(args, cwd, USER_ID), index=False)
+            
+        trainer.save_model(SAVE_MODEL_DIR(args)) if not test_mode and not infer_mode else None

@@ -13,7 +13,8 @@ class Data():
         args: argparse.ArgumentParser, the argument parser.        
     """
     def __init__(self, DATASET, args, user_id=None):
-        root = f'/Users/siddhantpathak/Desktop/Projects/tagon/'
+        # root = f'/Users/siddhantpathak/Desktop/Projects/tagon/'
+        root = f'/home/FYP/siddhant005/tagon/'
         g_df = pd.read_csv(root + 'datasets/{}/data/ml_{}.csv'.format(DATASET, DATASET))
         self.g_df = g_df
         self.args = args
@@ -30,7 +31,13 @@ class Data():
         """
         logger = logging.getLogger()
         
-        val_time, test_time = list(np.quantile(g_df.ts, [0.80, 0.90]))
+        val_time, test_time = list(np.quantile(g_df.ts, [0.10, 0.15]))
+        
+        self.src_l = g_df.u.values
+        self.dst_l = g_df.i.values
+        self.e_idx_l = g_df.idx.values
+        self.label_l = g_df.label.values
+        self.ts_l = g_df.ts.values
         
         src_l = g_df.u.values
         dst_l = g_df.i.values

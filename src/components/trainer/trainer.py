@@ -123,9 +123,9 @@ class Trainer:
         print('Training completed')
     
     def test(self, user_id=None):
-        self.model.ngh_finder = self.data.test_train_ngh_finder
+        self.model.ngh_finder = self.data.full_ngh_finder
         print('Commence final test phase')
-        valid_result, valid_pred_output = eval_users(self.model, self.data.test_src_l, self.data.test_dst_l, self.data.test_ts_l, self.data.train_src_l, self.data.train_dst_l, self.args, user_id=user_id)
+        valid_result, valid_pred_output = eval_users(self.model, self.data.src_l, self.data.dst_l, self.data.ts_l, self.data.src_l, self.data.dst_l, self.args, user_id=user_id)
         print("Final test phase completed")
         return valid_result, valid_pred_output
 

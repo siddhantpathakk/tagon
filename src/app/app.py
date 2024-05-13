@@ -84,9 +84,9 @@ selected_dataset = st.sidebar.selectbox("Select dataset", dataset_names, index=d
     st.session_state.get('selected_dataset', dataset_names[0])))
 
 default_user_id = userset_map[selected_dataset][0]
-# user_id = st.sidebar.text_input("Enter User ID (randomly chosen by default)", str(st.session_state.get('user_id', default_user_id)))
 user_id = st.sidebar.selectbox("Select User ID", userset_map[selected_dataset], index=userset_map[selected_dataset].index(
     st.session_state.get('user_id', default_user_id)))
+# user_id = st.sidebar.text_input("Enter User ID (randomly chosen by default)", str(st.session_state.get('user_id', default_user_id)))
 user_id = int(user_id)
 
 # Validity check for User ID
@@ -102,10 +102,13 @@ show_csv = st.sidebar.checkbox("Show CSV Data", value=True, disabled=True)
 
 # Prediction Button
 n_recs = st.sidebar.slider("Number of recommendations to make", 1, 20, 5)
-predict_button = st.sidebar.button('Predict', disabled=not valid_user_id_flag, )
+predict_button = st.sidebar.button('Predict', 
+                                #    disabled=not valid_user_id_flag, 
+                                   )
 
 # Process predictions
 if predict_button and valid_user_id_flag and n_recs > 0:
+# if predict_button and n_recs > 0:
     st.toast("Running predictions...", icon="⏳")
     user_hist, output = get_output(selected_dataset, user_id)
     st.session_state['user_hist'] = user_hist
@@ -114,22 +117,22 @@ if predict_button and valid_user_id_flag and n_recs > 0:
 
 # Display Results
 if 'output' in st.session_state and valid_user_id_flag:
+# if 'output' in st.session_state:
     st.header("Continuous Time Bipartite Graph (CTBG)")
     fig = make_ctbg(st.session_state['user_hist'], selected_dataset, trim=trim, theme=st.get_option("theme.backgroundColor"))
     st.plotly_chart(fig)
 
-    # if show_csv:
-    #     dataframe = pd.DataFrame(st.session_state['user_hist'])
-    #     dataframe['ts'] = pd.to_datetime(dataframe['ts'], unit='s')
-    #     dataframe = dataframe.sort_values(by='ts', ascending=False)
-    #     dataframe = dataframe[['u', 'i', 'ts']].head(trim)
-    #     user_hist = dataframe.copy()
-    #     st.dataframe(dataframe, hide_index=True, width=1000)
+    dataframe = pd.DataFrame(st.session_state['user_hist'])
+    dataframe['ts'] = pd.to_datetime(dataframe['ts'], unit='s')
+    dataframe = dataframe.sort_values(by='ts', ascending=False)
+    dataframe = dataframe[['u', 'i', 'ts']].head(trim)
+    user_hist = dataframe.copy()
+    if show_csv:
+        st.dataframe(dataframe, hide_index=True, width=1000)
 
-    
     out_dataframe = pd.DataFrame(st.session_state['output']).rename(columns={'u_pos_gd': 'i', 'u_ind': 'u', 'timestamp': 'ts'})
     out_dataframe['ts'] = pd.to_datetime(out_dataframe['ts'], unit='s')
-    
+    # st.dataframe(out_dataframe, hide_index=True, width=1000)
     ts_list_historical = user_hist['i'].values
     ts_list_new = out_dataframe['i'].values
     common_items = list(set(ts_list_historical) & set(ts_list_new))
@@ -148,8 +151,8 @@ if 'output' in st.session_state and valid_user_id_flag:
                                                 recommendations=recs)
         st.plotly_chart(fig_rec)
         
-        # if show_csv:
-        #     rec_df = pd.merge(dataframe, out_dataframe, on=['u', 'ts', 'i'], how='outer').dropna()
-        #     rec_df['ts'] = pd.to_datetime(rec_df['ts'], unit='s')
-        #     rec_df['predicted'] = rec_df['predicted'].apply(lambda x: x[:5])
-        #     st.dataframe(rec_df, hide_index=True, width=1000)
+        if show_csv:
+            rec_df = pd.merge(dataframe, out_dataframe, on=['u', 'ts', 'i'], how='outer').dropna()
+            rec_df['ts'] = pd.to_datetime(rec_df['ts'], unit='s')
+            rec_df['predicted'] = rec_df['predicted'].apply(lambda x: x[:5])
+            st.dataframe(rec_df, hide_index=True, width=1000)
